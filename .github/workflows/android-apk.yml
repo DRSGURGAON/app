@@ -1,0 +1,40 @@
+# Builds an installable debug-signed-free RELEASE APK on GitHub's runners. NOT RUN in the authoring environment.
+# Required repo secrets: API_URL (https://api.your-domain), KEYSTORE_BASE64, KEYSTORE_PASSWORD, KEY_ALIAS, KEY_PASSWORD
+# Optional: GOOGLE_SERVICES_JSON (base64) to enable push notifications.
+name: Android APK
+on: { workflow_dispatch: {} }
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    defaults: { run: { working-directory: apps/mobile } }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm, cache-dependency-path: apps/mobile/package-lock.json }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - run: npm ci
+      - name: Generate google-services.json (optional)
+        env: { GS: "${{ secrets.GOOGLE_SERVICES_JSON }}" }
+        run: if [ -n "$GS" ]; then echo "$GS" | base64 -d > google-services.json; fi
+      - run: npx expo prebuild --platform android --no-install
+        env: { EXPO_PUBLIC_API_URL: "${{ secrets.API_URL }}" }
+      - name: Configure release signing
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore
+          cat >> android/gradle.properties <<EOF
+          RELEASE_STORE_FILE=release.keystore
+          RELEASE_STORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD }}
+          RELEASE_KEY_ALIAS=${{ secrets.KEY_ALIAS }}
+          RELEASE_KEY_PASSWORD=${{ secrets.KEY_PASSWORD }}
+          EOF
+          python3 - <<'PY'
+          import re
+          p='android/app/build.gradle'; s=open(p).read()
+          s=s.replace("signingConfigs {","signingConfigs {\n        release {\n            storeFile file(RELEASE_STORE_FILE)\n            storePassword RELEASE_STORE_PASSWORD\n            keyAlias RELEASE_KEY_ALIAS\n            keyPassword RELEASE_KEY_PASSWORD\n        }",1)
+          s=re.sub(r"(buildTypes \{\s*(?:.*?\n)*?\s*release \{[^}]*?)signingConfig signingConfigs\.debug",r"\1signingConfig signingConfigs.release",s,count=1)
+          open(p,'w').write(s)
+          PY
+      - run: cd android && ./gradlew assembleRelease bundleRelease --no-daemon
+      - uses: actions/upload-artifact@v4
+        with: { name: ardh-canteen-android, path: "apps/mobile/android/app/build/outputs/**/*.apk\napps/mobile/android/app/build/outputs/**/*.aab" }

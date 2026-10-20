@@ -1,0 +1,18 @@
+# UNTESTED template. Copy .env.example values into a real .env first. Put a TLS reverse proxy (Caddy / nginx) in front.
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment: { POSTGRES_USER: ardh, POSTGRES_PASSWORD: "${DB_PASSWORD:?set DB_PASSWORD}", POSTGRES_DB: ardh_store }
+    volumes: [pgdata:/var/lib/postgresql/data]
+  api:
+    build: .
+    restart: unless-stopped
+    depends_on: [db]
+    env_file: .env
+    environment:
+      DATABASE_URL: "postgres://ardh:${DB_PASSWORD}@db:5432/ardh_store"
+      AUTO_MIGRATE: "true"
+    ports: ["127.0.0.1:4000:4000"]
+    volumes: [uploads:/data/uploads]
+volumes: { pgdata: {}, uploads: {} }

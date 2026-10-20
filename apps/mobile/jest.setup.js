@@ -1,0 +1,2 @@
+jest.mock('@react-native-async-storage/async-storage', () => { let s = {}; return { __esModule: true, default: { getItem: async (k) => (k in s ? s[k] : null), setItem: async (k, v) => { s[k] = v; }, removeItem: async (k) => { delete s[k]; }, clear: async () => { s = {}; } } }; });
+jest.mock('expo-secure-store', () => { let s = {}; return { getItemAsync: async (k) => (k in s ? s[k] : null), setItemAsync: async (k, v) => { s[k] = v; }, deleteItemAsync: async (k) => { delete s[k]; } }; });
