@@ -9,6 +9,7 @@ export interface StoreConfig {
   coins: { enabled: boolean; coin_value: number; earn_coins_per_unit: number; earn_spend_unit: number };
   first_order: { enabled: boolean; [k: string]: unknown };
   payments: { provider: string; mode: string; live: boolean };
+  upi?: { enabled: boolean };
   policies: Record<'privacy' | 'terms' | 'delivery' | 'cancellation' | 'refund', { en: string; hi: string }>;
 }
 interface Ctx { config: StoreConfig | null; loading: boolean; error: string | null; reload: () => Promise<void> }

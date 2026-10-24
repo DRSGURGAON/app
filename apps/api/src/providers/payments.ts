@@ -16,7 +16,7 @@ export type NormalizedWebhook =
   | { kind: 'ignored'; type: string };
 
 export interface PaymentProvider {
-  readonly name: 'razorpay' | 'mock';
+  readonly name: 'razorpay' | 'mock' | 'none';
   readonly mode: 'sandbox' | 'live';
   /** Public key id that the mobile SDK needs. Never the secret. */
   readonly publicKeyId: string;
@@ -128,7 +128,24 @@ export class MockPaymentProvider implements PaymentProvider {
   }
 }
 
+// ------------------------------------------------------------------ None (no gateway configured)
+// Launch mode without Razorpay: gateway checkout is switched off (see createOrder / store config), so these are never reached
+// in normal use. Webhooks are rejected because no signature can be valid.
+export class DisabledPaymentProvider implements PaymentProvider {
+  readonly name = 'none' as const;
+  readonly mode = 'live' as const;
+  readonly publicKeyId = '';
+  private off(): never { throw new Error('No online payment gateway is configured (PAYMENT_PROVIDER=none)'); }
+  async createOrder(): Promise<{ providerOrderId: string }> { return this.off(); }
+  verifyCheckoutSignature() { return false; }
+  async fetchPayment(): Promise<ProviderPayment> { return this.off(); }
+  verifyWebhookSignature() { return false; }
+  parseWebhook(p: any): NormalizedWebhook { return { kind: 'ignored', type: String(p?.event ?? 'unknown') }; }
+  async refund(): Promise<{ providerRefundId: string; status: 'pending' | 'processed' }> { return this.off(); }
+}
+
 export function createPaymentProvider(c: Config): PaymentProvider {
   if (c.PAYMENT_PROVIDER === 'razorpay') return new RazorpayProvider(c.RAZORPAY_KEY_ID, c.RAZORPAY_KEY_SECRET, c.RAZORPAY_WEBHOOK_SECRET, c.PAYMENT_MODE);
+  if (c.PAYMENT_PROVIDER === 'none') return new DisabledPaymentProvider();
   return new MockPaymentProvider();
 }

@@ -13,6 +13,7 @@ Copy `apps/api/.env.example` to `.env` (never commit it).
 * `NODE_ENV=production`, `PUBLIC_BASE_URL=https://api.example.com`, `CORS_ORIGINS=https://admin.example.com` (not needed if the API serves the admin at `/admin/`).
 * `JWT_SECRET`, `OTP_HMAC_SECRET`: `node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"` each.
 * `OTP_PROVIDER=msg91` + `MSG91_AUTH_KEY`, `MSG91_TEMPLATE_ID`. `PAYMENT_PROVIDER=razorpay` + keys; `PAYMENT_MODE=sandbox` first (test keys `rzp_test_…`), `live` only with `rzp_live_…` keys.
+* **No gateway yet?** `PAYMENT_PROVIDER=none` starts in production with Cash on Delivery plus staff-verified UPI to your own UPI ID (switch it on in Admin → Store & policies → UPI payments). See [UPI_MANUAL.md](UPI_MANUAL.md).
 * The server **refuses to start** in production with mock OTP/payments, placeholder secrets, or mismatched Razorpay mode/keys.
 * `STORAGE_DRIVER=s3` + `S3_*` for images (recommended; local disk needs backups too). `FCM_PROJECT_ID` + `FCM_SERVICE_ACCOUNT_FILE` for push.
 

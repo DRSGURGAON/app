@@ -148,7 +148,7 @@ export async function applyRefundProcessed(tx: Tx, e: { providerPaymentId: strin
 export async function processPendingRefunds(ctx: AppCtx): Promise<number> {
   const { rows } = await ctx.db.query(
     `SELECT r.id, r.amount, p.provider_payment_id, o.order_no FROM refunds r JOIN payments p ON p.id=r.payment_id JOIN orders o ON o.id=r.order_id
-      WHERE r.status='pending' AND p.provider_payment_id IS NOT NULL ORDER BY r.created_at LIMIT 20`);
+      WHERE r.status='pending' AND p.provider_payment_id IS NOT NULL AND p.provider=$1 ORDER BY r.created_at LIMIT 20`, [ctx.payments.name]); // UPI (upi_manual) refunds are sent back by staff, never via the gateway
   let done = 0;
   for (const r of rows) {
     const claim = await ctx.db.query(`UPDATE refunds SET status='processing' WHERE id=$1 AND status='pending' RETURNING id`, [r.id]);

@@ -13,7 +13,8 @@ const schema = z.object({
   OTP_PROVIDER: z.enum(['mock', 'msg91']).default('mock'),
   MSG91_AUTH_KEY: z.string().default(''),
   MSG91_TEMPLATE_ID: z.string().default(''),
-  PAYMENT_PROVIDER: z.enum(['mock', 'razorpay']).default('mock'),
+  // none = no payment gateway: checkout offers COD and (if enabled in Admin → UPI) staff-verified UPI only.
+  PAYMENT_PROVIDER: z.enum(['mock', 'razorpay', 'none']).default('mock'),
   RAZORPAY_KEY_ID: z.string().default(''),
   RAZORPAY_KEY_SECRET: z.string().default(''),
   RAZORPAY_WEBHOOK_SECRET: z.string().default(''),

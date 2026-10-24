@@ -49,6 +49,16 @@ export const settingsSchemas = {
     max_lines: z.number().int().min(1).max(200).default(60),
     payment_window_minutes: z.number().int().min(5).max(120).default(20),
   }),
+  // UPI paid straight to the store's own UPI ID; staff confirm each payment in the bank app (no gateway).
+  upi: z.object({
+    enabled: z.boolean().default(false),
+    // A merchant / business UPI ID is strongly recommended: some UPI apps decline amount-prefilled payments to personal IDs.
+    vpa: z.string().trim().max(100).refine((v) => v === '' || /^[a-zA-Z0-9._-]{2,256}@[a-zA-Z][a-zA-Z0-9.-]{1,63}$/.test(v), 'Enter a UPI ID like shopname@bank').default(''),
+    payee_name: z.string().trim().min(1).max(50).default('Ardh Sainik Canteen'),
+    // 4-digit merchant category code from the bank, only for a merchant UPI ID. Empty = personal UPI ID.
+    merchant_code: z.string().trim().regex(/^(\d{4})?$/, 'Merchant category code is 4 digits (leave empty for a personal UPI ID)').default(''),
+    max_unverified_per_customer: z.number().int().min(1).max(10).default(3),
+  }),
   coins: z.object({
     enabled: z.boolean().default(true),
     earn_coins_per_unit: z.number().int().min(0).max(1000).default(1),

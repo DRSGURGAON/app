@@ -13,7 +13,7 @@ import { resolveZone } from '../../services/pricing.js';
 import { toPaise, fromPaise } from '../../lib/money.js';
 
 const SETTING_PERMISSION: Record<SettingKey, Permission> = {
-  store: 'settings:write', policies: 'settings:write', notifications: 'settings:write', delivery: 'delivery:write', order: 'delivery:write', coins: 'coins:write', first_order: 'coins:write',
+  store: 'settings:write', upi: 'settings:write', policies: 'settings:write', notifications: 'settings:write', delivery: 'delivery:write', order: 'delivery:write', coins: 'coins:write', first_order: 'coins:write',
 };
 const ISTART = `(date_trunc('day', now() AT TIME ZONE 'Asia/Kolkata') AT TIME ZONE 'Asia/Kolkata')`;
 const LIVE = `('placed','accepted','packing','ready_for_dispatch','out_for_delivery','delivered','ready_for_pickup','collected')`;

@@ -6,6 +6,7 @@ import { AppError } from '../lib/errors.js';
 import { createOrder, getOrderDetail, listUserOrders, transitionOrder } from '../services/orders.js';
 import { MockPaymentProvider } from '../providers/payments.js';
 import { confirmPayment, createPaymentSession, handleWebhook, processPendingRefunds } from '../services/payments.js';
+import { getUpiPaymentInfo, reportUpiPayment } from '../services/upi.js';
 
 export async function orderRoutes(app: FastifyInstance, { ctx, requireUser }: RouteDeps) {
   const auth = { preHandler: requireUser };
@@ -13,7 +14,7 @@ export async function orderRoutes(app: FastifyInstance, { ctx, requireUser }: Ro
   const checkoutBody = z.object({
     items: z.array(z.object({ product_id: uuid, qty: z.number().int().min(1).max(999) })).min(1).max(200),
     fulfilment: z.enum(['delivery', 'pickup']), address_id: uuid.nullish(), zone_id: uuid.nullish(),
-    payment_method: z.enum(['cod', 'online']), coupon_code: z.string().trim().max(24).nullish(), use_coins: z.number().int().min(0).max(100000).default(0),
+    payment_method: z.enum(['cod', 'online', 'upi']), coupon_code: z.string().trim().max(24).nullish(), use_coins: z.number().int().min(0).max(100000).default(0),
     expected_total: z.string().regex(/^\d+(\.\d{1,2})?$/).nullish(), note: z.string().trim().max(300).nullish(),
   });
 
@@ -58,6 +59,18 @@ export async function orderRoutes(app: FastifyInstance, { ctx, requireUser }: Ro
     const b = parse(z.object({ provider_order_id: z.string().min(5).max(80), provider_payment_id: z.string().min(5).max(80), signature: z.string().min(10).max(200) }), req.body);
     const r = await confirmPayment(ctx, req.userId!, { providerOrderId: b.provider_order_id, providerPaymentId: b.provider_payment_id, signature: b.signature });
     return { status: r.status, order: await getOrderDetail(ctx.db, r.orderId, req.userId) };
+  });
+
+  // ---- UPI to the store's own UPI ID (staff-verified, no gateway)
+  app.get('/orders/:id/upi', auth, async (req) => {
+    const { id } = parse(z.object({ id: uuid }), req.params);
+    return { upi: await getUpiPaymentInfo(ctx, id, req.userId!) };
+  });
+  app.post('/orders/:id/upi/report', { ...auth, config: { rateLimit: { max: 20, timeWindow: '1 minute' } } }, async (req) => {
+    const { id } = parse(z.object({ id: uuid }), req.params);
+    const b = parse(z.object({ utr: z.string().trim().regex(/^\d{12}$/, 'UTR must be exactly 12 digits').nullish() }), req.body ?? {});
+    await reportUpiPayment(ctx, id, req.userId!, b.utr ?? null);
+    return { order: await getOrderDetail(ctx.db, id, req.userId), upi: await getUpiPaymentInfo(ctx, id, req.userId!) };
   });
 
   // ---- DEV ONLY: lets the mobile app complete a payment when the MOCK provider is configured. Never registered with real Razorpay keys (config refuses mock in production).

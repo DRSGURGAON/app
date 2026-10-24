@@ -26,6 +26,10 @@ export const SPECS: Record<string, { title: string; perm: string; fields: Fld[];
     { k: 'earn_on_discounted_orders', label: 'Earn coins on orders using coupon / first-order discount', type: 'bool' }, { k: 'expiry_days', label: 'Coins expire after (days, 0 = never)', type: 'num', int: true } ] },
   first_order: { title: 'First-order discount', perm: 'offers:write', fields: [
     { k: 'enabled', label: 'Enabled', type: 'bool' }, { k: 'type', label: 'Type', type: 'select', opts: [['percent', 'Percent'], ['fixed', 'Fixed ₹']] }, { k: 'value', label: 'Value', type: 'num', step: 0.5 }, { k: 'min_spend', label: 'Min spend (₹)', type: 'num' }, { k: 'max_discount', label: 'Max discount (₹, blank = none)', type: 'num', nullable: true } ] },
+  upi: { title: 'UPI payments (to your own UPI ID)', perm: 'settings:write', note: 'Customers pay from PhonePe / Google Pay / Paytm straight to this UPI ID. No gateway checks the payment: staff confirm each one in Orders after seeing the money in the bank app. Use a merchant / business UPI ID if you can — some apps decline amount-filled payments to personal IDs.', fields: [
+    { k: 'enabled', label: 'Offer UPI at checkout', type: 'bool' }, { k: 'vpa', label: 'Store UPI ID', type: 'text', hint: 'e.g. ardhsainik@sbi — check it twice; payments go here.' },
+    { k: 'payee_name', label: 'Payee name shown in the UPI app', type: 'text' }, { k: 'merchant_code', label: 'Merchant category code (4 digits)', type: 'text', hint: 'Only for a merchant UPI ID, from your bank. Leave empty for a personal UPI ID.' },
+    { k: 'max_unverified_per_customer', label: 'Max unverified UPI orders per customer', type: 'num', int: true } ] },
   notifications: { title: 'Notifications', perm: 'settings:write', fields: [{ k: 'order_updates', label: 'Order status notifications', type: 'bool' }, { k: 'promotions', label: 'Promotional notifications (only to customers who opted in)', type: 'bool' }] },
 };
 
@@ -58,5 +62,5 @@ export function SettingsPage() {
   const { data, error, reload, setData } = useSettings();
   if (!data) return <Loading error={error} retry={reload} />;
   return <><h1>Store & policies</h1>
-    <SettingsForm name="store" settings={data} onSaved={setData} /><SettingsForm name="order" settings={data} onSaved={setData} /><SettingsForm name="notifications" settings={data} onSaved={setData} /><PolicyEditor settings={data} onSaved={setData} /></>;
+    <SettingsForm name="store" settings={data} onSaved={setData} /><SettingsForm name="order" settings={data} onSaved={setData} /><SettingsForm name="upi" settings={data} onSaved={setData} /><SettingsForm name="notifications" settings={data} onSaved={setData} /><PolicyEditor settings={data} onSaved={setData} /></>;
 }
