@@ -41,8 +41,21 @@ export async function createPaymentSession(ctx: AppCtx, orderId: string, userId:
 
 export type CaptureOutcome = 'paid' | 'duplicate' | 'late_refund' | 'amount_mismatch' | 'unknown_order' | 'conflict';
 
+/**
+ * Lock order for money rows is always orders → payments → refunds (cancellation and adminRefund lock the order first).
+ * Paths that start from a payment look up its order (payments.order_id never changes) and lock that first, so no two
+ * of these transactions can wait on each other in a cycle. Returns false when no payment matches.
+ */
+async function lockOrderOfPayment(tx: Tx, column: 'provider_order_id' | 'provider_payment_id', value: string): Promise<boolean> {
+  const ref = await tx.query(`SELECT order_id FROM payments WHERE ${column}=$1`, [value]);
+  if (!ref.rowCount) return false;
+  await tx.query('SELECT id FROM orders WHERE id=$1 FOR UPDATE', [ref.rows[0].order_id]);
+  return true;
+}
+
 /** Idempotent: record a captured payment and move the order forward. Never trusts the client. */
 export async function applyPaymentCaptured(tx: Tx, e: { providerOrderId: string; providerPaymentId: string; amountPaise: number; method?: string }): Promise<CaptureOutcome> {
+  if (!(await lockOrderOfPayment(tx, 'provider_order_id', e.providerOrderId))) return 'unknown_order';
   const p = await tx.query('SELECT * FROM payments WHERE provider_order_id=$1 FOR UPDATE', [e.providerOrderId]);
   if (!p.rowCount) return 'unknown_order';
   const pay = p.rows[0];
@@ -111,6 +124,7 @@ export async function confirmPayment(ctx: AppCtx, userId: string, a: { providerO
 
 // ------------------------------------------------------------------ refunds
 export async function applyRefundProcessed(tx: Tx, e: { providerPaymentId: string; providerRefundId: string; amountPaise: number }) {
+  if (!(await lockOrderOfPayment(tx, 'provider_payment_id', e.providerPaymentId))) return;
   const pay = await tx.query('SELECT * FROM payments WHERE provider_payment_id=$1 FOR UPDATE', [e.providerPaymentId]);
   if (!pay.rowCount) return;
   const payment = pay.rows[0];

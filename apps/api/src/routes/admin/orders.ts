@@ -7,6 +7,8 @@ import { getOrderDetail, transitionOrder, STATUS_LABELS, type OrderStatus } from
 import { adminRefund } from '../../services/payments.js';
 import { confirmUpiPayment, recordManualRefund, rejectUpiPayment } from '../../services/upi.js';
 import { toPaise } from '../../lib/money.js';
+import { hasPermission } from '../../services/auth.js';
+import { AppError } from '../../lib/errors.js';
 import { loadSettings } from '../../services/settings.js';
 
 const STATUSES = Object.keys(STATUS_LABELS) as [OrderStatus, ...OrderStatus[]];
@@ -17,6 +19,8 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
   const db = ctx.db;
   const read = { preHandler: requireAdmin('orders:read') };
   const write = { preHandler: requireAdmin('orders:write') };
+  // Marking UPI money as received (or not) releases goods without a gateway check: owner/manager, or staff the owner grants it to.
+  const verify = { preHandler: requireAdmin('payments:verify') };
 
   app.get('/orders', read, async (req) => {
     const q = parse(pageParams.extend({
@@ -49,6 +53,11 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
   app.post('/orders/:id/status', write, async (req) => {
     const { id } = parse(z.object({ id: uuid }), req.params);
     const b = parse(z.object({ status: z.enum(STATUSES), note: z.string().trim().max(300).optional(), reason: z.string().trim().max(300).optional() }), req.body);
+    // Cancelling an unpaid UPI order is a payment decision (the money may already be in the bank): same permission as reject.
+    const cur = (await db.query('SELECT payment_method, status FROM orders WHERE id=$1', [id])).rows[0];
+    if (cur?.payment_method === 'upi' && cur.status === 'pending_payment' && !hasPermission(req.admin!, 'payments:verify')) {
+      throw new AppError(403, 'FORBIDDEN', 'Only staff allowed to verify payments can cancel an unpaid UPI order');
+    }
     await transitionOrder(ctx, id, b.status, { type: 'admin', id: req.admin!.id }, { note: b.note, reason: b.reason, ip: req.ip });
     return { order: await getOrderDetail(db, id) };
   });
@@ -61,14 +70,14 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
   });
 
   // ---- UPI to the store's own UPI ID: staff check the bank app, then confirm or reject.
-  app.post('/orders/:id/upi/confirm', write, async (req) => {
+  app.post('/orders/:id/upi/confirm', verify, async (req) => {
     const { id } = parse(z.object({ id: uuid }), req.params);
     const b = parse(z.object({ amount: rupees, utr: z.string().trim().regex(/^\d{12}$/, 'UTR must be exactly 12 digits'), accept_utr_mismatch: z.boolean().optional() }), req.body);
     const outcome = await confirmUpiPayment(ctx, id, req.admin!.id, { amountPaise: toPaise(b.amount), utr: b.utr, acceptUtrMismatch: b.accept_utr_mismatch }, req.ip);
     return { outcome, order: await getOrderDetail(db, id) };
   });
 
-  app.post('/orders/:id/upi/reject', write, async (req) => {
+  app.post('/orders/:id/upi/reject', verify, async (req) => {
     const { id } = parse(z.object({ id: uuid }), req.params);
     const b = parse(z.object({ reason: z.string().trim().min(3).max(200) }), req.body);
     await rejectUpiPayment(ctx, id, req.admin!.id, b.reason, req.ip);

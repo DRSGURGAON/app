@@ -115,11 +115,11 @@ export async function logout(db: Db, refreshToken: string | undefined) {
 }
 
 // ------------------------------------------------------------------ admin
-export const PERMISSIONS = ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'settings:write', 'staff:write', 'customers:read', 'customers:write', 'reports:read', 'audit:read', 'imports:write'] as const;
+export const PERMISSIONS = ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'payments:verify', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'settings:write', 'staff:write', 'customers:read', 'customers:write', 'reports:read', 'audit:read', 'imports:write'] as const;
 export type Permission = (typeof PERMISSIONS)[number];
 export const ROLE_PERMISSIONS: Record<'owner' | 'manager' | 'staff', Permission[] | '*'> = {
   owner: '*',
-  manager: ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'customers:read', 'reports:read', 'imports:write'],
+  manager: ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'payments:verify', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'customers:read', 'reports:read', 'imports:write'],
   staff: ['catalog:read', 'inventory:read', 'orders:read', 'orders:write', 'customers:read'],
 };
 export const hasPermission = (a: { role: 'owner' | 'manager' | 'staff'; extra_permissions: string[] }, p: Permission) => {

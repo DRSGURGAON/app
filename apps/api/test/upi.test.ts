@@ -248,9 +248,9 @@ describe('UPI over HTTP', () => {
     const b = await app.inject({ method: 'POST', url: '/v1/auth/otp/verify', payload: { phone, code: json(a).dev_code } });
     return { authorization: `Bearer ${json(b).access_token}` };
   }
-  async function admin(role: 'owner' | 'staff') {
+  async function admin(role: 'owner' | 'manager' | 'staff', extra: string[] = []) {
     const email = `${role}-${randomUUID().slice(0, 6)}@t.test`;
-    await db.query(`INSERT INTO admin_users (email,name,password_hash,role) VALUES ($1,$2,$3,$4)`, [email, role, await hashPassword('correct-horse-9'), role]);
+    await db.query(`INSERT INTO admin_users (email,name,password_hash,role,extra_permissions) VALUES ($1,$2,$3,$4,$5)`, [email, role, await hashPassword('correct-horse-9'), role, extra]);
     const r = await app.inject({ method: 'POST', url: '/v1/admin/login', payload: { email, password: 'correct-horse-9' } });
     return { authorization: `Bearer ${json(r).token}` };
   }
@@ -281,14 +281,45 @@ describe('UPI over HTTP', () => {
     const defaultList = json(await app.inject({ method: 'GET', url: '/v1/admin/orders', headers: staff }));
     expect(defaultList.items.map((o: any) => o.id)).toContain(id); // reported UPI orders are visible by default
 
-    const ok = await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/upi/confirm`, headers: staff, payload: confirmBody });
+    // Plain staff (orders:write only) may NOT decide UPI payments: confirm, reject and the generic cancel are all 403.
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/upi/confirm`, headers: staff, payload: confirmBody })).statusCode).toBe(403);
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/upi/reject`, headers: staff, payload: { reason: 'not found in bank' } })).statusCode).toBe(403);
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/status`, headers: staff, payload: { status: 'cancelled', reason: 'bypass reject' } })).statusCode).toBe(403);
+    expect(json(await app.inject({ method: 'GET', url: `/v1/admin/orders/${id}`, headers: staff })).order).toMatchObject({ status: 'pending_payment', payment_status: 'verifying' });
+
+    // Staff the owner explicitly granted payments:verify can confirm; the decision is audit-logged.
+    const trusted = await admin('staff', ['payments:verify']);
+    const ok = await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/upi/confirm`, headers: trusted, payload: confirmBody });
     expect(ok.statusCode).toBe(200);
     expect(json(ok)).toMatchObject({ outcome: 'paid', order: { status: 'placed', payment_status: 'paid' } });
+    expect((await db.query(`SELECT count(*)::int n FROM audit_logs WHERE action='payment.upi_confirmed' AND entity_id=$1`, [id])).rows[0].n).toBe(1);
 
     // staff role has no refunds:write
     const refund = (await db.query('SELECT id FROM refunds LIMIT 1')).rows[0];
     expect(refund).toBeUndefined();
     const staffRefund = await app.inject({ method: 'POST', url: `/v1/admin/orders/${id}/refund`, headers: staff, payload: { amount: '100', reason: 'test' } });
     expect(staffRefund.statusCode).toBe(403);
+  });
+
+  it('manager can reject and confirm by default; staff order permissions for COD are unchanged', async () => {
+    const manager = await admin('manager'); const staff = await admin('staff');
+    const p = await mkProduct(db, { price: 1000, stock: 5 });
+    const place = async (method: 'upi' | 'cod') => {
+      const u = await mkUser(db);
+      return (await createOrder(ctx, u.id, { idempotency_key: randomUUID(), items: [{ product_id: p.id, qty: 1 }], fulfilment: 'pickup', payment_method: method })).orderId;
+    };
+    const toReject = await place('upi'); const toConfirm = await place('upi'); const cod = await place('cod');
+
+    const rej = await app.inject({ method: 'POST', url: `/v1/admin/orders/${toReject}/upi/reject`, headers: manager, payload: { reason: 'No credit in bank' } });
+    expect(rej.statusCode).toBe(200); expect(json(rej).order.status).toBe('cancelled');
+    expect((await db.query(`SELECT count(*)::int n FROM audit_logs WHERE action='order.cancelled' AND entity_id=$1`, [toReject])).rows[0].n).toBe(1);
+
+    const conf = await app.inject({ method: 'POST', url: `/v1/admin/orders/${toConfirm}/upi/confirm`, headers: manager, payload: { amount: '1000', utr: '712345678901' } });
+    expect(conf.statusCode).toBe(200); expect(json(conf).outcome).toBe('paid');
+
+    // Staff still run COD orders exactly as before (orders:write) and can move a confirmed UPI order along.
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${cod}/status`, headers: staff, payload: { status: 'accepted' } })).statusCode).toBe(200);
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${cod}/status`, headers: staff, payload: { status: 'cancelled', reason: 'customer asked' } })).statusCode).toBe(200);
+    expect((await app.inject({ method: 'POST', url: `/v1/admin/orders/${toConfirm}/status`, headers: staff, payload: { status: 'accepted' } })).statusCode).toBe(200);
   });
 });

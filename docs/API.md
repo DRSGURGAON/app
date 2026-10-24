@@ -57,7 +57,7 @@ Customers: `GET /customers`, `POST /customers/:id/block`, `POST /customers/:id/d
 Staff & audit: `GET/POST/PUT /staff` (owner only), `GET /audit-logs`.
 
 ### Permissions
-`catalog:read|write · inventory:read|write · orders:read|write · refunds:write · offers:write · coins:write · delivery:write · settings:write · staff:write · customers:read|write · reports:read · audit:read · imports:write`. Owner = all; Manager = operations; Staff = orders + inventory; any person can be granted extras.
+`catalog:read|write · inventory:read|write · orders:read|write · payments:verify (confirm / reject UPI payments; owner + manager by default, grant to individual staff via extra permissions) · refunds:write · offers:write · coins:write · delivery:write · settings:write · staff:write · customers:read|write · reports:read · audit:read · imports:write`. Owner = all; Manager = operations; Staff = orders + inventory; any person can be granted extras.
 
 ### Common error codes
 `VALIDATION_ERROR` (400) · `UNAUTHORIZED`/`FORBIDDEN` (401/403) · `NOT_FOUND` · `CONFLICT`-style codes (`DUPLICATE_SKU`, `LAST_OWNER`, `HAS_ORDERS`…) (409) · `MIN_ORDER_NOT_MET`, `INSUFFICIENT_STOCK`, `OUT_OF_STOCK`, `MAX_QTY`, `STORE_CLOSED`, `DELIVERY_ZONE_REQUIRED`, `ADDRESS_REQUIRED`, `PRICE_CHANGED`, `CHECKOUT_BLOCKED`, `INVALID_TRANSITION`, `IDEMPOTENCY_KEY_REQUIRED` (4xx) · `RATE_LIMITED` (429).

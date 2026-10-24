@@ -72,10 +72,11 @@ function OrderModal({ id, onClose, onChanged }: { id: string; onClose: () => voi
       {Number(t.first_order_discount) > 0 && <tr><td>First-order discount</td><td>−{inr(t.first_order_discount)}</td></tr>}
       {Number(t.coin_discount) > 0 && <tr><td>Coins ({t.coins_redeemed})</td><td>−{inr(t.coin_discount)}</td></tr>}
       <tr><td>Delivery fee</td><td>{inr(t.delivery_fee)}</td></tr><tr><td><b>Total</b></td><td><b>{inr(t.total)}</b></td></tr></tbody></table>
-    {can('orders:write') && o.payment_method === 'upi' && (o.status === 'pending_payment' || (o.status === 'cancelled' && o.payment_status === 'failed'))
+    {o.payment_method === 'upi' && o.status === 'pending_payment' && !can('payments:verify') ? <p className="muted">⏳ UPI payment waiting for verification by the owner / manager (or staff allowed to verify payments).</p> : null}
+    {can('payments:verify') && o.payment_method === 'upi' && (o.status === 'pending_payment' || (o.status === 'cancelled' && o.payment_status === 'failed'))
       ? <UpiVerify o={o} onDone={(order) => { setData(order); onChanged(); }} /> : null}
     <p className="muted">Payment: {o.payment_method === 'cod' ? 'Cash on delivery' : o.payment_method === 'upi' ? 'UPI (staff verified)' : 'Online'} · {o.payment_status}{o.fulfilment_type === 'delivery' ? ` · Delivery: ${o.delivery.distance_km ?? '—'} km (${o.delivery.method ?? '—'})${o.delivery.zone ? `, zone ${o.delivery.zone}` : ''}` : ''}{o.cancel_reason ? ` · Reason: ${o.cancel_reason}` : ''}</p>
-    {can('orders:write') && o.admin_next.length ? <div className="card" style={{ background: '#fafbf8' }}><h3 style={{ marginTop: 0 }}>Update status</h3>
+    {can('orders:write') && o.admin_next.length && !(o.payment_method === 'upi' && o.status === 'pending_payment' && !can('payments:verify')) ? <div className="card" style={{ background: '#fafbf8' }}><h3 style={{ marginTop: 0 }}>Update status</h3>
       <Field label="Reason (required for cancel / reject)"><input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="e.g. Item out of stock" /></Field>
       <div className="row">{o.admin_next.map((s: string, i: number) => <button key={s} className={['cancelled', 'rejected'].includes(s) ? 'danger' : i === 0 ? 'primary' : ''} onClick={() => move(s)}>{['cancelled', 'rejected'].includes(s) ? label(s) : `→ ${label(s)}`}</button>)}</div></div> : null}
     {can('orders:write') && o.payment_method === 'cod' && o.payment_status === 'cod_pending' && ['delivered', 'collected'].includes(o.status) ? <button className="primary" onClick={async () => { const r = await run(() => api.post(`/orders/${id}/cod-collected`), 'Cash marked collected'); if (r) { setData(r.order); onChanged(); } }}>Mark cash collected</button> : null}

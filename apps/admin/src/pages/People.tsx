@@ -36,7 +36,7 @@ export function Customers() {
     {proc ? <Confirm danger title="Process account deletion?" text={`Remove ${proc.phone}'s personal data (name, phone, addresses, devices). Order records are kept for accounting. This cannot be undone.`} confirmLabel="Delete personal data" onConfirm={async () => { await run(() => api.post(`/customers/${proc.id}/delete`), 'Customer data deleted'); reload(); }} onClose={() => setProc(null)} /> : null}</>;
 }
 
-const PERMS = ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'settings:write', 'staff:write', 'customers:read', 'customers:write', 'reports:read', 'audit:read', 'imports:write'];
+const PERMS = ['catalog:read', 'catalog:write', 'inventory:read', 'inventory:write', 'orders:read', 'orders:write', 'payments:verify', 'refunds:write', 'offers:write', 'coins:write', 'delivery:write', 'settings:write', 'staff:write', 'customers:read', 'customers:write', 'reports:read', 'audit:read', 'imports:write'];
 export function Staff() {
   const run = useAction(); const { data, error, reload } = useLoad(() => api.get('/staff').then((r) => r.staff)); const [edit, setEdit] = useState<any>(null);
   const [f, setF] = useState<any>({}); const open = (s: any) => { setF({ email: '', name: '', role: 'staff', status: 'active', extra_permissions: [], password: '', ...s, password_: '' }); setEdit(s); };

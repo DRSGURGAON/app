@@ -159,6 +159,7 @@ export async function recordManualRefund(ctx: AppCtx, orderId: string, refundId:
   if (!/^[A-Za-z0-9][A-Za-z0-9 /_-]{3,59}$/.test(ref)) throw new AppError(400, 'INVALID_REFERENCE', 'Enter the refund UTR / reference (4–60 letters or digits)');
   try {
     await withTx(ctx.db, async (tx) => {
+      await tx.query('SELECT id FROM orders WHERE id=$1 FOR UPDATE', [orderId]); // order first: same lock order as cancel / refund / capture
       const r = await tx.query(
         `SELECT r.*, p.provider, p.provider_payment_id FROM refunds r JOIN payments p ON p.id=r.payment_id WHERE r.id=$1 AND r.order_id=$2 FOR UPDATE OF r`, [refundId, orderId]);
       if (!r.rowCount) throw notFound('Refund not found');

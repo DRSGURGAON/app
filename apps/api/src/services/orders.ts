@@ -260,23 +260,40 @@ export async function unwindOrder(tx: Tx, order: any, finalStatus: 'cancelled' |
   for (const r of rel.rows) await tx.query('UPDATE coupons SET used_count = GREATEST(used_count - 1, 0) WHERE id=$1', [r.coupon_id]);
 
   let refundId: string | null = null;
+  let refunding = false;
   await tx.query(`UPDATE orders SET cancel_reason=$2, cancelled_by=$3 WHERE id=$1`, [order.id, reason, actor.type]);
   await history(tx, order.id, order.status, finalStatus, actor, reason);
-  if (order.payment_status === 'paid') {
-    const p = await tx.query(`SELECT id FROM payments WHERE order_id=$1 AND is_primary AND status='paid' LIMIT 1`, [order.id]);
-    if (p.rowCount) {
-      const r = await tx.query(`INSERT INTO refunds (payment_id, order_id, amount, reason) VALUES ($1,$2,$3,$4) RETURNING id`, [p.rows[0].id, order.id, order.total, `Order ${finalStatus}: ${reason}`]);
-      refundId = r.rows[0].id;
+
+  // The captured payment (if any). Locked after the order row, the same order adminRefund uses, so a refund and a
+  // cancellation of the same order are serialised and cannot both refund the same money.
+  const p = await tx.query(`SELECT id, amount FROM payments WHERE order_id=$1 AND is_primary AND status IN ('paid','partially_refunded','refunded') LIMIT 1 FOR UPDATE`, [order.id]);
+  if (p.rowCount) {
+    const pay = p.rows[0];
+    // Money already refunded or on its way back. A 'failed' refund returned nothing, so it does not count.
+    const r = (await tx.query(`SELECT COALESCE(SUM(amount),0) AS committed, count(*) FILTER (WHERE status IN ('pending','processing'))::int AS in_flight
+                                 FROM refunds WHERE payment_id=$1 AND status IN ('pending','processing','processed')`, [pay.id])).rows[0];
+    const remaining = toPaise(pay.amount) - toPaise(r.committed);
+    if (remaining > 0) {
+      const ins = await tx.query(`INSERT INTO refunds (payment_id, order_id, amount, reason) VALUES ($1,$2,$3,$4) RETURNING id`, [pay.id, order.id, fromPaise(remaining), `Order ${finalStatus}: ${reason}`]);
+      refundId = ins.rows[0].id;
     }
-    await tx.query(`UPDATE orders SET status='refund_pending', payment_status='refund_pending' WHERE id=$1`, [order.id]);
-    await history(tx, order.id, finalStatus, 'refund_pending', { type: 'system' }, 'Refund to original payment method initiated');
+    refunding = remaining > 0 || r.in_flight > 0;
+    if (refunding) {
+      await tx.query(`UPDATE orders SET status='refund_pending', payment_status='refund_pending' WHERE id=$1`, [order.id]);
+      await history(tx, order.id, finalStatus, 'refund_pending', { type: 'system' },
+        remaining > 0 ? `Refund of ₹${fromPaise(remaining)} to original payment method initiated` : 'Refund already in progress');
+    } else {
+      // Everything was already refunded: the order is cancelled, its payment history (refunded) stays as it is.
+      await tx.query(`UPDATE orders SET status=$2 WHERE id=$1`, [order.id, finalStatus]);
+    }
   } else {
-    await tx.query(`UPDATE orders SET status=$2, payment_status=CASE WHEN payment_method<>'cod' THEN 'failed' ELSE payment_status END WHERE id=$1`, [order.id, finalStatus]);
+    // Nothing was captured. Only an unpaid online/UPI payment becomes 'failed'; COD and any refund states are kept.
+    await tx.query(`UPDATE orders SET status=$2, payment_status=CASE WHEN payment_method<>'cod' AND payment_status IN ('pending','verifying') THEN 'failed' ELSE payment_status END WHERE id=$1`, [order.id, finalStatus]);
     await tx.query(`UPDATE payments SET status='failed', failure_reason=COALESCE(failure_reason,'Order cancelled before payment') WHERE order_id=$1 AND status IN ('created','pending')`, [order.id]);
   }
   const verb = finalStatus === 'rejected' ? 'could not be accepted' : 'has been cancelled';
   await notifyUser(tx, order.user_id, 'order_update', finalStatus === 'rejected' ? 'Order rejected' : 'Order cancelled',
-    `Your order ${order.order_no} ${verb}. ${reason}${refundId ? ' Your payment will be refunded.' : ''}`, { order_id: order.id });
+    `Your order ${order.order_no} ${verb}. ${reason}${refunding ? ' Your payment will be refunded.' : ''}`, { order_id: order.id });
   return { refundId };
 }
 
