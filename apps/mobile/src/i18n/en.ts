@@ -29,5 +29,15 @@ export const en = {
   coinsWalletTitle: 'Coins wallet', coins: 'Coins', coinValueNote: '1 coin = {{amt}}', noCoinHistory: 'No coin activity yet', coinEarned: 'Earned', coinRedeemed: 'Used', coinExpired: 'Expired', coinAdjust: 'Adjustment', coinsExpireSoon: '{{n}} coins expire on {{d}}', coinRules: 'Earn {{e}} coin per {{u}} spent. Coins can be used on eligible items.',
   noNotifications: 'No notifications yet', markAllRead: 'Mark all as read', accessibleCart: 'Cart, {{n}} items', increase: 'Increase quantity', decrease: 'Decrease quantity', qty: 'Qty',
   statusPlaced: 'Order placed', statusAccepted: 'Accepted', statusPacking: 'Packing', statusReadyForDispatch: 'Ready for dispatch', statusOutForDelivery: 'Out for delivery', statusDelivered: 'Delivered', statusReadyForPickup: 'Ready for pickup', statusCollected: 'Collected', statusCancelled: 'Cancelled', statusRejected: 'Rejected', statusRefundPending: 'Refund pending', statusRefunded: 'Refunded', statusPendingPayment: 'Awaiting payment',
+  upi: 'UPI (PhonePe / Google Pay / Paytm)', upiHint: 'Pay from your UPI app. The store confirms your payment.', upiDisabled: 'UPI payment is not available right now',
+  upiContinue: 'Continue to pay {{amt}} by UPI', upiPayTitle: 'Pay {{amt}} by UPI', upiPayBefore: 'Pay before {{t}}',
+  upiPayHint: 'Tap the button to open your UPI app with the amount filled in. After paying, come back here and tap "I have paid".',
+  upiPayApp: 'Pay with UPI app', upiPayWith: 'Pay with {{app}}', upiId: 'UPI ID', upiCopy: 'Copy', upiCopied: 'UPI ID copied',
+  upiManualHint: 'If no app opens, pay {{amt}} to this UPI ID from any UPI app and write order {{n}} in the note.',
+  upiPersonalNote: 'If your UPI app declines the payment, pay to the UPI ID above yourself.',
+  upiUtrLabel: 'UTR / UPI reference no. (12 digits, optional)', upiUtrHelp: 'You can find it in your UPI app under payment details.', upiUtrInvalid: 'UTR must be exactly 12 digits',
+  upiIHavePaid: 'I have paid', upiAddUtr: 'Add UTR', upiNoApp: 'No UPI app could be opened. Pay to the UPI ID shown below from any UPI app.',
+  upiVerifying: 'Payment is being verified', upiVerifyingHint: 'The store is checking your payment. Your order will be confirmed here and you will get a notification.',
+  upiReported: 'Thank you! The store will confirm your payment shortly.', upiExpired: 'The time to pay for this order has ended. If money was deducted, call the store with your UTR.',
 } as const;
 export type Key = keyof typeof en;

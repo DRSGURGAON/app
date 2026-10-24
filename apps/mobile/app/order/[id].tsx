@@ -12,6 +12,7 @@ import { useStoreConfig } from '../../src/state/storeConfig';
 import { colors, radius, space } from '../../src/theme';
 import { Button, Card, ErrorState, Field, Row, SectionTitle, Skeleton, Thumb } from '../../src/ui/kit';
 import { fmtDate, STATUS_KEY, statusColor } from '../../src/ui/status';
+import { UpiPayCard } from '../../src/ui/UpiPayCard';
 
 export default function OrderScreen() {
   const p = useLocalSearchParams<{ id: string; placed?: string; pay?: string; payMsg?: string }>(); const { t, lang, pick } = useI18n(); const { user } = useAuth(); const cart = useCart(); const { config } = useStoreConfig();
@@ -41,7 +42,8 @@ export default function OrderScreen() {
   return (
     <ScrollView contentContainerStyle={{ padding: space.lg, paddingBottom: 40 }} refreshControl={<RefreshControl refreshing={q.loading} onRefresh={q.reload} colors={[colors.primary]} />}>
       {p.placed === '1' ? <Card style={{ backgroundColor: colors.primarySoft, alignItems: 'center' }}><Text style={{ fontSize: 40 }}>🎉</Text><Text style={{ fontWeight: '800', fontSize: 20, color: colors.primary }}>{t('orderPlaced')}</Text><Text style={{ color: colors.muted, textAlign: 'center' }}>{o.payment_status === 'paid' ? t('paymentSuccess') : t('orderPlacedHint')}</Text></Card> : null}
-      {unpaid ? <Card style={{ backgroundColor: colors.accentSoft }}><Text style={{ fontWeight: '800', color: colors.warn }}>{t('paymentPending')}</Text>{msg ? <Text style={{ marginTop: 4 }}>{msg}</Text> : null}{canPay ? <Button title={t('payNow', { amt: formatINR(o.totals.total) })} loading={busy} onPress={doPay} style={{ marginTop: 10 }} /> : null}</Card> : msg ? <Card><Text accessibilityLiveRegion="polite">{msg}</Text></Card> : null}
+      {unpaid && o.payment_method === 'upi' ? <UpiPayCard orderId={o.id} paymentStatus={o.payment_status} onChanged={() => void q.reload()} />
+        : unpaid ? <Card style={{ backgroundColor: colors.accentSoft }}><Text style={{ fontWeight: '800', color: colors.warn }}>{t('paymentPending')}</Text>{msg ? <Text style={{ marginTop: 4 }}>{msg}</Text> : null}{canPay ? <Button title={t('payNow', { amt: formatINR(o.totals.total) })} loading={busy} onPress={doPay} style={{ marginTop: 10 }} /> : null}</Card> : msg ? <Card><Text accessibilityLiveRegion="polite">{msg}</Text></Card> : null}
       <Card>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontWeight: '800', fontSize: 17 }}>{t('orderNo', { n: o.order_no })}</Text><Text style={{ fontWeight: '800', color: statusColor(o.status) }}>{t(STATUS_KEY[o.status] ?? 'statusPlaced')}</Text></View>
         <Text style={{ color: colors.muted }}>{t('placedOn', { d: fmtDate(o.placed_at, lang) })}</Text>
@@ -56,7 +58,7 @@ export default function OrderScreen() {
       <Card>
         <Text style={{ fontWeight: '800', marginBottom: 6 }}>{o.fulfilment_type === 'pickup' ? t('pickupFrom') : t('deliveredTo')}</Text>
         {o.fulfilment_type === 'pickup' ? <Text>{pick(config?.store.address_en, config?.store.address_hi)}</Text> : addr ? <Text>{[addr.full_name, addr.line1, addr.line2, addr.landmark, `${addr.city ?? ''} ${addr.pincode ?? ''}`].filter(Boolean).join(', ')}</Text> : null}
-        <Text style={{ color: colors.muted, marginTop: 6 }}>{t('paymentLabel')}: {o.payment_method === 'cod' ? t('cod') : t('online')} · {o.payment_status}</Text>
+        <Text style={{ color: colors.muted, marginTop: 6 }}>{t('paymentLabel')}: {o.payment_method === 'cod' ? t('cod') : o.payment_method === 'upi' ? 'UPI' : t('online')} · {o.payment_status}</Text>
       </Card>
       <SectionTitle title={t('items', { n: o.items.length })} />
       <Card style={{ padding: space.md }}>

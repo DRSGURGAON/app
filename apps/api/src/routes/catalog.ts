@@ -41,7 +41,8 @@ export async function catalogRoutes(app: FastifyInstance, { ctx, optionalUser }:
     return {
       store: { ...s.store, open_now: open.open, closed_reason: open.reason ?? null },
       delivery: { base_fee: s.delivery.base_fee.toFixed(2), far_fee: s.delivery.far_fee.toFixed(2), near_radius_km: s.delivery.near_radius_km, max_radius_km: s.delivery.max_radius_km, zone_mode: s.delivery.zone_mode, fallback_mode: s.delivery.fallback_mode },
-      order: { min_order: s.order.min_order.toFixed(2), min_applies_to_pickup: s.order.min_applies_to_pickup, cod_enabled: s.order.cod_enabled, online_enabled: s.order.online_enabled, payment_window_minutes: s.order.payment_window_minutes },
+      order: { min_order: s.order.min_order.toFixed(2), min_applies_to_pickup: s.order.min_applies_to_pickup, cod_enabled: s.order.cod_enabled, online_enabled: s.order.online_enabled && ctx.payments.name !== 'none', payment_window_minutes: s.order.payment_window_minutes },
+      upi: { enabled: s.upi.enabled && !!s.upi.vpa },
       coins: s.coins, first_order: s.first_order.enabled ? s.first_order : { enabled: false },
       payments: { provider: ctx.payments.name, mode: ctx.payments.mode, live: ctx.payments.mode === 'live' },
       policies: s.policies, server_time: new Date().toISOString(),
@@ -153,7 +154,7 @@ export async function catalogRoutes(app: FastifyInstance, { ctx, optionalUser }:
     address_id: uuid.nullish(), zone_id: uuid.nullish(),
     address: z.object({ latitude: z.number().min(-90).max(90).nullish(), longitude: z.number().min(-180).max(180).nullish(), pincode: z.string().regex(/^\d{6}$/).nullish(), zone_id: uuid.nullish() }).nullish(),
     coupon_code: z.string().trim().max(24).nullish(), use_coins: z.number().int().min(0).max(100000).default(0),
-    payment_method: z.enum(['cod', 'online']).nullish(),
+    payment_method: z.enum(['cod', 'online', 'upi']).nullish(),
   });
   app.post('/cart/quote', { preHandler: optionalUser }, async (req) => {
     const b = parse(quoteBody, req.body);

@@ -13,7 +13,7 @@ export interface Quote {
   store: { open: boolean; reason?: string };
   blockers: Blocker[]; can_checkout: boolean;
 }
-export interface QuoteParams { items: { product_id: string; qty: number }[]; fulfilment: 'delivery' | 'pickup'; address_id?: string | null; zone_id?: string | null; coupon_code?: string | null; use_coins?: number; payment_method?: 'cod' | 'online' | null }
+export interface QuoteParams { items: { product_id: string; qty: number }[]; fulfilment: 'delivery' | 'pickup'; address_id?: string | null; zone_id?: string | null; coupon_code?: string | null; use_coins?: number; payment_method?: 'cod' | 'online' | 'upi' | null }
 
 /** Debounced server quote. The server is the only source of truth for prices, fees and discounts. */
 export function useQuote(p: QuoteParams, enabled = true) {

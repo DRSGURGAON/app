@@ -5,6 +5,10 @@ import { parse, uuid, rupees, pageParams } from '../../lib/validate.js';
 import { notFound } from '../../lib/errors.js';
 import { getOrderDetail, transitionOrder, STATUS_LABELS, type OrderStatus } from '../../services/orders.js';
 import { adminRefund } from '../../services/payments.js';
+import { confirmUpiPayment, recordManualRefund, rejectUpiPayment } from '../../services/upi.js';
+import { toPaise } from '../../lib/money.js';
+import { hasPermission } from '../../services/auth.js';
+import { AppError } from '../../lib/errors.js';
 import { loadSettings } from '../../services/settings.js';
 
 const STATUSES = Object.keys(STATUS_LABELS) as [OrderStatus, ...OrderStatus[]];
@@ -15,15 +19,20 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
   const db = ctx.db;
   const read = { preHandler: requireAdmin('orders:read') };
   const write = { preHandler: requireAdmin('orders:write') };
+  // Marking UPI money as received (or not) releases goods without a gateway check: owner/manager, or staff the owner grants it to.
+  const verify = { preHandler: requireAdmin('payments:verify') };
 
   app.get('/orders', read, async (req) => {
     const q = parse(pageParams.extend({
-      status: z.enum(STATUSES).optional(), fulfilment: z.enum(['delivery', 'pickup']).optional(), payment_method: z.enum(['cod', 'online']).optional(),
+      status: z.enum(STATUSES).optional(), fulfilment: z.enum(['delivery', 'pickup']).optional(), payment_method: z.enum(['cod', 'online', 'upi']).optional(),
+      payment_status: z.enum(['cod_pending', 'cod_collected', 'pending', 'verifying', 'paid', 'failed', 'refund_pending', 'refunded', 'partially_refunded']).optional(),
       q: z.string().trim().max(40).optional(), from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(), include_unpaid: z.coerce.boolean().optional(),
     }), req.query);
     const args: unknown[] = []; const w: string[] = [];
     const add = (sql: string, v: unknown) => { args.push(v); w.push(sql.replace('?', `$${args.length}`)); };
-    if (q.status) add('o.status = ?', q.status); else if (!q.include_unpaid) w.push(`o.status <> 'pending_payment'`);
+    // Unpaid orders stay hidden by default, except UPI payments a customer reported: staff must see those to verify them.
+    if (q.status) add('o.status = ?', q.status); else if (!q.include_unpaid && !q.payment_status) w.push(`(o.status <> 'pending_payment' OR o.payment_status = 'verifying')`);
+    if (q.payment_status) add('o.payment_status = ?', q.payment_status);
     if (q.fulfilment) add('o.fulfilment_type = ?', q.fulfilment);
     if (q.payment_method) add('o.payment_method = ?', q.payment_method);
     if (q.q) { args.push(`%${q.q.replace(/[\\%_]/g, (m) => '\\' + m)}%`); w.push(`(o.order_no ILIKE $${args.length} OR o.customer_phone ILIKE $${args.length} OR o.customer_name ILIKE $${args.length})`); }
@@ -44,6 +53,11 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
   app.post('/orders/:id/status', write, async (req) => {
     const { id } = parse(z.object({ id: uuid }), req.params);
     const b = parse(z.object({ status: z.enum(STATUSES), note: z.string().trim().max(300).optional(), reason: z.string().trim().max(300).optional() }), req.body);
+    // Cancelling an unpaid UPI order is a payment decision (the money may already be in the bank): same permission as reject.
+    const cur = (await db.query('SELECT payment_method, status FROM orders WHERE id=$1', [id])).rows[0];
+    if (cur?.payment_method === 'upi' && cur.status === 'pending_payment' && !hasPermission(req.admin!, 'payments:verify')) {
+      throw new AppError(403, 'FORBIDDEN', 'Only staff allowed to verify payments can cancel an unpaid UPI order');
+    }
     await transitionOrder(ctx, id, b.status, { type: 'admin', id: req.admin!.id }, { note: b.note, reason: b.reason, ip: req.ip });
     return { order: await getOrderDetail(db, id) };
   });
@@ -52,6 +66,29 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
     const { id } = parse(z.object({ id: uuid }), req.params);
     const b = parse(z.object({ amount: rupees.optional(), reason: z.string().trim().min(3).max(300) }), req.body);
     await adminRefund(ctx, id, req.admin!.id, b.amount, b.reason, req.ip);
+    return { order: await getOrderDetail(db, id) };
+  });
+
+  // ---- UPI to the store's own UPI ID: staff check the bank app, then confirm or reject.
+  app.post('/orders/:id/upi/confirm', verify, async (req) => {
+    const { id } = parse(z.object({ id: uuid }), req.params);
+    const b = parse(z.object({ amount: rupees, utr: z.string().trim().regex(/^\d{12}$/, 'UTR must be exactly 12 digits'), accept_utr_mismatch: z.boolean().optional() }), req.body);
+    const outcome = await confirmUpiPayment(ctx, id, req.admin!.id, { amountPaise: toPaise(b.amount), utr: b.utr, acceptUtrMismatch: b.accept_utr_mismatch }, req.ip);
+    return { outcome, order: await getOrderDetail(db, id) };
+  });
+
+  app.post('/orders/:id/upi/reject', verify, async (req) => {
+    const { id } = parse(z.object({ id: uuid }), req.params);
+    const b = parse(z.object({ reason: z.string().trim().min(3).max(200) }), req.body);
+    await rejectUpiPayment(ctx, id, req.admin!.id, b.reason, req.ip);
+    return { order: await getOrderDetail(db, id) };
+  });
+
+  /** A queued refund on a UPI payment was sent back by staff (UPI / bank transfer); record the reference. */
+  app.post('/orders/:id/refunds/:refundId/manual', { preHandler: requireAdmin('refunds:write') }, async (req) => {
+    const { id, refundId } = parse(z.object({ id: uuid, refundId: uuid }), req.params);
+    const b = parse(z.object({ reference: z.string().trim().min(4).max(60) }), req.body);
+    await recordManualRefund(ctx, id, refundId, req.admin!.id, b.reference, req.ip);
     return { order: await getOrderDetail(db, id) };
   });
 
@@ -75,7 +112,7 @@ export async function adminOrderRoutes(app: FastifyInstance, { ctx, requireAdmin
 <style>body{font:14px/1.45 system-ui,sans-serif;color:#111;max-width:760px;margin:24px auto;padding:0 16px}h1{font-size:20px;margin:0}table{width:100%;border-collapse:collapse;margin-top:12px}th,td{padding:6px 8px;border-bottom:1px solid #ddd;text-align:left;vertical-align:top}.r{text-align:right}small{color:#555}.tot td{font-weight:700;border-top:2px solid #111}.hdr{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}.btn{margin:16px 0;padding:8px 14px}@media print{.btn{display:none}body{margin:0}}</style></head><body>
 <button class="btn" onclick="window.print()">Print</button>
 <div class="hdr"><div><h1>${esc(s.name_en)}</h1><div>${esc(s.name_hi)}</div><div>${esc(s.address_en)}</div><div>Phone: ${esc(s.phone)}</div></div>
-<div><strong>Invoice / Order ${esc(o.order_no)}</strong><br>Date: ${esc(new Date(o.placed_at as any).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}<br>Status: ${esc(o.status_label.en)}<br>Payment: ${o.payment_method === 'cod' ? 'Cash on delivery' : 'Online'} (${esc(o.payment_status)})<br>${o.fulfilment_type === 'pickup' ? 'Store pickup' : 'Home delivery'}</div></div>
+<div><strong>Invoice / Order ${esc(o.order_no)}</strong><br>Date: ${esc(new Date(o.placed_at as any).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }))}<br>Status: ${esc(o.status_label.en)}<br>Payment: ${o.payment_method === 'cod' ? 'Cash on delivery' : o.payment_method === 'upi' ? 'UPI' : 'Online'} (${esc(o.payment_status)})<br>${o.fulfilment_type === 'pickup' ? 'Store pickup' : 'Home delivery'}</div></div>
 <p><strong>Customer:</strong> ${esc(o.customer_name ?? '')} ${esc(o.customer_phone)}<br>${o.fulfilment_type === 'delivery' ? `<strong>Deliver to:</strong> ${esc([addr.line1, addr.line2, addr.landmark, addr.city, addr.pincode].filter(Boolean).join(', '))}` : ''}</p>
 <table><thead><tr><th>#</th><th>Item</th><th class=r>Rate</th><th class=r>Qty</th><th class=r>Amount</th></tr></thead><tbody>${rows}
 ${line('Items total', t.subtotal)}${line(`Coupon ${esc(t.coupon_code ?? '')}`, t.coupon_discount, true)}${line('First-order discount', t.first_order_discount, true)}${line(`Coins used (${t.coins_redeemed})`, t.coin_discount, true)}

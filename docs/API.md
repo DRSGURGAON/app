@@ -38,23 +38,26 @@ Rate limits: 300 req/min/IP globally; OTP/login endpoints are tighter. Health ch
 | `POST /orders/:id/payment-session` | (Re)create the Razorpay order for a pending online order |
 | `POST /payments/confirm` | After the Razorpay sheet: `{order_id, razorpay_payment_id, razorpay_signature}` → verifies signature + fetches payment + matches amount |
 | `POST /webhooks/payments` | Razorpay webhook (signature over raw body; idempotent) |
+| `GET /orders/:id/upi` | UPI order (`payment_method: "upi"`): `upi://pay` link with the server total, iPhone per-app links, store UPI ID, payable/expiry, claimed UTR |
+| `POST /orders/:id/upi/report` | Customer says "I have paid": `{utr?: "12 digits"}` → payment `verifying`. Never marks the order paid; staff confirm in the admin |
 | `POST /dev/mock-pay` | Development only; not registered in production |
 
 ## Admin (`/v1/admin/*`, admin JWT, permission-checked)
 Auth: `POST /login`, `GET /me`, `POST /me/password`.
 Dashboard: `GET /dashboard`, `GET /store-status`, `GET /system` (payments/OTP/routing/push/storage status — no secrets).
-Settings: `GET /settings`, `PUT /settings/:key` for `store | delivery | order | coins | first_order | notifications | policies` (validated, audited, per-key permission).
+Settings: `GET /settings`, `PUT /settings/:key` for `store | delivery | order | upi | coins | first_order | notifications | policies` (validated, audited, per-key permission).
 Delivery: `GET/POST/PUT/DELETE /zones`, `POST /delivery/preview` (fee for distance / pincode / zone / coordinates).
 Catalogue: `GET/POST/PUT/DELETE /categories` (+`POST /categories/:id/image`) · `GET/POST/PUT/DELETE /products`, `PATCH /products/:id/active`, `POST /products/:id/images`, `PUT /products/:id/images/order`, `DELETE /products/:id/images/:imageId`.
 Inventory: `GET /inventory`, `POST /products/:id/stock` (reason required), `GET /products/:id/movements`.
 Import: `GET /imports/template?format=xlsx|csv`, `POST /imports/preview` (multipart), `GET /imports/:id`, `POST /imports/:id/confirm`, `POST /imports/:id/cancel`, `GET /imports`.
-Orders: `GET /orders`, `GET /orders/:id`, `POST /orders/:id/status`, `POST /orders/:id/refund`, `POST /orders/:id/cod-collected`, `GET /orders/:id/invoice` (printable HTML).
+Orders: `GET /orders` (filters incl. `payment_method=upi`, `payment_status=verifying`), `GET /orders/:id`, `POST /orders/:id/status`, `POST /orders/:id/refund`, `POST /orders/:id/cod-collected`, `GET /orders/:id/invoice` (printable HTML).
+UPI (staff-verified): `POST /orders/:id/upi/confirm` `{amount, utr, accept_utr_mismatch?}` (amount and UTR as seen in the bank app; must equal the order total; one UTR per payment) · `POST /orders/:id/upi/reject` `{reason}` (cancels, returns stock/coins/coupon) · `POST /orders/:id/refunds/:refundId/manual` `{reference}` (refunds:write; UPI refunds are sent by staff, never by the gateway).
 Offers: `GET/POST/PUT/DELETE /coupons`, `PATCH /coupons/:id/active` · `GET/POST/PUT/DELETE /banners`, `POST /banners/:id/image` · `GET /coins/overview`, `GET /customers/:id/wallet`, `POST /customers/:id/coins`.
 Customers: `GET /customers`, `POST /customers/:id/block`, `POST /customers/:id/delete` (process deletion request).
 Staff & audit: `GET/POST/PUT /staff` (owner only), `GET /audit-logs`.
 
 ### Permissions
-`catalog:read|write · inventory:read|write · orders:read|write · refunds:write · offers:write · coins:write · delivery:write · settings:write · staff:write · customers:read|write · reports:read · audit:read · imports:write`. Owner = all; Manager = operations; Staff = orders + inventory; any person can be granted extras.
+`catalog:read|write · inventory:read|write · orders:read|write · payments:verify (confirm / reject UPI payments; owner + manager by default, grant to individual staff via extra permissions) · refunds:write · offers:write · coins:write · delivery:write · settings:write · staff:write · customers:read|write · reports:read · audit:read · imports:write`. Owner = all; Manager = operations; Staff = orders + inventory; any person can be granted extras.
 
 ### Common error codes
 `VALIDATION_ERROR` (400) · `UNAUTHORIZED`/`FORBIDDEN` (401/403) · `NOT_FOUND` · `CONFLICT`-style codes (`DUPLICATE_SKU`, `LAST_OWNER`, `HAS_ORDERS`…) (409) · `MIN_ORDER_NOT_MET`, `INSUFFICIENT_STOCK`, `OUT_OF_STOCK`, `MAX_QTY`, `STORE_CLOSED`, `DELIVERY_ZONE_REQUIRED`, `ADDRESS_REQUIRED`, `PRICE_CHANGED`, `CHECKOUT_BLOCKED`, `INVALID_TRANSITION`, `IDEMPOTENCY_KEY_REQUIRED` (4xx) · `RATE_LIMITED` (429).

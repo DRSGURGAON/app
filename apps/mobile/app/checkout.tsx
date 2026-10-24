@@ -25,7 +25,7 @@ export default function CheckoutScreen() {
   const { t, pick } = useI18n(); const { user, ready } = useAuth(); const cart = useCart(); const { config } = useStoreConfig();
   const [fulfilment, setFulfilment] = useState<'delivery' | 'pickup'>('delivery');
   const [addressId, setAddressId] = useState<string | null>(null); const [zoneId, setZoneId] = useState<string | null>(null);
-  const [payment, setPayment] = useState<'cod' | 'online'>('cod');
+  const [payment, setPayment] = useState<'cod' | 'online' | 'upi'>('cod');
   const [couponInput, setCouponInput] = useState(''); const [coupon, setCoupon] = useState<string | null>(null);
   const [useCoins, setUseCoins] = useState(false); const [note, setNote] = useState('');
   const [placing, setPlacing] = useState(false); const [msg, setMsg] = useState<string | null>(null);
@@ -52,6 +52,7 @@ export default function CheckoutScreen() {
   const needZone = quote?.delivery.error?.code === 'DELIVERY_ZONE_REQUIRED';
   const zoneChoices = quote?.delivery.zones_to_choose?.length ? quote.delivery.zones_to_choose : zones.data?.zones ?? [];
   const codOk = config?.order.cod_enabled !== false; const onlineOk = config?.order.online_enabled !== false;
+  const upiOk = config?.upi?.enabled === true; const gateway = config?.payments.provider !== 'none';
   const deliveryOk = config?.store.delivery_enabled !== false; const pickupOk = config?.store.pickup_enabled !== false;
   const nonBlocking = new Set(['DELIVERY_ZONE_REQUIRED']);
   const hardBlockers = (quote?.blockers ?? []).filter((b) => !nonBlocking.has(b.code) && !b.details?.coupon);
@@ -71,6 +72,8 @@ export default function CheckoutScreen() {
       if (payment === 'online' && r.order.status === 'pending_payment') {
         const res = await payOrder(r.order.id, user?.name);
         router.replace({ pathname: '/order/[id]', params: { id: r.order.id, placed: res.status === 'paid' ? '1' : '0', pay: res.status, ...(res.message ? { payMsg: res.message } : {}) } });
+      } else if (payment === 'upi' && r.order.status === 'pending_payment') {
+        router.replace({ pathname: '/order/[id]', params: { id: r.order.id, placed: '0', pay: 'upi' } }); // the order screen shows the UPI pay panel
       } else router.replace({ pathname: '/order/[id]', params: { id: r.order.id, placed: '1' } });
     } catch (e: any) {
       const m = e instanceof ApiError ? e.message : t('errGeneric');
@@ -106,7 +109,8 @@ export default function CheckoutScreen() {
 
         <Text style={{ fontWeight: '800', fontSize: 16, marginVertical: space.sm }}>{t('paymentMethod')}</Text>
         <Option selected={payment === 'cod'} title={fulfilment === 'pickup' ? t('codPickup') : t('cod')} disabled={!codOk} hint={!codOk ? t('codDisabled') : undefined} onPress={() => setPayment('cod')} />
-        <Option selected={payment === 'online'} title={t('online')} hint={!onlineOk ? t('onlineDisabled') : config?.payments.provider === 'mock' ? `${t('onlineHint')} (TEST MODE)` : t('onlineHint')} disabled={!onlineOk} onPress={() => setPayment('online')} />
+        {upiOk ? <Option selected={payment === 'upi'} title={t('upi')} hint={t('upiHint')} onPress={() => setPayment('upi')} /> : null}
+        {gateway ? <Option selected={payment === 'online'} title={t('online')} hint={!onlineOk ? t('onlineDisabled') : config?.payments.provider === 'mock' ? `${t('onlineHint')} (TEST MODE)` : t('onlineHint')} disabled={!onlineOk} onPress={() => setPayment('online')} /> : null}
 
         <Card>
           <Text style={{ fontWeight: '800', marginBottom: 6 }}>{t('couponTitle')}</Text>
@@ -153,7 +157,7 @@ export default function CheckoutScreen() {
         {msg ? <Text accessibilityLiveRegion="assertive" style={{ color: colors.danger, fontWeight: '700', marginTop: 6 }}>{msg}</Text> : null}
       </ScrollView>
       <View style={{ padding: space.md, backgroundColor: '#fff', borderTopWidth: 1, borderTopColor: colors.border }}>
-        <Button title={placing ? t('placing') : payment === 'online' && quote?.totals.total ? t('payNow', { amt: formatINR(quote.totals.total) }) : t('placeOrder')} loading={placing} disabled={!canPlace} onPress={() => { if (payment === 'cod' && fulfilment === 'delivery' && Platform.OS !== 'web') Alert.alert(t('placeOrder'), `${t('toPay')}: ${formatINR(quote?.totals.total)}`, [{ text: t('cancel'), style: 'cancel' }, { text: t('placeOrder'), onPress: place }]); else void place(); }} />
+        <Button title={placing ? t('placing') : payment === 'online' && quote?.totals.total ? t('payNow', { amt: formatINR(quote.totals.total) }) : payment === 'upi' && quote?.totals.total ? t('upiContinue', { amt: formatINR(quote.totals.total) }) : t('placeOrder')} loading={placing} disabled={!canPlace} onPress={() => { if (payment === 'cod' && fulfilment === 'delivery' && Platform.OS !== 'web') Alert.alert(t('placeOrder'), `${t('toPay')}: ${formatINR(quote?.totals.total)}`, [{ text: t('cancel'), style: 'cancel' }, { text: t('placeOrder'), onPress: place }]); else void place(); }} />
       </View>
     </KeyboardAvoidingView>
   );

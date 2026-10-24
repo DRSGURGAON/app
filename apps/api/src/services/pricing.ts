@@ -14,7 +14,7 @@ export interface QuoteRequest {
   address?: AddressInput | null;
   coupon_code?: string | null;
   use_coins?: number;
-  payment_method?: 'cod' | 'online';
+  payment_method?: 'cod' | 'online' | 'upi';
 }
 export interface QuoteDeps {
   q: Queryable; userId: string | null; settings: AppSettings; routing: RoutingProvider | null; lock?: boolean; now?: Date;
@@ -87,6 +87,7 @@ export async function buildQuote(req: QuoteRequest, deps: QuoteDeps): Promise<{ 
   if (req.fulfilment === 'pickup' && !S.store.pickup_enabled) blockers.push({ code: 'PICKUP_DISABLED', message: 'Store pickup is not available right now.' });
   if (req.payment_method === 'cod' && !S.order.cod_enabled) blockers.push({ code: 'COD_DISABLED', message: 'Cash on Delivery is not available right now.' });
   if (req.payment_method === 'online' && !S.order.online_enabled) blockers.push({ code: 'ONLINE_DISABLED', message: 'Online payment is not available right now.' });
+  if (req.payment_method === 'upi' && !(S.upi.enabled && S.upi.vpa)) blockers.push({ code: 'UPI_DISABLED', message: 'UPI payment is not available right now.' });
 
   // ---- cart lines (merge duplicates)
   const merged = new Map<string, number>();

@@ -56,7 +56,8 @@ export function adminNextStatuses(from: OrderStatus, fulfilment: 'delivery' | 'p
   return next;
 }
 
-export const customerCanCancel = (s: OrderStatus) => s === 'pending_payment' || s === 'placed';
+// A UPI order the customer has reported as paid is waiting for staff: only staff may cancel it (money may already be in the bank).
+export const customerCanCancel = (s: OrderStatus, paymentStatus?: string) => (s === 'pending_payment' && paymentStatus !== 'verifying') || s === 'placed';
 
 export interface CheckoutInput {
   idempotency_key: string;
@@ -64,7 +65,7 @@ export interface CheckoutInput {
   fulfilment: 'delivery' | 'pickup';
   address_id?: string | null;
   zone_id?: string | null;
-  payment_method: 'cod' | 'online';
+  payment_method: 'cod' | 'online' | 'upi';
   coupon_code?: string | null;
   use_coins?: number;
   expected_total?: string | null;
@@ -89,6 +90,7 @@ export async function loadAddressInput(q: Queryable, userId: string, addressId: 
 }
 
 export async function createOrder(ctx: AppCtx, userId: string, input: CheckoutInput): Promise<{ orderId: string; replay: boolean; quote?: Quote }> {
+  if (input.payment_method === 'online' && ctx.payments.name === 'none') throw new AppError(422, 'ONLINE_DISABLED', 'Online payment is not available right now.');
   try {
     return await withTx(ctx.db, async (tx) => {
       // Serialise this customer's checkouts: idempotency, first-order discount and coin balance all depend on it.
@@ -124,7 +126,7 @@ export async function createOrder(ctx: AppCtx, userId: string, input: CheckoutIn
       const orderId = randomUUID();
       const seq = (await tx.query("SELECT nextval('order_no_seq') AS n")).rows[0].n;
       const orderNo = `ASM${istDateStamp()}-${String(seq).padStart(5, '0')}`;
-      const online = input.payment_method === 'online';
+      const online = input.payment_method !== 'cod'; // gateway or UPI: paid before the store accepts the order
       const status: OrderStatus = online ? 'pending_payment' : 'placed';
       const d = internal.deliveryQuote!;
       const snapshot = addr ? {
@@ -165,6 +167,12 @@ export async function createOrder(ctx: AppCtx, userId: string, input: CheckoutIn
 
       await reserveStock(tx, internal.lines.map((l) => ({ productId: l.product.id, qty: l.qty })), orderId);
 
+      if (input.payment_method === 'upi') {
+        // One payment record per UPI order; staff confirmation settles it through applyPaymentCaptured like a gateway capture.
+        await tx.query(`INSERT INTO payments (order_id, provider, provider_order_id, amount, status, method, mode) VALUES ($1,'upi_manual',$2,$3,'created','upi','live')`,
+          [orderId, `upi_${orderNo}`, total]);
+      }
+
       if (internal.couponRow) {
         await tx.query('INSERT INTO coupon_redemptions (coupon_id, user_id, order_id, amount) VALUES ($1,$2,$3,$4)', [internal.couponRow.id, userId, orderId, fromPaise(internal.couponPaise)]);
         await tx.query('UPDATE coupons SET used_count = used_count + 1 WHERE id=$1', [internal.couponRow.id]);
@@ -174,7 +182,7 @@ export async function createOrder(ctx: AppCtx, userId: string, input: CheckoutIn
       }
 
       await tx.query(`INSERT INTO order_status_history (order_id, from_status, to_status, note, actor_type, actor_id) VALUES ($1,NULL,$2,$3,'customer',$4)`,
-        [orderId, status, online ? 'Waiting for online payment' : 'Cash on Delivery order placed', userId]);
+        [orderId, status, input.payment_method === 'upi' ? 'Waiting for UPI payment' : online ? 'Waiting for online payment' : 'Cash on Delivery order placed', userId]);
       if (!online) {
         await notifyUser(tx, userId, 'order_update', 'Order placed', `Your order ${orderNo} has been placed. Total ₹${total}.`, { order_id: orderId });
       }
@@ -198,7 +206,7 @@ export async function getOrderDetail(q: Queryable, orderId: string, userId?: str
   const [items, hist, pay, refunds] = await Promise.all([
     q.query('SELECT * FROM order_items WHERE order_id=$1 ORDER BY name', [orderId]),
     q.query('SELECT from_status, to_status, note, actor_type, created_at FROM order_status_history WHERE order_id=$1 ORDER BY id', [orderId]),
-    q.query('SELECT id, provider, provider_order_id, provider_payment_id, amount, status, method, mode, created_at FROM payments WHERE order_id=$1 ORDER BY created_at', [orderId]),
+    q.query('SELECT id, provider, provider_order_id, provider_payment_id, amount, status, method, mode, claimed_utr, claimed_at, verified_at, created_at FROM payments WHERE order_id=$1 ORDER BY created_at', [orderId]),
     q.query('SELECT id, amount, status, reason, created_at FROM refunds WHERE order_id=$1 ORDER BY created_at', [orderId]),
   ]);
   const flow = order.fulfilment_type === 'delivery' ? DELIVERY_FLOW : PICKUP_FLOW;
@@ -220,7 +228,7 @@ export async function getOrderDetail(q: Queryable, orderId: string, userId?: str
     history: hist.rows.map((h) => ({ ...h, label: STATUS_LABELS[h.to_status as OrderStatus] })),
     timeline: terminalBad ? timeline.filter((t) => t.done) : timeline,
     payments: pay.rows, refunds: refunds.rows,
-    can_cancel: customerCanCancel(order.status),
+    can_cancel: customerCanCancel(order.status, order.payment_status),
     admin_next: adminNextStatuses(order.status, order.fulfilment_type),
   };
 }
@@ -230,7 +238,7 @@ export async function listUserOrders(q: Queryable, userId: string, limit: number
     `SELECT o.id, o.order_no, o.status, o.fulfilment_type, o.payment_method, o.payment_status, o.total, o.placed_at,
             (SELECT count(*)::int FROM order_items i WHERE i.order_id=o.id) AS item_count,
             (SELECT string_agg(name, ', ' ORDER BY name) FROM (SELECT name FROM order_items WHERE order_id=o.id ORDER BY name LIMIT 3) t) AS preview
-       FROM orders o WHERE o.user_id=$1 AND (o.status <> 'pending_payment' OR o.payment_expires_at > now())
+       FROM orders o WHERE o.user_id=$1 AND (o.status <> 'pending_payment' OR o.payment_expires_at > now() OR o.payment_status = 'verifying')
        ORDER BY o.placed_at DESC LIMIT $2`, [userId, limit]);
   return rows.map((r) => ({ ...r, status_label: STATUS_LABELS[r.status as OrderStatus] }));
 }
@@ -252,23 +260,40 @@ export async function unwindOrder(tx: Tx, order: any, finalStatus: 'cancelled' |
   for (const r of rel.rows) await tx.query('UPDATE coupons SET used_count = GREATEST(used_count - 1, 0) WHERE id=$1', [r.coupon_id]);
 
   let refundId: string | null = null;
+  let refunding = false;
   await tx.query(`UPDATE orders SET cancel_reason=$2, cancelled_by=$3 WHERE id=$1`, [order.id, reason, actor.type]);
   await history(tx, order.id, order.status, finalStatus, actor, reason);
-  if (order.payment_status === 'paid') {
-    const p = await tx.query(`SELECT id FROM payments WHERE order_id=$1 AND is_primary AND status='paid' LIMIT 1`, [order.id]);
-    if (p.rowCount) {
-      const r = await tx.query(`INSERT INTO refunds (payment_id, order_id, amount, reason) VALUES ($1,$2,$3,$4) RETURNING id`, [p.rows[0].id, order.id, order.total, `Order ${finalStatus}: ${reason}`]);
-      refundId = r.rows[0].id;
+
+  // The captured payment (if any). Locked after the order row, the same order adminRefund uses, so a refund and a
+  // cancellation of the same order are serialised and cannot both refund the same money.
+  const p = await tx.query(`SELECT id, amount FROM payments WHERE order_id=$1 AND is_primary AND status IN ('paid','partially_refunded','refunded') LIMIT 1 FOR UPDATE`, [order.id]);
+  if (p.rowCount) {
+    const pay = p.rows[0];
+    // Money already refunded or on its way back. A 'failed' refund returned nothing, so it does not count.
+    const r = (await tx.query(`SELECT COALESCE(SUM(amount),0) AS committed, count(*) FILTER (WHERE status IN ('pending','processing'))::int AS in_flight
+                                 FROM refunds WHERE payment_id=$1 AND status IN ('pending','processing','processed')`, [pay.id])).rows[0];
+    const remaining = toPaise(pay.amount) - toPaise(r.committed);
+    if (remaining > 0) {
+      const ins = await tx.query(`INSERT INTO refunds (payment_id, order_id, amount, reason) VALUES ($1,$2,$3,$4) RETURNING id`, [pay.id, order.id, fromPaise(remaining), `Order ${finalStatus}: ${reason}`]);
+      refundId = ins.rows[0].id;
     }
-    await tx.query(`UPDATE orders SET status='refund_pending', payment_status='refund_pending' WHERE id=$1`, [order.id]);
-    await history(tx, order.id, finalStatus, 'refund_pending', { type: 'system' }, 'Refund to original payment method initiated');
+    refunding = remaining > 0 || r.in_flight > 0;
+    if (refunding) {
+      await tx.query(`UPDATE orders SET status='refund_pending', payment_status='refund_pending' WHERE id=$1`, [order.id]);
+      await history(tx, order.id, finalStatus, 'refund_pending', { type: 'system' },
+        remaining > 0 ? `Refund of ₹${fromPaise(remaining)} to original payment method initiated` : 'Refund already in progress');
+    } else {
+      // Everything was already refunded: the order is cancelled, its payment history (refunded) stays as it is.
+      await tx.query(`UPDATE orders SET status=$2 WHERE id=$1`, [order.id, finalStatus]);
+    }
   } else {
-    await tx.query(`UPDATE orders SET status=$2, payment_status=CASE WHEN payment_method='online' THEN 'failed' ELSE payment_status END WHERE id=$1`, [order.id, finalStatus]);
+    // Nothing was captured. Only an unpaid online/UPI payment becomes 'failed'; COD and any refund states are kept.
+    await tx.query(`UPDATE orders SET status=$2, payment_status=CASE WHEN payment_method<>'cod' AND payment_status IN ('pending','verifying') THEN 'failed' ELSE payment_status END WHERE id=$1`, [order.id, finalStatus]);
     await tx.query(`UPDATE payments SET status='failed', failure_reason=COALESCE(failure_reason,'Order cancelled before payment') WHERE order_id=$1 AND status IN ('created','pending')`, [order.id]);
   }
   const verb = finalStatus === 'rejected' ? 'could not be accepted' : 'has been cancelled';
   await notifyUser(tx, order.user_id, 'order_update', finalStatus === 'rejected' ? 'Order rejected' : 'Order cancelled',
-    `Your order ${order.order_no} ${verb}. ${reason}${refundId ? ' Your payment will be refunded.' : ''}`, { order_id: order.id });
+    `Your order ${order.order_no} ${verb}. ${reason}${refunding ? ' Your payment will be refunded.' : ''}`, { order_id: order.id });
   return { refundId };
 }
 
@@ -283,7 +308,7 @@ export async function transitionOrder(ctx: AppCtx, orderId: string, to: OrderSta
     let allowed: OrderStatus[];
     if (actor.type === 'customer') {
       if (order.user_id !== actor.id) throw notFound('Order not found');
-      allowed = customerCanCancel(from) ? ['cancelled'] : [];
+      allowed = customerCanCancel(from, order.payment_status) ? ['cancelled'] : [];
     } else if (actor.type === 'system' || actor.type === 'payment') {
       allowed = from === 'pending_payment' ? ['cancelled'] : [];
     } else {
