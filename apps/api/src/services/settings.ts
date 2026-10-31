@@ -33,7 +33,7 @@ export const settingsSchemas = {
     // STARTING VALUE ONLY - the owner decides the real short-distance fee in Admin → Delivery.
     base_fee: money.default(30),
     far_fee: money.default(70),
-    max_radius_km: z.number().min(0).max(200).default(0), // 0 = no maximum
+    max_radius_km: z.number().min(0).max(200).default(15), // 0 = no maximum
     zone_mode: z.enum(['radius', 'zones']).default('radius'),
     zone_overrides_enabled: z.boolean().default(false),
     fallback_mode: z.enum(['ask_zone', 'straight_line', 'block']).default('ask_zone'),

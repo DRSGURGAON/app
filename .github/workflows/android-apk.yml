@@ -18,7 +18,7 @@ jobs:
         env: { GS: "${{ secrets.GOOGLE_SERVICES_JSON }}" }
         run: if [ -n "$GS" ]; then echo "$GS" | base64 -d > google-services.json; fi
       - run: npx expo prebuild --platform android --no-install
-        env: { EXPO_PUBLIC_API_URL: "${{ secrets.API_URL }}" }
+        env: { EXPO_PUBLIC_API_URL: "${{ secrets.API_URL }}", GOOGLE_MAPS_ANDROID_KEY: "${{ secrets.GOOGLE_MAPS_ANDROID_KEY }}" }
       - name: Configure release signing
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/app/release.keystore

@@ -44,6 +44,7 @@ export async function catalogRoutes(app: FastifyInstance, { ctx, optionalUser }:
       order: { min_order: s.order.min_order.toFixed(2), min_applies_to_pickup: s.order.min_applies_to_pickup, cod_enabled: s.order.cod_enabled, online_enabled: s.order.online_enabled && ctx.payments.name !== 'none', payment_window_minutes: s.order.payment_window_minutes },
       upi: { enabled: s.upi.enabled && !!s.upi.vpa },
       coins: s.coins, first_order: s.first_order.enabled ? s.first_order : { enabled: false },
+      maps: { search_enabled: !!ctx.places, road_distance: !!ctx.routing },
       payments: { provider: ctx.payments.name, mode: ctx.payments.mode, live: ctx.payments.mode === 'live' },
       policies: s.policies, server_time: new Date().toISOString(),
     };

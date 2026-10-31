@@ -61,3 +61,10 @@ Staff & audit: `GET/POST/PUT /staff` (owner only), `GET /audit-logs`.
 
 ### Common error codes
 `VALIDATION_ERROR` (400) · `UNAUTHORIZED`/`FORBIDDEN` (401/403) · `NOT_FOUND` · `CONFLICT`-style codes (`DUPLICATE_SKU`, `LAST_OWNER`, `HAS_ORDERS`…) (409) · `MIN_ORDER_NOT_MET`, `INSUFFICIENT_STOCK`, `OUT_OF_STOCK`, `MAX_QTY`, `STORE_CLOSED`, `DELIVERY_ZONE_REQUIRED`, `ADDRESS_REQUIRED`, `PRICE_CHANGED`, `CHECKOUT_BLOCKED`, `INVALID_TRANSITION`, `IDEMPOTENCY_KEY_REQUIRED` (4xx) · `RATE_LIMITED` (429).
+
+## Maps (login required)
+- `GET /v1/maps/autocomplete?q=&session=` -> suggestions (Places New, India only)
+- `GET /v1/maps/place?id=&session=` -> lat/lng + address parts
+- `GET /v1/maps/reverse?lat=&lng=` -> address for a pin
+- `POST /v1/delivery/estimate` `{lat,lng,subtotal?}` -> server-computed fee preview for an unsaved pin; out of area gives `serviceable:false`.
+Errors: 503 `MAPS_UNAVAILABLE` on Google failure/timeout. Default `max_radius_km` = 15.

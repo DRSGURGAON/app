@@ -168,6 +168,13 @@ export async function resolveDistance(opts: {
   if (!address) return { km: null, method: 'none', reason: 'missing_address_coordinates' };
   if (!store) return { km: null, method: 'none', reason: 'store_location_not_configured' };
 
+  // Roads are never shorter than the straight line. If even the straight line is beyond the maximum delivery radius, the order
+  // is going to be refused anyway - do not spend a (billable) routing call on it. The figure is a lower bound used for the refusal message.
+  if (provider && settings.max_radius_km > 0) {
+    const straight = haversineKm(store, address);
+    if (straight > settings.max_radius_km) return { km: straight, method: 'straight_line' };
+  }
+
   let failed = false;
   if (provider) {
     const ctrl = new AbortController();

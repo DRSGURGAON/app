@@ -53,3 +53,6 @@ Expire unpaid orders (60 s), process pending refunds (120 s), expire coins (6 h)
 
 ## Data model
 See `apps/api/src/db/migrations/001_init.sql` (single migration, checksummed by `npm run migrate`).
+
+## Maps & distance
+Routes API distance is wrapped by `CachedRouting` (table `distance_cache`, 90-day TTL). A haversine prefilter skips the billable call beyond `max_radius_km` (15). The server key never reaches the app; the app only holds the restricted Android Maps key.

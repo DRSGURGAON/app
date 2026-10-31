@@ -43,3 +43,6 @@ Install APK → Hindi default shows → switch English → browse/search → add
 
 ## Play Console checklist
 App name & short/full description (Hindi + English), 512×512 icon, 1024×500 feature graphic, ≥ 2 phone screenshots, category *Shopping*, contact email/phone, **Privacy Policy URL** = `https://api.example.com/policy/privacy`, **Account deletion URL** = `https://api.example.com/account-deletion`, Data safety form (collected: phone number, name, address, purchase history, device token, approximate/precise location if used; encrypted in transit; deletion on request), content rating questionnaire, target audience 18+, ads: none. Start with *Internal testing*, then *Closed testing* (new personal accounts must run a closed test with ≥ 12 testers for 14 days before production — check Play's current rule).
+
+## Maps key
+Set GitHub secret `GOOGLE_MAPS_ANDROID_KEY`; the workflow passes it to `expo prebuild`. Locally: `GOOGLE_MAPS_ANDROID_KEY=... npx expo prebuild`. See GOOGLE_MAPS_SETUP.md. Map needs a dev/release build.

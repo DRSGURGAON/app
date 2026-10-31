@@ -16,7 +16,7 @@ export function makeCtx(over: Partial<AppCtx> = {}): AppCtx & { db: Db; payments
 export async function reset(db: Db) {
   await db.query(`TRUNCATE settings, users, auth_otps, refresh_tokens, device_tokens, admin_users, delivery_zones, addresses, categories, products,
     product_images, stock_movements, coupons, banners, orders, order_items, order_status_history, coupon_redemptions, payments, payment_events,
-    refunds, wallets, wallet_transactions, coin_lots, notifications, audit_logs, import_jobs, import_errors RESTART IDENTITY CASCADE`);
+    refunds, wallets, wallet_transactions, coin_lots, notifications, audit_logs, import_jobs, import_errors, distance_cache RESTART IDENTITY CASCADE`);
   await db.query('ALTER SEQUENCE order_no_seq RESTART WITH 1');
 }
 

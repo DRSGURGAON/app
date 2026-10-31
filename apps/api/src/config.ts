@@ -21,7 +21,8 @@ const schema = z.object({
   PAYMENT_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
   ROUTING_PROVIDER: z.enum(['none', 'osrm', 'google']).default('none'),
   OSRM_BASE_URL: z.string().default(''),
-  GOOGLE_MAPS_API_KEY: z.string().default(''),
+  GOOGLE_MAPS_API_KEY: z.string().default(''), // SERVER key (Routes + Places + Geocoding). Never the Android app key.
+  GOOGLE_PLACES_ENABLED: z.enum(['true', 'false']).default('true').transform((v) => v === 'true'),
   FCM_PROJECT_ID: z.string().default(''),
   FCM_SERVICE_ACCOUNT_FILE: z.string().default(''),
   STORAGE_DRIVER: z.enum(['local', 's3']).default('local'),

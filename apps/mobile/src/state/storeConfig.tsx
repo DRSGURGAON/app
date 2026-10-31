@@ -4,6 +4,7 @@ import { kv } from '../lib/storage';
 
 export interface StoreConfig {
   store: { name_hi: string; name_en: string; phone: string; address_hi: string; address_en: string; open_time: string; close_time: string; open_now: boolean; closed_reason: string | null; closed_message: string; delivery_enabled: boolean; pickup_enabled: boolean; pickup_instructions: string };
+  maps?: { search_enabled: boolean; road_distance: boolean };
   delivery: { base_fee: string; far_fee: string; near_radius_km: number; max_radius_km: number };
   order: { min_order: string; cod_enabled: boolean; online_enabled: boolean; payment_window_minutes: number };
   coins: { enabled: boolean; coin_value: number; earn_coins_per_unit: number; earn_spend_unit: number };

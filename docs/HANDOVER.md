@@ -60,3 +60,6 @@ Date: 2026-10-20 · Code: ~6,200 lines TypeScript (API ≈ 3,000, app + admin �
 
 ## 6. Where things are
 `apps/api/src/services/pricing.ts` (all price/fee/discount logic) · `services/orders.ts` (state machine, reservation) · `services/payments.ts` · `services/coins.ts` · `services/importer.ts` · `routes/` (public + `routes/admin/`) · `db/migrations/001_init.sql` · `apps/mobile/app/` (screens) · `apps/mobile/src/lib/` (api, quote, pay) · `apps/admin/src/pages/` · `e2e/` (browser scripts).
+
+## Maps (added)
+Done + tested with mock Google: cache, 15 km radius, estimate, search, pin picker UI (web e2e). NOT verified: real Google APIs, native MapView on a device, APK build. See GOOGLE_MAPS_SETUP.md.

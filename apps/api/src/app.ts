@@ -20,6 +20,7 @@ import { adminOrderRoutes } from './routes/admin/orders.js';
 import { adminOfferRoutes } from './routes/admin/offers.js';
 import { adminImportRoutes } from './routes/admin/imports.js';
 import { publicPageRoutes } from './routes/publicPages.js';
+import { mapsRoutes } from './routes/maps.js';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -94,6 +95,7 @@ export async function buildApp(ctx: AppCtx): Promise<FastifyInstance> {
   await app.register(async (r) => catalogRoutes(r, deps), { prefix: '/v1' });
   await app.register(async (r) => authRoutes(r, deps), { prefix: '/v1' });
   await app.register(async (r) => customerRoutes(r, deps), { prefix: '/v1' });
+  await app.register(async (r) => mapsRoutes(r, deps), { prefix: '/v1' });
   await app.register(async (r) => orderRoutes(r, deps), { prefix: '/v1' });
   await app.register(async (r) => { await adminCoreRoutes(r, deps); await adminCatalogRoutes(r, deps); await adminOrderRoutes(r, deps); await adminOfferRoutes(r, deps); await adminImportRoutes(r, deps); }, { prefix: '/v1/admin' });
 

@@ -35,3 +35,5 @@ Tick every box before telling customers the app is live. "Verified" means you di
 - [ ] Staff trained: accept → pack → dispatch → deliver; cancel/reject with reason; COD cash-collected; refunds; stock adjust with reason; print invoice
 - [ ] Rehearsal: 3 end-to-end orders (delivery COD, pickup, online) handled start to finish
 - [ ] Support phone/WhatsApp shown in app = 9485519555 (verify)
+
+- [ ] Maps: 5 real addresses match Google Maps km; budget alert + quota caps set; both keys restricted; Play App Signing SHA-1 added.

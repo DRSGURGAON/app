@@ -89,7 +89,7 @@ export async function adminCoreRoutes(app: FastifyInstance, { ctx, requireAdmin 
     payments: { provider: ctx.payments.name, mode: ctx.payments.mode, live: ctx.payments.mode === 'live', keys_configured: ctx.config.PAYMENT_PROVIDER === 'razorpay' ? !!(ctx.config.RAZORPAY_KEY_ID && ctx.config.RAZORPAY_KEY_SECRET) : false, webhook_secret_configured: !!ctx.config.RAZORPAY_WEBHOOK_SECRET, webhook_url_path: '/v1/webhooks/payments',
       note: ctx.config.PAYMENT_PROVIDER === 'mock' ? 'MOCK payments (development only). Real Razorpay keys are not configured.' : ctx.payments.mode === 'sandbox' ? 'Razorpay TEST mode. No real money moves.' : 'LIVE payments enabled.' },
     otp: { provider: ctx.otp.name, dev_echo: ctx.otp.devEcho, note: ctx.otp.name === 'mock' ? 'MOCK OTP (development only). Customers cannot receive real SMS.' : 'MSG91 configured.' },
-    routing: { provider: ctx.config.ROUTING_PROVIDER, configured: !!ctx.routing },
+    routing: { provider: ctx.config.ROUTING_PROVIDER, configured: !!ctx.routing, address_search: !!ctx.places },
     push: { configured: ctx.push.configured }, storage: { driver: ctx.config.STORAGE_DRIVER }, environment: ctx.config.NODE_ENV,
     note: 'Secrets are set in the server environment and are never shown here or sent to the apps.',
   }));

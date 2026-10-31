@@ -16,7 +16,7 @@ import { fulfilStock, releaseStock, reserveStock } from './stock.js';
 import { notifyUser } from './notifications.js';
 
 export interface AppCtx {
-  db: Db; config: Config; payments: PaymentProvider; routing: RoutingProvider | null; push: PushSender; otp: OtpSender;
+  db: Db; config: Config; payments: PaymentProvider; routing: RoutingProvider | null; places?: import('./maps.js').PlacesProvider | null; push: PushSender; otp: OtpSender;
 }
 
 export type OrderStatus =
