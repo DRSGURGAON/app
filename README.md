@@ -18,7 +18,7 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 | SQLCipher-encrypted metadata database (Drift) | Implemented, tested on host with SQLCipher |
 | Secure import via Storage Access Framework, decrypt-to-temp preview | Implemented, **needs a device run** |
 | Auto-lock, FLAG_SECURE, backup exclusion | Implemented |
-| Android build / on-device tests | Run by GitHub Actions (`.github/workflows/ci.yml`) |
+| Android build / on-device tests | Green on GitHub Actions (APK build, 5 Keystore tests, on-device flow on API 34 emulator) |
 
 Phases 2–8 (full vault, scanner, PDF tools, OCR, reminders, billing, polish, release) have not been started.
 See [docs/TESTING.md](docs/TESTING.md) for exactly what has and has not been verified.

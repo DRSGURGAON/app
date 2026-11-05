@@ -7,12 +7,13 @@
 | Crypto core (JVM) — 33 tests | `cd native/docsafe-crypto && ./gradlew test` | Any JVM, CI | **Passed locally** |
 | Dart unit + widget — 38 tests (SQLCipher on host) | `flutter test` | Host, CI | **Passed locally** |
 | Static analysis | `flutter analyze` | Host, CI | **No issues** |
-| Debug APK build | `flutter build apk --debug` | CI (needs Android SDK) | **Not yet run** — no Android SDK in the dev container |
-| Keystore instrumented tests — 5 tests | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator (CI) | **Not yet run** |
-| On-device flow (setup → lock → wrong PIN → unlock → SQLCipher) | `flutter test integration_test` | Emulator (CI) | **Not yet run** |
+| Debug APK build | `flutter build apk --debug` | CI | **Passed** (CI run 12) |
+| Keystore instrumented tests — 5 tests | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
+| On-device flow (setup → lock → wrong PIN → unlock → SQLCipher) | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
 
-"Not yet run" items execute in `.github/workflows/ci.yml` once the code is pushed to GitHub.
-The Android Kotlin layer has not been compiled yet: the first CI run is its first compilation.
+All suites run in `.github/workflows/ci.yml` on every push (branch `docsafe-main` of DRSGURGAON/app).
+Emulator results cover the real Android Keystore, PinManager and SQLCipher on Android 14;
+they do not replace the physical-device checks below (OEM Keystore quirks, real biometrics, SAF picker).
 
 ## Phase 1 acceptance criteria
 
@@ -30,7 +31,7 @@ The Android Kotlin layer has not been compiled yet: the first CI run is its firs
 | 10 | Low storage | Pre-check and mid-write exhaustion leave nothing; UI message widget test | Manual: nearly-full emulator |
 | 11 | Integrity failure | Bit flips, header/key tampering, truncation (mid/boundary), reorder, append, swapped files, wrong key; UI message | — |
 
-**Phase 1 is not complete until the CI device job is green and the manual checks above are done.**
+**CI device job: green. Phase 1 is complete once the manual checks below pass on a physical phone.**
 
 ## Manual device checklist
 
