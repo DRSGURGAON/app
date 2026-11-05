@@ -50,9 +50,11 @@ dependencies {
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
-    androidTestImplementation("androidx.test:runner:1.7.0")
-    androidTestImplementation("androidx.test.ext:junit:1.3.0")
-    androidTestImplementation("junit:junit:4.13.2")
+    // Versions aligned with what Flutter's integration_test plugin puts on the debug runtime
+    // classpath; Gradle's consistent resolution rejects anything newer here.
+    androidTestImplementation("androidx.test:runner:1.3.0")
+    androidTestImplementation("androidx.test.ext:junit:1.1.2")
+    androidTestImplementation("junit:junit:4.12")
 }
 
 flutter {
