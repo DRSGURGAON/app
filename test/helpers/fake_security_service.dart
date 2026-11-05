@@ -1,0 +1,207 @@
+import 'dart:typed_data';
+
+import 'package:docsafe/core/security/security_failure.dart';
+import 'package:docsafe/core/security/security_service.dart';
+
+/// In-memory stand-in for the native security module, mirroring its rules:
+/// 6-digit PIN, weak PIN rejection, 5 free attempts then lockout, and
+/// refusal of vault operations while locked.
+class FakeSecurityService implements SecurityService {
+  String? _pin;
+  bool unlocked = false;
+  bool biometricEnabled = false;
+  BiometricAvailability availability = BiometricAvailability.available;
+  BiometricOutcome nextBiometricOutcome = BiometricOutcome.success;
+  KeyProtection protection = KeyProtection.trustedEnvironment;
+  int failed = 0;
+  int lockoutMillis = 0;
+  String? language;
+
+  /// Next value returned by [pickAndImportDocument]; null = user cancelled.
+  ImportedFile? nextImport;
+  SecurityFailure? nextImportFailure;
+  final Set<String> filesOnDisk = {};
+  final Set<String> tempFiles = {};
+  final List<Uint8List> pinBuffersSeen = [];
+  int lockCalls = 0;
+
+  void _requireUnlocked() {
+    if (!unlocked) throw const SecurityFailure(SecurityErrorCode.locked);
+  }
+
+  @override
+  Future<SecurityStatus> getStatus() async => SecurityStatus(
+    pinSet: _pin != null,
+    unlocked: unlocked,
+    biometricEnabled: biometricEnabled,
+    biometricAvailability: availability,
+    failedAttempts: failed,
+    lockoutRemainingMillis: lockoutMillis,
+    keyProtection: protection,
+  );
+
+  @override
+  Future<void> setPin(Uint8List digits) async {
+    pinBuffersSeen.add(digits);
+    final p = digits.join();
+    digits.fillRange(0, digits.length, 0);
+    if (_pin != null) _requireUnlocked();
+    if (p.length != 6 || RegExp(r'^(\d)\1+$').hasMatch(p) || p == '123456') {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    _pin = p;
+    unlocked = true;
+  }
+
+  @override
+  Future<PinVerifyResult> verifyPin(Uint8List digits) async {
+    pinBuffersSeen.add(digits);
+    final p = digits.join();
+    digits.fillRange(0, digits.length, 0);
+    if (_pin == null) {
+      return PinVerifyResult(
+        outcome: PinOutcome.notSet,
+        failedAttempts: 0,
+        lockoutMillis: 0,
+        attemptsBeforeLockout: 0,
+      );
+    }
+    if (lockoutMillis > 0) {
+      return PinVerifyResult(
+        outcome: PinOutcome.lockedOut,
+        failedAttempts: failed,
+        lockoutMillis: lockoutMillis,
+        attemptsBeforeLockout: 0,
+      );
+    }
+    if (p == _pin) {
+      failed = 0;
+      unlocked = true;
+      return PinVerifyResult(
+        outcome: PinOutcome.success,
+        failedAttempts: 0,
+        lockoutMillis: 0,
+        attemptsBeforeLockout: 5,
+      );
+    }
+    failed++;
+    if (failed >= 5) lockoutMillis = 30000;
+    return PinVerifyResult(
+      outcome: PinOutcome.wrong,
+      failedAttempts: failed,
+      lockoutMillis: lockoutMillis,
+      attemptsBeforeLockout: (5 - failed).clamp(0, 5),
+    );
+  }
+
+  @override
+  Future<void> lock() async {
+    lockCalls++;
+    unlocked = false;
+    tempFiles.clear();
+  }
+
+  @override
+  Future<BiometricOutcome> enableBiometric(BiometricPromptText text) async {
+    _requireUnlocked();
+    if (nextBiometricOutcome == BiometricOutcome.success) {
+      biometricEnabled = true;
+    }
+    return nextBiometricOutcome;
+  }
+
+  @override
+  Future<void> disableBiometric() async {
+    _requireUnlocked();
+    biometricEnabled = false;
+  }
+
+  @override
+  Future<BiometricOutcome> unlockWithBiometric(BiometricPromptText text) async {
+    if (nextBiometricOutcome == BiometricOutcome.success) {
+      unlocked = true;
+      failed = 0;
+    }
+    if (nextBiometricOutcome == BiometricOutcome.keyInvalidated) {
+      biometricEnabled = false;
+    }
+    return nextBiometricOutcome;
+  }
+
+  @override
+  Future<DatabaseConfig> getDatabaseConfig() async {
+    _requireUnlocked();
+    return DatabaseConfig(path: ':memory:', keyHex: 'a' * 64);
+  }
+
+  @override
+  Future<ImportedFile?> pickAndImportDocument(List<String> mimeTypes) async {
+    _requireUnlocked();
+    final failure = nextImportFailure;
+    if (failure != null) throw failure;
+    final f = nextImport;
+    if (f != null) filesOnDisk.add(f.fileId);
+    return f;
+  }
+
+  @override
+  Future<String> decryptToTemp(String fileId, String extension) async {
+    _requireUnlocked();
+    if (!filesOnDisk.contains(fileId)) {
+      throw const SecurityFailure(SecurityErrorCode.io);
+    }
+    final path = '/tmp/fake-$fileId.$extension';
+    tempFiles.add(path);
+    return path;
+  }
+
+  @override
+  Future<bool> deleteTemp(String path) async => tempFiles.remove(path);
+
+  @override
+  Future<int> sweepTemp() async {
+    final n = tempFiles.length;
+    tempFiles.clear();
+    return n;
+  }
+
+  @override
+  Future<void> verifyEncryptedFile(String fileId) async => _requireUnlocked();
+
+  @override
+  Future<void> deleteEncryptedFile(String fileId) async {
+    _requireUnlocked();
+    filesOnDisk.remove(fileId);
+  }
+
+  @override
+  Future<List<String>> listEncryptedFileIds() async {
+    _requireUnlocked();
+    return filesOnDisk.toList();
+  }
+
+  @override
+  Future<StorageInfo> getStorageInfo() async =>
+      StorageInfo(vaultBytes: 0, availableBytes: 1 << 30);
+
+  @override
+  Future<String?> getLanguage() async => language;
+
+  @override
+  Future<void> setLanguage(String languageCode) async =>
+      language = languageCode;
+}
+
+ImportedFile fakeImport({
+  String id = '0123456789abcdef0123456789abcdef',
+  String name = 'Driving Licence.pdf',
+  String mime = 'application/pdf',
+  String? fingerprint = 'fp-1',
+}) => ImportedFile(
+  fileId: id,
+  displayName: name,
+  mimeType: mime,
+  plaintextBytes: 1234,
+  ciphertextBytes: 1400,
+  fingerprint: fingerprint,
+);
