@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Test APK only. androidx.test:core 1.3.0 (pinned by Flutter's integration_test plugin)
+     omits android:exported on its helper activities, which Android 12+ requires.
+     Upstream 1.4.0+ declares them exported="true"; mirror that here. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <activity
+            android:name="androidx.test.core.app.InstrumentationActivityInvoker$BootstrapActivity"
+            android:exported="true"
+            tools:node="merge" />
+        <activity
+            android:name="androidx.test.core.app.InstrumentationActivityInvoker$EmptyActivity"
+            android:exported="true"
+            tools:node="merge" />
+        <activity
+            android:name="androidx.test.core.app.InstrumentationActivityInvoker$EmptyFloatingActivity"
+            android:exported="true"
+            tools:node="merge" />
+    </application>
+</manifest>
