@@ -123,39 +123,52 @@ class _EraseScreenState extends ConsumerState<EraseScreen> {
     if (_askPin) {
       return Scaffold(
         appBar: AppBar(title: Text(l.settingsErase)),
+        // Scrollable so the keypad fits small screens (e.g. 320x480 dp).
         body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                children: [
-                  const SizedBox(height: 16),
-                  Text(l.eraseConfirmPin, style: theme.textTheme.titleLarge),
-                  const SizedBox(height: 24),
-                  PinDots(filled: _pin.length, error: _error != null),
-                  SizedBox(
-                    height: 64,
-                    child: Center(
-                      child: _error == null
-                          ? null
-                          : Text(
-                              _error!,
-                              style: TextStyle(color: scheme.error),
-                            ),
+          child: LayoutBuilder(
+            builder: (context, c) => SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: c.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      children: [
+                        const SizedBox(height: 16),
+                        Text(
+                          l.eraseConfirmPin,
+                          style: theme.textTheme.titleLarge,
+                        ),
+                        const SizedBox(height: 24),
+                        PinDots(filled: _pin.length, error: _error != null),
+                        SizedBox(
+                          height: 64,
+                          child: Center(
+                            child: _error == null
+                                ? null
+                                : Text(
+                                    _error!,
+                                    style: TextStyle(color: scheme.error),
+                                  ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-                child: PinPad(
-                  onDigit: (d) => unawaited(_onDigit(d)),
-                  onDelete: () {
-                    if (_pin.isNotEmpty) setState(() => _pin.removeLast());
-                  },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+                      child: PinPad(
+                        onDigit: (d) => unawaited(_onDigit(d)),
+                        onDelete: () {
+                          if (_pin.isNotEmpty) {
+                            setState(() => _pin.removeLast());
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       );

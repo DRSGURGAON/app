@@ -101,6 +101,8 @@ Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
     200,
     scrollable: find.byType(Scrollable).first,
   );
+  await tester.ensureVisible(finder);
+  await tester.pump();
   await tester.tap(finder);
   await settle(tester);
 }

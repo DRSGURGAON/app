@@ -24,7 +24,11 @@ class PinPad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    // Short screens (e.g. 320x480 dp budget phones): flatter keys so the
+    // whole keypad stays visible without scrolling.
+    final compact = MediaQuery.sizeOf(context).height < 640;
     Widget key(int d) => _PadKey(
+      compact: compact,
       label: '$d',
       onTap: enabled
           ? () {
@@ -67,18 +71,23 @@ class PinPad extends StatelessWidget {
 }
 
 class _PadKey extends StatelessWidget {
-  const _PadKey({required this.label, required this.onTap});
+  const _PadKey({
+    required this.label,
+    required this.onTap,
+    this.compact = false,
+  });
 
   final String label;
   final VoidCallback? onTap;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     return Padding(
-      padding: const EdgeInsets.all(8),
+      padding: EdgeInsets.all(compact ? 4 : 8),
       child: AspectRatio(
-        aspectRatio: 1.35,
+        aspectRatio: compact ? 2.5 : 1.35,
         child: Material(
           color: scheme.surfaceContainerHigh,
           shape: const StadiumBorder(),

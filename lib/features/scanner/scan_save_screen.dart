@@ -161,6 +161,7 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
             ),
           const SizedBox(height: 20),
           DropdownButtonFormField<int?>(
+            isExpanded: true,
             initialValue: _categoryId,
             decoration: InputDecoration(
               labelText: l.detailsCategory,
@@ -169,12 +170,19 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
             items: [
               DropdownMenuItem(value: null, child: Text(l.noCategory)),
               for (final c in categories)
-                DropdownMenuItem(value: c.id, child: Text(l.categoryName(c))),
+                DropdownMenuItem(
+                  value: c.id,
+                  child: Text(
+                    l.categoryName(c),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
             ],
             onChanged: (v) => setState(() => _categoryId = v),
           ),
           const SizedBox(height: 16),
           DropdownButtonFormField<int?>(
+            isExpanded: true,
             initialValue: _folderId,
             decoration: InputDecoration(
               labelText: l.detailsFolder,
@@ -183,7 +191,10 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
             items: [
               DropdownMenuItem(value: null, child: Text(l.noFolder)),
               for (final f in folders)
-                DropdownMenuItem(value: f.id, child: Text(f.name)),
+                DropdownMenuItem(
+                  value: f.id,
+                  child: Text(f.name, overflow: TextOverflow.ellipsis),
+                ),
             ],
             onChanged: (v) => setState(() => _folderId = v),
           ),

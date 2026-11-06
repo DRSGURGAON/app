@@ -5,7 +5,7 @@
 | Suite | Command | Where it runs | Result (this commit) |
 |---|---|---|---|
 | Crypto core (JVM) — 46 tests (incl. push encryptor, JPEG parser, PDF writer validated with PDFBox) | `cd native/docsafe-crypto && ./gradlew test` | Any JVM, CI | **Passed locally** |
-| Dart unit + widget + migration — 83 tests (real SQLCipher on host, incl. widget tests) | `flutter test` | Host, CI | **Passed locally** |
+| Dart unit + widget + migration — 86 tests (real SQLCipher on host; incl. 320x480 dp Hindi layout tests) | `flutter test` | Host, CI | **Passed locally** |
 | Static analysis | `flutter analyze` | Host, CI | **No issues** |
 | Debug + release APK build, release permission audit | `flutter build apk --debug/--release` | CI | **Passed** (CI run 12) |
 | Android instrumented tests — 14 tests (Keystore vault incl. 64 MB streaming; scan save path with `PdfRenderer`; scan-directory cleanup) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
