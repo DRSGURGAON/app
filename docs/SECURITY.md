@@ -170,7 +170,31 @@ suggestions/autocorrect so IMEs are not taught document names.
   app cache during review (best-effort wipe, flash caveats as in §4). Devices without the Play
   services module cannot scan (clear error message).
 
-## 11. Known limitations
+## 11. Where plaintext can exist (inventory)
+
+| # | Plaintext item | Location | Created | Removed | In backups? |
+|---|---|---|---|---|---|
+| 1 | Decrypted preview | `cache/vault_tmp/<random>.<ext>` | Viewer opens | Viewer closes; lock/auto-lock; next app start | No (cache) |
+| 2 | Partial decryption | `cache/vault_tmp/<random>.part` | During decrypt | On failure immediately; next start | No |
+| 3 | Scanner pages | ML Kit output directory under `cache/` (copies of non-file results: `cache/docscan_pages/`) | Scan returns | Save confirmed, discard, page delete, lock/auto-lock, erase, next start | No |
+| 4 | Other scanner output in the same directory | as 3 | ML Kit | When the scan session ends, lock, erase, next start (recorded scan directories) | No |
+| 5 | Decoded images in memory | Flutter image cache | Viewer / thumbnails | Viewer close (cache cleared) | — |
+| 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |
+| 7 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
+
+Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
+keys, the PIN verifier. In-progress imports (`*.dsf.part`) are ciphertext. The pending-scan list
+holds paths only. Backups: `allowBackup=false` and data-extraction rules exclude every domain;
+`cache/` and `no_backup/` are never part of Android backups in any case.
+
+**Residual risks (not eliminated):** deletion overwrites with zeros first but flash storage may
+keep old blocks (no secure-erase claim); if the OS kills DocSafe while a viewer or scan review is
+open, plaintext stays in the app-private cache until the next start; the ML Kit scanner screens
+belong to Google Play services and are not covered by DocSafe's FLAG_SECURE; PDFium parses
+documents the user imports (a malicious PDF targets a native parser); anything with root access
+can read the cache while it exists.
+
+## 12. Known limitations
 
 - Biometric prompt, SAF import, PDF rendering and Keystore behaviour on real OEM devices have not
   been verified on physical hardware yet (see TESTING.md).

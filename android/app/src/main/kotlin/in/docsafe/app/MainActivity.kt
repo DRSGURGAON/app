@@ -107,6 +107,8 @@ class MainActivity : FlutterFragmentActivity() {
                 documentUi = documentUi,
             ),
         )
+        // Debug builds only; a no-op object in release/profile (see src/debug, src/release).
+        TestFixtures.register(flutterEngine, this)
     }
 
     override fun onDestroy() {

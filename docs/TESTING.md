@@ -8,8 +8,8 @@
 | Dart unit + widget + migration — 83 tests (real SQLCipher on host, incl. widget tests) | `flutter test` | Host, CI | **Passed locally** |
 | Static analysis | `flutter analyze` | Host, CI | **No issues** |
 | Debug + release APK build, release permission audit | `flutter build apk --debug/--release` | CI | **Passed** (CI run 12) |
-| Android instrumented tests — 12 tests (Keystore vault incl. 64 MB streaming; scan save path with `PdfRenderer`) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
-| On-device flow (setup → lock → wrong PIN → unlock → SQLCipher → restart persistence → erase all) | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
+| Android instrumented tests — 14 tests (Keystore vault incl. 64 MB streaming; scan save path with `PdfRenderer`; scan-directory cleanup) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
+| On-device: security flow, preview robustness, **true process restart** (force-stop) and **device reboot** — `tool/ci/device_tests.sh` | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
 
 All suites run in `.github/workflows/ci.yml` on every push (branch `docsafe-main` of DRSGURGAON/app).
 Emulator results cover the real Android Keystore, PinManager and SQLCipher on Android 14;
@@ -74,3 +74,14 @@ database needs the fake clock to be pumped.
 7. Kill the app during review → relaunch → `adb shell run-as in.docsafe.app ls -R cache` shows no leftover pages.
 8. Fill storage to < 50 MB free → save shows the low-storage message; pages are kept; free space and save again.
 9. Device without Play services (or module disabled) → the "scanner isn't available" message.
+
+## True restart and preview tests (CI emulator)
+
+`tool/ci/device_tests.sh` runs `integration_test/restart/stage_a_test.dart`, force-stops the
+app, asserts the process is gone, runs `stage_b_test.dart` in a new process (verifies a different
+PID, locked start, PIN unlock, metadata and a byte-identical decrypted PDF), reboots the emulator
+and runs stage B again. `integration_test/preview_test.dart` covers small/multi-page/~50 MB PDFs,
+a 24 MP image, corrupted PDF and image, and a tampered container, checking that temp plaintext
+and decoded pixels are released after each viewer. These tests place documents through a
+**debug-build-only** fixture channel (`android/app/src/debug`); CI verifies the release APK does
+not contain it. Physical-device procedures: [DEVICE_TESTING.md](DEVICE_TESTING.md).

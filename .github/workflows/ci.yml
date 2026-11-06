@@ -75,10 +75,37 @@ jobs:
             echo "::error::Unexpected permission in the release APK"
             exit 1
           fi
+      - name: Audit release manifest (backup, debuggable) and debug-only test hooks
+        run: |
+          AAPT2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          "$AAPT2" dump xmltree --file AndroidManifest.xml build/app/outputs/flutter-apk/app-release.apk > release-manifest.txt
+          grep -E "allowBackup|dataExtractionRules|fullBackupContent|debuggable|usesCleartextTraffic" release-manifest.txt | tee -a release-permissions.txt
+          grep -q 'allowBackup.*=0x0\|allowBackup.*false' release-manifest.txt || { echo "::error::allowBackup is not false"; exit 1; }
+          if grep -q 'debuggable.*0xffffffff' release-manifest.txt; then echo "::error::release is debuggable"; exit 1; fi
+          RELEASE_HITS=$(unzip -p build/app/outputs/flutter-apk/app-release.apk 'classes*.dex' | grep -a -c "docsafe.debug/fixtures" || true)
+          DEBUG_HITS=$(unzip -p build/app/outputs/flutter-apk/app-debug.apk 'classes*.dex' | grep -a -c "docsafe.debug/fixtures" || true)
+          echo "test-fixture channel in release dex: $RELEASE_HITS, in debug dex: $DEBUG_HITS" | tee -a release-permissions.txt
+          [ "$RELEASE_HITS" = "0" ] || { echo "::error::debug test fixtures present in release APK"; exit 1; }
+          [ "$DEBUG_HITS" != "0" ] || { echo "::error::sanity check failed: fixtures missing from debug APK"; exit 1; }
+      - name: Size report (universal APK vs per-ABI APKs vs App Bundle)
+        run: |
+          flutter build apk --release --split-per-abi
+          flutter build appbundle --release
+          {
+            echo "## Sizes"
+            ls -l build/app/outputs/flutter-apk/*.apk | awk '{print $5, $9}'
+            ls -l build/app/outputs/bundle/release/*.aab | awk '{print $5, $9}'
+            echo "## Largest entries in the universal APK"
+            unzip -lv build/app/outputs/flutter-apk/app-release.apk | sort -k1 -n -r | head -25
+          } | tee size-report.txt
+          flutter build apk --release --target-platform android-arm64 --analyze-size 2>&1 | tail -40 | tee -a size-report.txt
       - uses: actions/upload-artifact@v4
         with:
-          name: release-permissions
-          path: release-permissions.txt
+          name: release-audit
+          path: |
+            release-permissions.txt
+            release-manifest.txt
+            size-report.txt
       - uses: actions/upload-artifact@v4
         with:
           name: docsafe-debug-apk
@@ -89,7 +116,7 @@ jobs:
     name: On-device security tests (emulator)
     runs-on: ubuntu-latest
     needs: [crypto-core, flutter]
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - name: Enable KVM
@@ -117,9 +144,7 @@ jobs:
           target: google_apis
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: |
-            cd android && ./gradlew :app:connectedDebugAndroidTest --console=plain && cd ..
-            flutter test integration_test -d emulator-5554
+          script: ./tool/ci/device_tests.sh
       - uses: actions/upload-artifact@v4
         if: always()
         with:

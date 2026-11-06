@@ -96,7 +96,15 @@ class _DocumentPreviewScreenState extends ConsumerState<DocumentPreviewScreen> {
               ),
             )
           : doc.isPdf
-          ? PdfViewer.file(path)
+          ? PdfViewer.file(
+              path,
+              params: PdfViewerParams(
+                // A damaged PDF that still decrypted (authentic but not
+                // renderable) shows DocSafe's own message, not a raw error.
+                errorBannerBuilder: (_, _, _, _) =>
+                    _PreviewError(message: l.errorIntegrity),
+              ),
+            )
           : InteractiveViewer(
               maxScale: 6,
               child: Center(
@@ -117,8 +125,11 @@ class _DocumentPreviewScreenState extends ConsumerState<DocumentPreviewScreen> {
   }
 }
 
+/// Key of the preview error widget (used by on-device tests).
+const previewErrorKey = ValueKey('preview-error');
+
 class _PreviewError extends StatelessWidget {
-  const _PreviewError({required this.message});
+  const _PreviewError({required this.message}) : super(key: previewErrorKey);
   final String message;
 
   @override

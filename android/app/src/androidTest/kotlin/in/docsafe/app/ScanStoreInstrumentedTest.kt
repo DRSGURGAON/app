@@ -154,6 +154,29 @@ class ScanStoreInstrumentedTest {
     }
 
     @Test
+    fun scannerLeftoversInTheScanDirectoryAreWipedWhenTheSessionEnds() {
+        val page = jpegPage("main.jpg", 40, 40, Color.BLUE)
+        val intermediate = File(pagesDir, "ml_intermediate.tmp").apply { writeBytes(ByteArray(64) { 1 }) }
+        val s = scanStore()
+        val reg = s.register(listOf(page)).single()
+        s.save(listOf(ScanStore.PageSpec(reg.path, 0)), ScanStore.Format.PDF)
+        assertTrue("kept until confirmed", intermediate.exists())
+        s.discard(listOf(reg.path))
+        assertFalse(page.exists())
+        assertFalse("scanner intermediate wiped", intermediate.exists())
+    }
+
+    @Test
+    fun scanDirectoriesSurviveRestartAndAreSweptOnLockOrStart() {
+        val page = jpegPage("x.jpg", 40, 40, Color.BLUE)
+        val other = File(pagesDir, "other.tmp").apply { writeBytes(ByteArray(8)) }
+        scanStore().register(listOf(page))
+        scanStore().sweep() // new instance = after restart; same path as lock()
+        assertFalse(page.exists())
+        assertFalse(other.exists())
+    }
+
+    @Test
     fun pendingPagesAreWipedAfterRestart() {
         val page = jpegPage("crash.jpg", 50, 50, Color.BLUE)
         scanStore().register(listOf(page)) // app killed before save/discard

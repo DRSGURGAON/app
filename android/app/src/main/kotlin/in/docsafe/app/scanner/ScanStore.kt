@@ -19,6 +19,9 @@ import java.io.FileInputStream
  *   read or deleted (no arbitrary path access from Dart).
  * - The list of pending page paths (paths only, no content) is persisted, so
  *   pages left behind by a crash or kill are wiped on the next start.
+ * - The directories the scanner wrote into are recorded too ("D <dir>" lines):
+ *   any other files the scanner left there (intermediates, thumbnails) are
+ *   wiped when the session ends, on lock and on the next start.
  * - Saving never deletes the source pages; [discard] does, after the caller has
  *   recorded the result. Lock, erase-all and app start wipe all pending pages.
  */
@@ -34,13 +37,17 @@ class ScanStore(
     data class Page(val path: String, val width: Int, val height: Int)
 
     private val pending = LinkedHashSet<String>()
+    private val scanDirs = LinkedHashSet<String>()
     private val lock = Any()
 
     init {
         synchronized(lock) {
-            runCatching { pendingList.readLines() }.getOrDefault(emptyList())
-                .filter { it.isNotBlank() }
-                .forEach { pending.add(it) }
+            for (line in runCatching { pendingList.readLines() }.getOrDefault(emptyList())) {
+                when {
+                    line.startsWith(DIR_PREFIX) -> scanDirs.add(line.removePrefix(DIR_PREFIX))
+                    line.isNotBlank() -> pending.add(line)
+                }
+            }
         }
     }
 
@@ -50,6 +57,9 @@ class ScanStore(
             val canonical = requireInCache(f)
             val info = FileInputStream(canonical).use { JpegInfo.read(it) }
             pending.add(canonical.path)
+            canonical.parentFile?.let { dir ->
+                if (dir.canonicalFile != cacheDir.canonicalFile && dir.name != VAULT_TMP_DIR) scanDirs.add(dir.path)
+            }
             Page(canonical.path, info.width, info.height)
         }
         persist()
@@ -96,7 +106,33 @@ class ScanStore(
         for (p in paths) {
             if (pending.remove(p)) SecureFiles.bestEffortWipe(File(p))
         }
+        // Session over (saved or discarded): also remove scanner leftovers.
+        if (pending.isEmpty()) wipeScanDirs()
         persist()
+    }
+
+    private fun wipeScanDirs(): Int {
+        var n = 0
+        for (d in scanDirs) {
+            val dir = File(d)
+            if (!isStrictlyInsideCache(dir)) continue
+            dir.walkBottomUp().forEach { f ->
+                if (f.isFile) {
+                    if (SecureFiles.bestEffortWipe(f)) n++
+                } else if (f != dir) {
+                    f.delete()
+                }
+            }
+            dir.delete()
+        }
+        scanDirs.clear()
+        return n
+    }
+
+    private fun isStrictlyInsideCache(f: File): Boolean {
+        val root = cacheDir.canonicalFile
+        val c = f.canonicalFile
+        return c != root && c.path.startsWith(root.path + File.separator) && c.name != VAULT_TMP_DIR
     }
 
     /** Wipes every pending page (start-up, lock, erase-all) and stray scanner output. */
@@ -104,6 +140,7 @@ class ScanStore(
         var n = 0
         for (p in pending) if (SecureFiles.bestEffortWipe(File(p))) n++
         pending.clear()
+        n += wipeScanDirs()
         persist()
         // Belt and braces: ML Kit writes its results under the app cache in a
         // directory whose name contains "docscan"; remove anything left there.
@@ -130,7 +167,8 @@ class ScanStore(
     }
 
     private fun persist() {
-        SecureFiles.atomicWrite(pendingList, pending.joinToString("\n").toByteArray(Charsets.UTF_8))
+        val lines = pending.toList() + scanDirs.map { DIR_PREFIX + it }
+        SecureFiles.atomicWrite(pendingList, lines.joinToString("\n").toByteArray(Charsets.UTF_8))
     }
 
     private fun writeRotatedJpeg(file: File, rotation: Int, out: java.io.OutputStream) {
@@ -148,5 +186,7 @@ class ScanStore(
 
     companion object {
         const val JPEG_QUALITY = 92
+        private const val DIR_PREFIX = "D "
+        private const val VAULT_TMP_DIR = "vault_tmp"
     }
 }
