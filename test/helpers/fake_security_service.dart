@@ -21,6 +21,12 @@ class FakeSecurityService implements SecurityService {
   ImportedFile? nextImport;
   SecurityFailure? nextImportFailure;
   final Set<String> filesOnDisk = {};
+  List<String>? lastPickerTypes;
+  (String, String, String)? lastExport;
+  List<ExportItem>? lastExportAll;
+  bool exportCancelled = false;
+  int autoLockSeconds = 30;
+  int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
   int lockCalls = 0;
@@ -137,6 +143,7 @@ class FakeSecurityService implements SecurityService {
   @override
   Future<ImportedFile?> pickAndImportDocument(List<String> mimeTypes) async {
     _requireUnlocked();
+    lastPickerTypes = mimeTypes;
     final failure = nextImportFailure;
     if (failure != null) throw failure;
     final f = nextImport;
@@ -183,6 +190,63 @@ class FakeSecurityService implements SecurityService {
   @override
   Future<StorageInfo> getStorageInfo() async =>
       StorageInfo(vaultBytes: 0, availableBytes: 1 << 30);
+
+  @override
+  Future<PinVerifyResult> changePin(Uint8List current, Uint8List next) async {
+    _requireUnlocked();
+    final n = next.join();
+    if (n.length != 6 || RegExp(r'^(\d)\1+$').hasMatch(n) || n == '123456') {
+      current.fillRange(0, current.length, 0);
+      next.fillRange(0, next.length, 0);
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    final r = await verifyPin(current);
+    if (r.outcome == PinOutcome.success) _pin = n;
+    next.fillRange(0, next.length, 0);
+    return r;
+  }
+
+  @override
+  Future<bool> exportDocument(
+    String fileId,
+    String fileName,
+    String mimeType,
+  ) async {
+    _requireUnlocked();
+    if (exportCancelled) return false;
+    lastExport = (fileId, fileName, mimeType);
+    return true;
+  }
+
+  @override
+  Future<ExportSummary?> exportAllToFolder(
+    String folderName,
+    List<ExportItem> items,
+  ) async {
+    _requireUnlocked();
+    if (exportCancelled) return null;
+    lastExportAll = items;
+    return ExportSummary(exported: items.length, failed: 0);
+  }
+
+  @override
+  Future<void> eraseAllData() async {
+    eraseCalls++;
+    _pin = null;
+    unlocked = false;
+    biometricEnabled = false;
+    failed = 0;
+    lockoutMillis = 0;
+    filesOnDisk.clear();
+    tempFiles.clear();
+  }
+
+  @override
+  Future<int> getAutoLockSeconds() async => autoLockSeconds;
+
+  @override
+  Future<void> setAutoLockSeconds(int seconds) async =>
+      autoLockSeconds = seconds;
 
   @override
   Future<String?> getLanguage() async => language;

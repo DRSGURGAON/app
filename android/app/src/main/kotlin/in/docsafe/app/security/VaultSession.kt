@@ -75,6 +75,25 @@ class VaultSession private constructor(context: Context) {
         return key
     }
 
+    /**
+     * Permanently erases everything: encrypted documents, temp files, the
+     * database (and its journal files), wrapped keys, PIN, biometric enrolment
+     * and the Keystore keys. Afterwards the app is in first-run state.
+     */
+    @Synchronized
+    fun eraseAll() {
+        unlocked = false
+        vaultStore.wipeAll()
+        val db = databaseFile
+        for (suffix in listOf("", "-journal", "-wal", "-shm")) {
+            SecureFiles.bestEffortWipe(File(db.path + suffix))
+        }
+        SecureFiles.wipeDirectory(keysDir)
+        biometric.clear()
+        pinManager.clear()
+        KeystoreKeys.deleteAll()
+    }
+
     class SessionLockedException : Exception("Session locked")
 
     companion object {

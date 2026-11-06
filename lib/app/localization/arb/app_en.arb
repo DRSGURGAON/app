@@ -5,12 +5,10 @@
   "languageHindi": "हिन्दी",
   "languageEnglish": "English",
   "languageLabel": "Language",
-
   "splashLoading": "Securing your vault…",
   "startupErrorTitle": "DocSafe could not start securely",
   "startupErrorBody": "The security system on this phone did not respond as expected. Your documents have not been changed.",
   "retry": "Try again",
-
   "onboardingEncryptedTitle": "Encrypted on this phone",
   "onboardingEncryptedBody": "Every document is encrypted before it is saved, with keys kept in your phone's secure hardware. Nothing is uploaded.",
   "onboardingLockTitle": "Locked with your PIN",
@@ -20,7 +18,6 @@
   "onboardingNotDigiLocker": "DocSafe is a private storage app. It is not DigiLocker and does not verify documents.",
   "onboardingAcknowledge": "I understand that documents cannot be recovered if this phone's keys are lost.",
   "onboardingContinue": "Set up security",
-
   "pinCreateTitle": "Create a 6-digit PIN",
   "pinCreateSubtitle": "You will use it to open DocSafe.",
   "pinConfirmTitle": "Confirm your PIN",
@@ -29,7 +26,6 @@
   "pinTooWeak": "This PIN is too easy to guess. Avoid repeated or sequential digits.",
   "pinRecoveryNote": "The PIN controls access to the app. It cannot recover documents if this phone's security keys are lost.",
   "pinSaving": "Saving…",
-
   "biometricSetupTitle": "Unlock with fingerprint or face?",
   "biometricSetupBody": "Use your phone's strong biometric unlock instead of typing your PIN. Your PIN always works too.",
   "biometricEnable": "Enable biometric unlock",
@@ -47,19 +43,34 @@
   "biometricPromptEnableTitle": "Enable biometric unlock",
   "biometricPromptSubtitle": "Confirm it's you",
   "biometricPromptUsePin": "Use PIN",
-
   "lockTitle": "Enter your PIN",
   "lockUseBiometric": "Use fingerprint or face",
   "lockWrongPin": "Wrong PIN. {count, plural, =1{1 attempt} other{{count} attempts}} left before a temporary lock.",
-  "@lockWrongPin": {"placeholders": {"count": {"type": "int"}}},
+  "@lockWrongPin": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "lockWrongPinNoCount": "Wrong PIN.",
   "lockLockedOut": "Too many wrong attempts. Try again in {duration}.",
-  "@lockLockedOut": {"placeholders": {"duration": {"type": "String"}}},
-
+  "@lockLockedOut": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "pinPadDelete": "Delete last digit",
   "pinDigitsEntered": "{count} of 6 digits entered",
-  "@pinDigitsEntered": {"placeholders": {"count": {"type": "int"}}},
-
+  "@pinDigitsEntered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "vaultTitle": "Documents",
   "vaultLock": "Lock",
   "vaultEmptyTitle": "No documents yet",
@@ -75,10 +86,8 @@
   "keyProtectionTee": "Keys protected by the phone's secure hardware",
   "keyProtectionSoftware": "This phone has no secure hardware for keys; keys are protected by Android only",
   "keyProtectionUnknown": "Key protection level could not be determined",
-
   "previewOpening": "Decrypting…",
   "previewClose": "Close",
-
   "errorLowStorage": "Not enough free space. Free up storage and try again. Nothing was saved.",
   "errorIntegrity": "This document failed its integrity check and may be damaged or altered. It was not opened.",
   "errorUnsupported": "Only PDF, JPG and PNG files are supported.",
@@ -87,5 +96,250 @@
   "errorLocked": "DocSafe is locked. Unlock it and try again.",
   "errorBusy": "Another file picker is already open.",
   "errorDatabaseKey": "The encrypted document index could not be opened with this phone's keys.",
-  "errorGeneric": "Something went wrong. Try again."
+  "errorGeneric": "Something went wrong. Try again.",
+  "cancel": "Cancel",
+  "save": "Save",
+  "create": "Create",
+  "delete": "Delete",
+  "rename": "Rename",
+  "add": "Add",
+  "undo": "Undo",
+  "nameRequired": "Enter a name.",
+  "clearValue": "Clear",
+  "navHome": "Home",
+  "navVault": "Vault",
+  "navSettings": "Settings",
+  "categoryIdentity": "Identity Documents",
+  "categoryEducation": "Education",
+  "categoryVehicle": "Vehicle",
+  "categoryFinance": "Finance",
+  "categoryInsurance": "Insurance",
+  "categoryMedical": "Medical",
+  "categoryProperty": "Property",
+  "categoryWork": "Work",
+  "categoryBills": "Bills & Receipts",
+  "categoryPersonal": "Personal",
+  "categoryOther": "Other",
+  "homeSearchHint": "Search titles, categories, tags",
+  "homeSecurityTitle": "Your vault is protected",
+  "homeSecurityPinOnly": "Locked with your PIN",
+  "homeSecurityPinBiometric": "Locked with your PIN and biometrics",
+  "homeImportPdf": "Import PDF",
+  "homeImportImage": "Import image",
+  "homeCreateFolder": "New folder",
+  "homeRecent": "Recent documents",
+  "homeFavourites": "Favourites",
+  "homeCategories": "Categories",
+  "homeExpiringSoon": "Expiring soon",
+  "homeSeeAll": "See all",
+  "homeNoRecent": "Documents you add will appear here.",
+  "homeNoFavourites": "Mark a document as a favourite to find it quickly.",
+  "homeNoExpiring": "No documents expire in the next 30 days.",
+  "expiresOn": "Expires {date}",
+  "@expiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expiredOn": "Expired {date}",
+  "@expiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "documentCount": "{count, plural, =0{No documents} =1{1 document} other{{count} documents}}",
+  "@documentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vaultFolders": "Folders",
+  "vaultAllDocuments": "All documents",
+  "sortLabel": "Sort",
+  "sortNewest": "Newest first",
+  "sortOldest": "Oldest first",
+  "sortTitleAsc": "Name A–Z",
+  "sortTitleDesc": "Name Z–A",
+  "sortLargest": "Largest first",
+  "filterFavourites": "Favourites only",
+  "importChooseTitle": "Add a document",
+  "importDetailsAction": "Details",
+  "folderNameLabel": "Folder name",
+  "folderRename": "Rename folder",
+  "folderDelete": "Delete folder",
+  "folderDeleteConfirm": "Delete \"{name}\"? Its documents move to All documents; no document is deleted.",
+  "@folderDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "folderEmpty": "This folder is empty.",
+  "noFolder": "No folder",
+  "categoryEmpty": "No documents in this category.",
+  "noCategory": "No category",
+  "detailsTitle": "Document details",
+  "detailsOpen": "Open",
+  "detailsExport": "Export",
+  "detailsDelete": "Delete",
+  "detailsFavourite": "Add to favourites",
+  "detailsUnfavourite": "Remove from favourites",
+  "detailsTitleLabel": "Title",
+  "detailsCategory": "Category",
+  "detailsFolder": "Folder",
+  "detailsTags": "Tags",
+  "detailsAddTag": "Add tag",
+  "detailsTagLabel": "Tag",
+  "detailsIssueDate": "Issue date",
+  "detailsExpiryDate": "Expiry date",
+  "detailsNotes": "Notes",
+  "detailsNotesHint": "Optional. Avoid writing full ID numbers here.",
+  "detailsNotSet": "Not set",
+  "detailsFileInfo": "{type} · {size} · added {date}",
+  "@detailsFileInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailsExpiryBeforeIssue": "The expiry date can't be before the issue date.",
+  "detailsMovedToTrash": "Moved to Recently deleted. It will be removed permanently after 30 days.",
+  "detailsNotFound": "This document no longer exists.",
+  "exportWarningTitle": "Export a readable copy?",
+  "exportWarningBody": "The exported file is NOT encrypted. Anyone who can open the location you choose can read it.",
+  "exportContinue": "Choose location",
+  "exportDone": "Exported.",
+  "searchEmptyQuery": "Type to search titles, categories and tags.",
+  "searchNoResults": "No documents match \"{query}\".",
+  "@searchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "trashTitle": "Recently deleted",
+  "trashInfo": "Documents here are removed permanently after 30 days.",
+  "trashEmpty": "Nothing here.",
+  "trashRestore": "Restore",
+  "trashDeleteForever": "Delete permanently",
+  "trashDeleteConfirm": "Permanently delete \"{title}\"? This cannot be undone.",
+  "@trashDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trashEmptyAll": "Empty",
+  "trashEmptyConfirm": "Permanently delete all {count} documents in Recently deleted? This cannot be undone.",
+  "@trashEmptyConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trashDaysLeft": "{days, plural, =0{Removed today} =1{1 day left} other{{days} days left}}",
+  "@trashDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trashRestored": "Restored.",
+  "settingsSecuritySection": "Security",
+  "settingsBiometric": "Biometric unlock",
+  "settingsBiometricUnavailable": "Not available on this phone",
+  "settingsChangePin": "Change PIN",
+  "settingsAutoLock": "Auto-lock",
+  "autoLockImmediately": "Immediately",
+  "autoLock30s": "After 30 seconds",
+  "autoLock1m": "After 1 minute",
+  "autoLock5m": "After 5 minutes",
+  "settingsPrivacy": "Privacy & security",
+  "settingsDataSection": "Your data",
+  "settingsStorage": "Storage usage",
+  "settingsCategories": "Manage categories",
+  "settingsExportAll": "Export all documents",
+  "settingsErase": "Erase all data",
+  "changePinCurrent": "Enter your current PIN",
+  "changePinDone": "PIN changed.",
+  "privacyLocalOnly": "Everything stays on this phone. DocSafe has no account, no servers, no ads and no analytics.",
+  "privacyEncryption": "Each document is encrypted with its own key (AES-256-GCM). Those keys are protected by the Android Keystore.",
+  "privacyIndex": "Document names, tags and notes are kept in an encrypted database.",
+  "privacyScreen": "Screenshots and the recent-apps preview are blocked inside DocSafe.",
+  "privacyKeyProtection": "Key protection on this phone",
+  "privacyLimitsTitle": "Limits you should know",
+  "privacyLimitRoot": "On a rooted or compromised phone, malware could reach your documents while DocSafe is unlocked.",
+  "privacyLimitExport": "Exported files are not encrypted.",
+  "privacyLimitPin": "If you forget your PIN, the only option is to erase everything.",
+  "storageDocuments": "Documents",
+  "storageUsed": "Used by documents",
+  "storageFree": "Free on this phone",
+  "storageInTrash": "In Recently deleted",
+  "storageNote": "Sizes are of the original files. Encrypted copies are slightly larger.",
+  "categoriesAdd": "New category",
+  "categoryNameLabel": "Category name",
+  "categoriesDefaultNote": "Default categories can't be renamed or deleted.",
+  "categoryDeleteConfirm": "Delete \"{name}\"? Its documents become uncategorised; no document is deleted.",
+  "@categoryDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportAllBody": "Copies every document (except Recently deleted) into a new folder you choose. The copies are NOT encrypted.",
+  "exportAllButton": "Choose folder and export",
+  "exportAllResult": "Exported {exported} of {total} documents.",
+  "@exportAllResult": {
+    "placeholders": {
+      "exported": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "exportAllFailedNote": "{failed} could not be exported. Check free space at the destination.",
+  "@exportAllFailedNote": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "exportAllNothing": "There are no documents to export.",
+  "exportAllInProgress": "Exporting…",
+  "eraseBody": "This permanently deletes every document, folder, tag and setting in DocSafe, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.",
+  "eraseTypeToConfirm": "Type {word} to confirm",
+  "@eraseTypeToConfirm": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "eraseButton": "Erase everything",
+  "eraseConfirmPin": "Enter your PIN to erase",
+  "eraseForgotPin": "Forgot PIN?",
+  "eraseForgotBody": "Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.",
+  "erasing": "Erasing…"
 }

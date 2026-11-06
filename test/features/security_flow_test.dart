@@ -16,7 +16,7 @@ void main() {
   testWidgets('first run is Hindi; continue requires acknowledging key loss', (
     tester,
   ) async {
-    await pumpApp(tester, FakeSecurityService());
+    final app = await pumpApp(tester, FakeSecurityService());
     expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
 
     final button = find.widgetWithText(FilledButton, hi.onboardingContinue);
@@ -29,24 +29,26 @@ void main() {
 
     await scrollAndTap(tester, find.byType(Checkbox));
     expect(tester.widget<FilledButton>(button).onPressed, isNotNull);
+    await app.dispose();
   });
 
   testWidgets('language can be switched to English before setup', (
     tester,
   ) async {
     final fake = FakeSecurityService();
-    await pumpApp(tester, fake);
+    final app = await pumpApp(tester, fake);
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text(en.onboardingEncryptedTitle), findsOneWidget);
     expect(fake.language, 'en');
+    await app.dispose();
   });
 
   testWidgets('PIN mismatch restarts setup; matching PIN goes to biometric', (
     tester,
   ) async {
     final fake = FakeSecurityService()..language = 'en';
-    await pumpApp(tester, fake);
+    final app = await pumpApp(tester, fake);
     await scrollAndTap(tester, find.byType(Checkbox));
     await scrollAndTap(tester, find.text(en.onboardingContinue));
 
@@ -60,16 +62,18 @@ void main() {
     await enterPin(tester, '258036');
     await enterPin(tester, '258036');
     expect(find.text(en.biometricSetupTitle), findsOneWidget);
+    await app.dispose();
   });
 
   testWidgets('weak PIN is refused with an explanation', (tester) async {
     final fake = FakeSecurityService()..language = 'en';
-    await pumpApp(tester, fake);
+    final app = await pumpApp(tester, fake);
     await scrollAndTap(tester, find.byType(Checkbox));
     await scrollAndTap(tester, find.text(en.onboardingContinue));
     await enterPin(tester, '111111');
     await enterPin(tester, '111111');
     expect(find.text(en.pinTooWeak), findsOneWidget);
+    await app.dispose();
   });
 
   testWidgets('lock screen: wrong PIN message, lockout countdown, unlock', (
@@ -79,7 +83,7 @@ void main() {
     await fake.setPin(_digits('258036'));
     await fake.lock();
     fake.availability = BiometricAvailability.noHardware;
-    await pumpApp(tester, fake);
+    final app = await pumpApp(tester, fake);
 
     expect(find.text(en.lockTitle), findsOneWidget);
     await enterPin(tester, '111222');
@@ -96,7 +100,8 @@ void main() {
     fake.lockoutMillis = 0;
     await tester.pump(const Duration(seconds: 31));
     await enterPin(tester, '258036');
-    expect(find.text(en.vaultTitle), findsOneWidget);
+    expect(find.text(en.homeRecent), findsOneWidget);
+    await app.dispose();
   });
 
   testWidgets('cancelled biometric prompt falls back to PIN silently', (
@@ -108,10 +113,11 @@ void main() {
     fake
       ..biometricEnabled = true
       ..nextBiometricOutcome = BiometricOutcome.cancelled;
-    await pumpApp(tester, fake);
+    final app = await pumpApp(tester, fake);
     expect(find.text(en.lockTitle), findsOneWidget);
     expect(find.text(en.biometricCancelled), findsNothing);
     expect(find.byTooltip(en.lockUseBiometric), findsOneWidget);
+    await app.dispose();
   });
 }
 

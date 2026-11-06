@@ -491,6 +491,107 @@ class StorageInfo {
   }
 }
 
+class ExportItem {
+  ExportItem({
+    required this.fileId,
+    required this.fileName,
+    required this.mimeType,
+  });
+
+  String fileId;
+
+  /// Display file name (sanitised natively; extension added if missing).
+  String fileName;
+
+  String mimeType;
+
+  List<Object?> _toList() {
+    return <Object?>[fileId, fileName, mimeType];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ExportItem decode(Object result) {
+    result as List<Object?>;
+    return ExportItem(
+      fileId: result[0]! as String,
+      fileName: result[1]! as String,
+      mimeType: result[2]! as String,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ExportItem || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(fileId, other.fileId) &&
+        _deepEquals(fileName, other.fileName) &&
+        _deepEquals(mimeType, other.mimeType);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ExportItem(fileId: $fileId, fileName: $fileName, mimeType: $mimeType)';
+  }
+}
+
+class ExportSummary {
+  ExportSummary({required this.exported, required this.failed});
+
+  int exported;
+
+  int failed;
+
+  List<Object?> _toList() {
+    return <Object?>[exported, failed];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ExportSummary decode(Object result) {
+    result as List<Object?>;
+    return ExportSummary(
+      exported: result[0]! as int,
+      failed: result[1]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ExportSummary || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(exported, other.exported) &&
+        _deepEquals(failed, other.failed);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ExportSummary(exported: $exported, failed: $failed)';
+  }
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -528,6 +629,12 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is StorageInfo) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
+    } else if (value is ExportItem) {
+      buffer.putUint8(139);
+      writeValue(buffer, value.encode());
+    } else if (value is ExportSummary) {
+      buffer.putUint8(140);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -560,6 +667,10 @@ class _PigeonCodec extends StandardMessageCodec {
         return DatabaseConfig.decode(readValue(buffer)!);
       case 138:
         return StorageInfo.decode(readValue(buffer)!);
+      case 139:
+        return ExportItem.decode(readValue(buffer)!);
+      case 140:
+        return ExportSummary.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -903,6 +1014,147 @@ class SecurityHostApi {
       isNullValid: false,
     );
     return pigeonVar_replyValue! as StorageInfo;
+  }
+
+  /// Verifies [currentPin] (counts towards the attempt limit) and replaces it
+  /// with [newPin]. Requires an unlocked session.
+  Future<PinVerifyResult> changePin(
+    Uint8List currentPin,
+    Uint8List newPin,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.changePin$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[currentPin, newPin],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as PinVerifyResult;
+  }
+
+  /// Opens the system "save as" dialog and writes the DECRYPTED document to the
+  /// chosen location. Returns false if the user cancelled. A failed export
+  /// deletes the partially written destination file.
+  Future<bool> exportDocument(
+    String fileId,
+    String fileName,
+    String mimeType,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.exportDocument$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, fileName, mimeType],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Asks the user for a folder, creates [folderName] inside it and writes the
+  /// decrypted documents there. Returns null if the user cancelled.
+  Future<ExportSummary?> exportAllToFolder(
+    String folderName,
+    List<ExportItem> items,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.exportAllToFolder$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[folderName, items],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as ExportSummary?;
+  }
+
+  /// Permanently deletes every document, the database, the PIN, biometric
+  /// enrolment and all DocSafe Keystore keys. Works locked or unlocked.
+  /// The Dart side must close the database first.
+  Future<void> eraseAllData() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.eraseAllData$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+  }
+
+  /// Background time before auto-lock: 0, 30, 60 or 300 seconds.
+  Future<int> getAutoLockSeconds() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getAutoLockSeconds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as int;
+  }
+
+  Future<void> setAutoLockSeconds(int seconds) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setAutoLockSeconds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[seconds],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").

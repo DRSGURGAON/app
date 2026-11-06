@@ -3,8 +3,8 @@
 Privacy-first Android document vault (Flutter + Kotlin). Hindi default, English option.
 Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what is verified.
 
-- Phases: 0 done, 1 (security foundation) implemented — awaiting CI device run + manual checks.
-  Do not start Phase 2 until the user approves and Phase 1 acceptance passes.
+- Phases: 0–1 done (CI green), 2 (document vault) implemented. Physical-device checks pending.
+  Do not start Phase 3 until the user approves.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge;
   hardcode user-facing strings (use ARB files); add network/analytics/ads SDKs; claim untested
   features work.
@@ -12,4 +12,6 @@ Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what 
   `dart run build_runner build --delete-conflicting-outputs`, `flutter gen-l10n`, then `dart format lib`.
 - Checks: `dart format --set-exit-if-changed lib test integration_test pigeons`, `flutter analyze`,
   `flutter test`, `cd native/docsafe-crypto && ./gradlew test`.
-- Widget tests must not use real Drift databases (fake-async hangs); use FakeDocumentRepository.
+- Widget tests use a real in-memory DB via test/helpers/pump_app.dart; always `await app.dispose()`.
+- Schema changes: edit tables, bump schemaVersion, `dart run drift_dev make-migrations`, write the step.
+- SnackBars with actions must set `persist: false` (Flutter persists them by default).

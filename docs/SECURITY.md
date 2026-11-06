@@ -1,4 +1,4 @@
-# DocSafe security design (Phase 1)
+# DocSafe security design (Phases 1–2)
 
 This document describes what is implemented, the reasoning, and the limits. It must stay
 accurate: do not add claims here that the code does not back up.
@@ -117,26 +117,42 @@ keys. DocSafe does not claim protection in that case.
 | Malicious/mislabelled input files | Magic-byte detection; only PDF/JPEG/PNG; display names sanitised | Renderer bugs (PDFium) |
 | Logs leaking data | No titles/paths/PINs/keys/contents logged; native errors mapped to generic codes | — |
 | Rooted/compromised device, malware with root | **Out of scope** | Keys usable while the app runs |
-| Keystore key loss (reinstall, clear data, some OEM updates, device reset) | Clear warning in onboarding; explicit export (Phase 2+) | **Data unrecoverable** |
+| Keystore key loss (reinstall, clear data, some OEM updates, device reset) | Clear warning in onboarding and Privacy & security; explicit export | **Data unrecoverable** |
 
-## 9. Backup / export strategy (designed, not yet implemented)
+## 9. Export, erase and recently deleted (Phase 2)
 
-Implementation is planned for Phase 2 (export) and later (encrypted backup):
+**Export (implemented).** Single export uses the system "save as" dialog (`ACTION_CREATE_DOCUMENT`);
+"export all" asks for a folder (`ACTION_OPEN_DOCUMENT_TREE`) and creates a dated sub-folder.
+Both only run on an explicit user action after a warning that the copy is **not encrypted**.
+Plaintext is streamed straight into the destination while chunks are verified; if any chunk fails
+authentication or I/O fails, the destination document is deleted. File names are sanitised
+(`ExportNames`). No storage permission is involved.
 
-1. **Plain export** — the user selects documents and a destination via SAF `ACTION_CREATE_DOCUMENT`;
-   decrypted directly into the chosen stream, with a warning that the copy is unencrypted.
-2. **Encrypted backup archive** — the user chooses a strong passphrase (not the PIN); key derived
-   with a memory-hard KDF (Argon2id), archive encrypted with the same DSF chunk format, written via SAF.
-   Restorable on a new device. Losing the passphrase means losing the backup; DocSafe cannot reset it.
+**Encrypted backup (designed, not implemented).** A portable archive protected by a user-chosen
+passphrase (Argon2id → the same DSF chunk format), written via SAF and restorable on a new device.
+Until it exists, onboarding and Privacy & security state that documents stored only in DocSafe
+cannot be recovered if the phone's keys are lost.
 
-Until this exists, the onboarding requires the user to acknowledge that documents stored only in
-DocSafe cannot be recovered if the phone's keys are lost.
+**Erase all data.** Available from Settings (typed confirmation word + PIN) and from the lock
+screen as "Forgot PIN?" (typed confirmation only — erasing reveals nothing and equals clearing the
+app's data in Android settings). Order: leave the vault UI, close the database and wait for it,
+then natively wipe vault files, temp files, the database and its journal files, wrapped keys, PIN
+and biometric records, and delete the Keystore keys. Flash remanence caveats from §4 apply; deleting
+the KEK makes any remaining ciphertext undecryptable.
 
-## 10. Known limitations (Phase 1)
+**Recently deleted.** Deleting a document moves it to Recently deleted (still encrypted); it is
+purged — database rows first, then the container — after 30 days, on the next unlock. Containers
+whose rows are gone are removed by the orphan sweep.
+
+**Metadata.** Titles, tags, notes and dates are user-entered and stored only in the SQLCipher
+database. The notes field asks users not to type full ID numbers. Text inputs disable keyboard
+suggestions/autocorrect so IMEs are not taught document names.
+
+## 10. Known limitations
 
 - Biometric prompt, SAF import, PDF rendering and Keystore behaviour on real OEM devices have not
   been verified on physical hardware yet (see TESTING.md).
-- If a user forgets the PIN there is no reset flow yet; Android "Clear data" erases the vault.
-  Phase 2 adds an explicit "erase everything and start over" option.
+- A forgotten PIN can only be handled by erasing everything (by design).
+- Exported copies are outside DocSafe's protection.
 - Dart-side copies of the DB key and PIN digits are best-effort zeroed (PIN buffers) or immutable
   (DB key string); the Dart VM may keep copies until garbage collection.

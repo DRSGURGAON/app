@@ -129,6 +129,27 @@ class StorageInfo {
   int availableBytes;
 }
 
+class ExportItem {
+  ExportItem({
+    required this.fileId,
+    required this.fileName,
+    required this.mimeType,
+  });
+
+  String fileId;
+
+  /// Display file name (sanitised natively; extension added if missing).
+  String fileName;
+  String mimeType;
+}
+
+class ExportSummary {
+  ExportSummary({required this.exported, required this.failed});
+
+  int exported;
+  int failed;
+}
+
 @HostApi()
 abstract class SecurityHostApi {
   @async
@@ -183,6 +204,33 @@ abstract class SecurityHostApi {
 
   @async
   StorageInfo getStorageInfo();
+
+  /// Verifies [currentPin] (counts towards the attempt limit) and replaces it
+  /// with [newPin]. Requires an unlocked session.
+  @async
+  PinVerifyResult changePin(Uint8List currentPin, Uint8List newPin);
+
+  /// Opens the system "save as" dialog and writes the DECRYPTED document to the
+  /// chosen location. Returns false if the user cancelled. A failed export
+  /// deletes the partially written destination file.
+  @async
+  bool exportDocument(String fileId, String fileName, String mimeType);
+
+  /// Asks the user for a folder, creates [folderName] inside it and writes the
+  /// decrypted documents there. Returns null if the user cancelled.
+  @async
+  ExportSummary? exportAllToFolder(String folderName, List<ExportItem> items);
+
+  /// Permanently deletes every document, the database, the PIN, biometric
+  /// enrolment and all DocSafe Keystore keys. Works locked or unlocked.
+  /// The Dart side must close the database first.
+  @async
+  void eraseAllData();
+
+  /// Background time before auto-lock: 0, 30, 60 or 300 seconds.
+  int getAutoLockSeconds();
+
+  void setAutoLockSeconds(int seconds);
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();

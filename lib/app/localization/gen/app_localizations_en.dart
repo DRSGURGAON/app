@@ -272,4 +272,496 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorGeneric => 'Something went wrong. Try again.';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get rename => 'Rename';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get undo => 'Undo';
+
+  @override
+  String get nameRequired => 'Enter a name.';
+
+  @override
+  String get clearValue => 'Clear';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navVault => 'Vault';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get categoryIdentity => 'Identity Documents';
+
+  @override
+  String get categoryEducation => 'Education';
+
+  @override
+  String get categoryVehicle => 'Vehicle';
+
+  @override
+  String get categoryFinance => 'Finance';
+
+  @override
+  String get categoryInsurance => 'Insurance';
+
+  @override
+  String get categoryMedical => 'Medical';
+
+  @override
+  String get categoryProperty => 'Property';
+
+  @override
+  String get categoryWork => 'Work';
+
+  @override
+  String get categoryBills => 'Bills & Receipts';
+
+  @override
+  String get categoryPersonal => 'Personal';
+
+  @override
+  String get categoryOther => 'Other';
+
+  @override
+  String get homeSearchHint => 'Search titles, categories, tags';
+
+  @override
+  String get homeSecurityTitle => 'Your vault is protected';
+
+  @override
+  String get homeSecurityPinOnly => 'Locked with your PIN';
+
+  @override
+  String get homeSecurityPinBiometric => 'Locked with your PIN and biometrics';
+
+  @override
+  String get homeImportPdf => 'Import PDF';
+
+  @override
+  String get homeImportImage => 'Import image';
+
+  @override
+  String get homeCreateFolder => 'New folder';
+
+  @override
+  String get homeRecent => 'Recent documents';
+
+  @override
+  String get homeFavourites => 'Favourites';
+
+  @override
+  String get homeCategories => 'Categories';
+
+  @override
+  String get homeExpiringSoon => 'Expiring soon';
+
+  @override
+  String get homeSeeAll => 'See all';
+
+  @override
+  String get homeNoRecent => 'Documents you add will appear here.';
+
+  @override
+  String get homeNoFavourites =>
+      'Mark a document as a favourite to find it quickly.';
+
+  @override
+  String get homeNoExpiring => 'No documents expire in the next 30 days.';
+
+  @override
+  String expiresOn(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String expiredOn(String date) {
+    return 'Expired $date';
+  }
+
+  @override
+  String documentCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '1 document',
+      zero: 'No documents',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get vaultFolders => 'Folders';
+
+  @override
+  String get vaultAllDocuments => 'All documents';
+
+  @override
+  String get sortLabel => 'Sort';
+
+  @override
+  String get sortNewest => 'Newest first';
+
+  @override
+  String get sortOldest => 'Oldest first';
+
+  @override
+  String get sortTitleAsc => 'Name A–Z';
+
+  @override
+  String get sortTitleDesc => 'Name Z–A';
+
+  @override
+  String get sortLargest => 'Largest first';
+
+  @override
+  String get filterFavourites => 'Favourites only';
+
+  @override
+  String get importChooseTitle => 'Add a document';
+
+  @override
+  String get importDetailsAction => 'Details';
+
+  @override
+  String get folderNameLabel => 'Folder name';
+
+  @override
+  String get folderRename => 'Rename folder';
+
+  @override
+  String get folderDelete => 'Delete folder';
+
+  @override
+  String folderDeleteConfirm(String name) {
+    return 'Delete \"$name\"? Its documents move to All documents; no document is deleted.';
+  }
+
+  @override
+  String get folderEmpty => 'This folder is empty.';
+
+  @override
+  String get noFolder => 'No folder';
+
+  @override
+  String get categoryEmpty => 'No documents in this category.';
+
+  @override
+  String get noCategory => 'No category';
+
+  @override
+  String get detailsTitle => 'Document details';
+
+  @override
+  String get detailsOpen => 'Open';
+
+  @override
+  String get detailsExport => 'Export';
+
+  @override
+  String get detailsDelete => 'Delete';
+
+  @override
+  String get detailsFavourite => 'Add to favourites';
+
+  @override
+  String get detailsUnfavourite => 'Remove from favourites';
+
+  @override
+  String get detailsTitleLabel => 'Title';
+
+  @override
+  String get detailsCategory => 'Category';
+
+  @override
+  String get detailsFolder => 'Folder';
+
+  @override
+  String get detailsTags => 'Tags';
+
+  @override
+  String get detailsAddTag => 'Add tag';
+
+  @override
+  String get detailsTagLabel => 'Tag';
+
+  @override
+  String get detailsIssueDate => 'Issue date';
+
+  @override
+  String get detailsExpiryDate => 'Expiry date';
+
+  @override
+  String get detailsNotes => 'Notes';
+
+  @override
+  String get detailsNotesHint =>
+      'Optional. Avoid writing full ID numbers here.';
+
+  @override
+  String get detailsNotSet => 'Not set';
+
+  @override
+  String detailsFileInfo(String type, String size, String date) {
+    return '$type · $size · added $date';
+  }
+
+  @override
+  String get detailsExpiryBeforeIssue =>
+      'The expiry date can\'t be before the issue date.';
+
+  @override
+  String get detailsMovedToTrash =>
+      'Moved to Recently deleted. It will be removed permanently after 30 days.';
+
+  @override
+  String get detailsNotFound => 'This document no longer exists.';
+
+  @override
+  String get exportWarningTitle => 'Export a readable copy?';
+
+  @override
+  String get exportWarningBody =>
+      'The exported file is NOT encrypted. Anyone who can open the location you choose can read it.';
+
+  @override
+  String get exportContinue => 'Choose location';
+
+  @override
+  String get exportDone => 'Exported.';
+
+  @override
+  String get searchEmptyQuery => 'Type to search titles, categories and tags.';
+
+  @override
+  String searchNoResults(String query) {
+    return 'No documents match \"$query\".';
+  }
+
+  @override
+  String get trashTitle => 'Recently deleted';
+
+  @override
+  String get trashInfo =>
+      'Documents here are removed permanently after 30 days.';
+
+  @override
+  String get trashEmpty => 'Nothing here.';
+
+  @override
+  String get trashRestore => 'Restore';
+
+  @override
+  String get trashDeleteForever => 'Delete permanently';
+
+  @override
+  String trashDeleteConfirm(String title) {
+    return 'Permanently delete \"$title\"? This cannot be undone.';
+  }
+
+  @override
+  String get trashEmptyAll => 'Empty';
+
+  @override
+  String trashEmptyConfirm(int count) {
+    return 'Permanently delete all $count documents in Recently deleted? This cannot be undone.';
+  }
+
+  @override
+  String trashDaysLeft(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days left',
+      one: '1 day left',
+      zero: 'Removed today',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get trashRestored => 'Restored.';
+
+  @override
+  String get settingsSecuritySection => 'Security';
+
+  @override
+  String get settingsBiometric => 'Biometric unlock';
+
+  @override
+  String get settingsBiometricUnavailable => 'Not available on this phone';
+
+  @override
+  String get settingsChangePin => 'Change PIN';
+
+  @override
+  String get settingsAutoLock => 'Auto-lock';
+
+  @override
+  String get autoLockImmediately => 'Immediately';
+
+  @override
+  String get autoLock30s => 'After 30 seconds';
+
+  @override
+  String get autoLock1m => 'After 1 minute';
+
+  @override
+  String get autoLock5m => 'After 5 minutes';
+
+  @override
+  String get settingsPrivacy => 'Privacy & security';
+
+  @override
+  String get settingsDataSection => 'Your data';
+
+  @override
+  String get settingsStorage => 'Storage usage';
+
+  @override
+  String get settingsCategories => 'Manage categories';
+
+  @override
+  String get settingsExportAll => 'Export all documents';
+
+  @override
+  String get settingsErase => 'Erase all data';
+
+  @override
+  String get changePinCurrent => 'Enter your current PIN';
+
+  @override
+  String get changePinDone => 'PIN changed.';
+
+  @override
+  String get privacyLocalOnly =>
+      'Everything stays on this phone. DocSafe has no account, no servers, no ads and no analytics.';
+
+  @override
+  String get privacyEncryption =>
+      'Each document is encrypted with its own key (AES-256-GCM). Those keys are protected by the Android Keystore.';
+
+  @override
+  String get privacyIndex =>
+      'Document names, tags and notes are kept in an encrypted database.';
+
+  @override
+  String get privacyScreen =>
+      'Screenshots and the recent-apps preview are blocked inside DocSafe.';
+
+  @override
+  String get privacyKeyProtection => 'Key protection on this phone';
+
+  @override
+  String get privacyLimitsTitle => 'Limits you should know';
+
+  @override
+  String get privacyLimitRoot =>
+      'On a rooted or compromised phone, malware could reach your documents while DocSafe is unlocked.';
+
+  @override
+  String get privacyLimitExport => 'Exported files are not encrypted.';
+
+  @override
+  String get privacyLimitPin =>
+      'If you forget your PIN, the only option is to erase everything.';
+
+  @override
+  String get storageDocuments => 'Documents';
+
+  @override
+  String get storageUsed => 'Used by documents';
+
+  @override
+  String get storageFree => 'Free on this phone';
+
+  @override
+  String get storageInTrash => 'In Recently deleted';
+
+  @override
+  String get storageNote =>
+      'Sizes are of the original files. Encrypted copies are slightly larger.';
+
+  @override
+  String get categoriesAdd => 'New category';
+
+  @override
+  String get categoryNameLabel => 'Category name';
+
+  @override
+  String get categoriesDefaultNote =>
+      'Default categories can\'t be renamed or deleted.';
+
+  @override
+  String categoryDeleteConfirm(String name) {
+    return 'Delete \"$name\"? Its documents become uncategorised; no document is deleted.';
+  }
+
+  @override
+  String get exportAllBody =>
+      'Copies every document (except Recently deleted) into a new folder you choose. The copies are NOT encrypted.';
+
+  @override
+  String get exportAllButton => 'Choose folder and export';
+
+  @override
+  String exportAllResult(int exported, int total) {
+    return 'Exported $exported of $total documents.';
+  }
+
+  @override
+  String exportAllFailedNote(int failed) {
+    return '$failed could not be exported. Check free space at the destination.';
+  }
+
+  @override
+  String get exportAllNothing => 'There are no documents to export.';
+
+  @override
+  String get exportAllInProgress => 'Exporting…';
+
+  @override
+  String get eraseBody =>
+      'This permanently deletes every document, folder, tag and setting in DocSafe, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.';
+
+  @override
+  String eraseTypeToConfirm(String word) {
+    return 'Type $word to confirm';
+  }
+
+  @override
+  String get eraseButton => 'Erase everything';
+
+  @override
+  String get eraseConfirmPin => 'Enter your PIN to erase';
+
+  @override
+  String get eraseForgotPin => 'Forgot PIN?';
+
+  @override
+  String get eraseForgotBody =>
+      'Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.';
+
+  @override
+  String get erasing => 'Erasing…';
 }

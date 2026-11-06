@@ -5,12 +5,10 @@
   "languageHindi": "हिन्दी",
   "languageEnglish": "English",
   "languageLabel": "भाषा",
-
   "splashLoading": "आपका वॉल्ट सुरक्षित किया जा रहा है…",
   "startupErrorTitle": "DocSafe सुरक्षित रूप से शुरू नहीं हो सका",
   "startupErrorBody": "इस फ़ोन की सुरक्षा प्रणाली ने अपेक्षा के अनुसार जवाब नहीं दिया। आपके दस्तावेज़ों में कोई बदलाव नहीं हुआ है।",
   "retry": "फिर से कोशिश करें",
-
   "onboardingEncryptedTitle": "इसी फ़ोन पर एन्क्रिप्टेड",
   "onboardingEncryptedBody": "हर दस्तावेज़ सेव होने से पहले एन्क्रिप्ट किया जाता है, और उसकी कुंजियाँ आपके फ़ोन के सुरक्षित हार्डवेयर में रहती हैं। कुछ भी अपलोड नहीं होता।",
   "onboardingLockTitle": "आपके PIN से लॉक",
@@ -20,7 +18,6 @@
   "onboardingNotDigiLocker": "DocSafe एक निजी स्टोरेज ऐप है। यह DigiLocker नहीं है और दस्तावेज़ों का सत्यापन नहीं करता।",
   "onboardingAcknowledge": "मैं समझता/समझती हूँ कि इस फ़ोन की कुंजियाँ खो जाने पर दस्तावेज़ वापस नहीं मिल सकते।",
   "onboardingContinue": "सुरक्षा सेट करें",
-
   "pinCreateTitle": "6 अंकों का PIN बनाएँ",
   "pinCreateSubtitle": "DocSafe खोलने के लिए आप इसका उपयोग करेंगे।",
   "pinConfirmTitle": "अपने PIN की पुष्टि करें",
@@ -29,7 +26,6 @@
   "pinTooWeak": "यह PIN आसानी से अनुमान लगाया जा सकता है। एक जैसे या क्रम वाले अंक न रखें।",
   "pinRecoveryNote": "PIN ऐप तक पहुँच को नियंत्रित करता है। इस फ़ोन की सुरक्षा कुंजियाँ खो जाने पर यह दस्तावेज़ वापस नहीं ला सकता।",
   "pinSaving": "सेव हो रहा है…",
-
   "biometricSetupTitle": "फ़िंगरप्रिंट या फ़ेस से खोलें?",
   "biometricSetupBody": "PIN टाइप करने के बजाय अपने फ़ोन का मज़बूत बायोमेट्रिक अनलॉक इस्तेमाल करें। आपका PIN भी हमेशा काम करेगा।",
   "biometricEnable": "बायोमेट्रिक अनलॉक चालू करें",
@@ -47,19 +43,34 @@
   "biometricPromptEnableTitle": "बायोमेट्रिक अनलॉक चालू करें",
   "biometricPromptSubtitle": "पुष्टि करें कि यह आप ही हैं",
   "biometricPromptUsePin": "PIN इस्तेमाल करें",
-
   "lockTitle": "अपना PIN डालें",
   "lockUseBiometric": "फ़िंगरप्रिंट या फ़ेस इस्तेमाल करें",
   "lockWrongPin": "गलत PIN। अस्थायी लॉक से पहले {count, plural, =1{1 प्रयास} other{{count} प्रयास}} बचे हैं।",
-  "@lockWrongPin": {"placeholders": {"count": {"type": "int"}}},
+  "@lockWrongPin": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "lockWrongPinNoCount": "गलत PIN।",
   "lockLockedOut": "बहुत ज़्यादा गलत प्रयास। {duration} बाद फिर कोशिश करें।",
-  "@lockLockedOut": {"placeholders": {"duration": {"type": "String"}}},
-
+  "@lockLockedOut": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "pinPadDelete": "आखिरी अंक मिटाएँ",
   "pinDigitsEntered": "6 में से {count} अंक डाले गए",
-  "@pinDigitsEntered": {"placeholders": {"count": {"type": "int"}}},
-
+  "@pinDigitsEntered": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "vaultTitle": "दस्तावेज़",
   "vaultLock": "लॉक करें",
   "vaultEmptyTitle": "अभी कोई दस्तावेज़ नहीं",
@@ -75,10 +86,8 @@
   "keyProtectionTee": "कुंजियाँ फ़ोन के सुरक्षित हार्डवेयर में सुरक्षित हैं",
   "keyProtectionSoftware": "इस फ़ोन में कुंजियों के लिए सुरक्षित हार्डवेयर नहीं है; कुंजियाँ केवल Android द्वारा सुरक्षित हैं",
   "keyProtectionUnknown": "कुंजी सुरक्षा का स्तर पता नहीं चल सका",
-
   "previewOpening": "डिक्रिप्ट हो रहा है…",
   "previewClose": "बंद करें",
-
   "errorLowStorage": "पर्याप्त खाली जगह नहीं है। स्टोरेज खाली करके फिर कोशिश करें। कुछ भी सेव नहीं हुआ।",
   "errorIntegrity": "यह दस्तावेज़ सत्यता जाँच में विफल रहा और खराब या बदला हुआ हो सकता है। इसे खोला नहीं गया।",
   "errorUnsupported": "केवल PDF, JPG और PNG फ़ाइलें सपोर्ट होती हैं।",
@@ -87,5 +96,250 @@
   "errorLocked": "DocSafe लॉक है। अनलॉक करके फिर कोशिश करें।",
   "errorBusy": "एक फ़ाइल पिकर पहले से खुला है।",
   "errorDatabaseKey": "एन्क्रिप्टेड दस्तावेज़ सूची इस फ़ोन की कुंजियों से नहीं खुल सकी।",
-  "errorGeneric": "कुछ गलत हो गया। फिर से कोशिश करें।"
+  "errorGeneric": "कुछ गलत हो गया। फिर से कोशिश करें।",
+  "cancel": "रद्द करें",
+  "save": "सेव करें",
+  "create": "बनाएँ",
+  "delete": "हटाएँ",
+  "rename": "नाम बदलें",
+  "add": "जोड़ें",
+  "undo": "वापस लें",
+  "nameRequired": "नाम डालें।",
+  "clearValue": "हटाएँ",
+  "navHome": "होम",
+  "navVault": "वॉल्ट",
+  "navSettings": "सेटिंग्स",
+  "categoryIdentity": "पहचान दस्तावेज़",
+  "categoryEducation": "शिक्षा",
+  "categoryVehicle": "वाहन",
+  "categoryFinance": "वित्त",
+  "categoryInsurance": "बीमा",
+  "categoryMedical": "चिकित्सा",
+  "categoryProperty": "संपत्ति",
+  "categoryWork": "कार्य",
+  "categoryBills": "बिल और रसीदें",
+  "categoryPersonal": "व्यक्तिगत",
+  "categoryOther": "अन्य",
+  "homeSearchHint": "शीर्षक, श्रेणी, टैग खोजें",
+  "homeSecurityTitle": "आपका वॉल्ट सुरक्षित है",
+  "homeSecurityPinOnly": "आपके PIN से लॉक",
+  "homeSecurityPinBiometric": "आपके PIN और बायोमेट्रिक से लॉक",
+  "homeImportPdf": "PDF इम्पोर्ट करें",
+  "homeImportImage": "इमेज इम्पोर्ट करें",
+  "homeCreateFolder": "नया फ़ोल्डर",
+  "homeRecent": "हाल के दस्तावेज़",
+  "homeFavourites": "पसंदीदा",
+  "homeCategories": "श्रेणियाँ",
+  "homeExpiringSoon": "जल्द समाप्त होने वाले",
+  "homeSeeAll": "सभी देखें",
+  "homeNoRecent": "आपके जोड़े गए दस्तावेज़ यहाँ दिखेंगे।",
+  "homeNoFavourites": "किसी दस्तावेज़ को पसंदीदा बनाकर जल्दी खोजें।",
+  "homeNoExpiring": "अगले 30 दिनों में कोई दस्तावेज़ समाप्त नहीं हो रहा।",
+  "expiresOn": "{date} को समाप्त होगा",
+  "@expiresOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "expiredOn": "{date} को समाप्त हो गया",
+  "@expiredOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "documentCount": "{count, plural, =0{कोई दस्तावेज़ नहीं} =1{1 दस्तावेज़} other{{count} दस्तावेज़}}",
+  "@documentCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vaultFolders": "फ़ोल्डर",
+  "vaultAllDocuments": "सभी दस्तावेज़",
+  "sortLabel": "क्रम",
+  "sortNewest": "नए पहले",
+  "sortOldest": "पुराने पहले",
+  "sortTitleAsc": "नाम A–Z",
+  "sortTitleDesc": "नाम Z–A",
+  "sortLargest": "बड़े पहले",
+  "filterFavourites": "केवल पसंदीदा",
+  "importChooseTitle": "दस्तावेज़ जोड़ें",
+  "importDetailsAction": "विवरण",
+  "folderNameLabel": "फ़ोल्डर का नाम",
+  "folderRename": "फ़ोल्डर का नाम बदलें",
+  "folderDelete": "फ़ोल्डर हटाएँ",
+  "folderDeleteConfirm": "\"{name}\" हटाएँ? इसके दस्तावेज़ 'सभी दस्तावेज़' में चले जाएँगे; कोई दस्तावेज़ नहीं हटेगा।",
+  "@folderDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "folderEmpty": "यह फ़ोल्डर खाली है।",
+  "noFolder": "कोई फ़ोल्डर नहीं",
+  "categoryEmpty": "इस श्रेणी में कोई दस्तावेज़ नहीं।",
+  "noCategory": "कोई श्रेणी नहीं",
+  "detailsTitle": "दस्तावेज़ विवरण",
+  "detailsOpen": "खोलें",
+  "detailsExport": "एक्सपोर्ट करें",
+  "detailsDelete": "हटाएँ",
+  "detailsFavourite": "पसंदीदा में जोड़ें",
+  "detailsUnfavourite": "पसंदीदा से हटाएँ",
+  "detailsTitleLabel": "शीर्षक",
+  "detailsCategory": "श्रेणी",
+  "detailsFolder": "फ़ोल्डर",
+  "detailsTags": "टैग",
+  "detailsAddTag": "टैग जोड़ें",
+  "detailsTagLabel": "टैग",
+  "detailsIssueDate": "जारी होने की तारीख",
+  "detailsExpiryDate": "समाप्ति तारीख",
+  "detailsNotes": "नोट्स",
+  "detailsNotesHint": "वैकल्पिक। यहाँ पूरे पहचान नंबर न लिखें।",
+  "detailsNotSet": "सेट नहीं",
+  "detailsFileInfo": "{type} · {size} · {date} को जोड़ा",
+  "@detailsFileInfo": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "detailsExpiryBeforeIssue": "समाप्ति तारीख जारी होने की तारीख से पहले नहीं हो सकती।",
+  "detailsMovedToTrash": "हाल ही में हटाए गए में भेजा गया। 30 दिन बाद यह स्थायी रूप से हट जाएगा।",
+  "detailsNotFound": "यह दस्तावेज़ अब मौजूद नहीं है।",
+  "exportWarningTitle": "पढ़ने योग्य कॉपी एक्सपोर्ट करें?",
+  "exportWarningBody": "एक्सपोर्ट की गई फ़ाइल एन्क्रिप्टेड नहीं होगी। आप जो जगह चुनेंगे, उसे खोल सकने वाला कोई भी इसे पढ़ सकता है।",
+  "exportContinue": "जगह चुनें",
+  "exportDone": "एक्सपोर्ट हो गया।",
+  "searchEmptyQuery": "शीर्षक, श्रेणी और टैग में खोजने के लिए टाइप करें।",
+  "searchNoResults": "\"{query}\" से मेल खाता कोई दस्तावेज़ नहीं।",
+  "@searchNoResults": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "trashTitle": "हाल ही में हटाए गए",
+  "trashInfo": "यहाँ के दस्तावेज़ 30 दिन बाद स्थायी रूप से हट जाते हैं।",
+  "trashEmpty": "यहाँ कुछ नहीं है।",
+  "trashRestore": "वापस लाएँ",
+  "trashDeleteForever": "स्थायी रूप से हटाएँ",
+  "trashDeleteConfirm": "\"{title}\" को स्थायी रूप से हटाएँ? यह वापस नहीं होगा।",
+  "@trashDeleteConfirm": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "trashEmptyAll": "खाली करें",
+  "trashEmptyConfirm": "हाल ही में हटाए गए के सभी {count} दस्तावेज़ स्थायी रूप से हटाएँ? यह वापस नहीं होगा।",
+  "@trashEmptyConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "trashDaysLeft": "{days, plural, =0{आज हट जाएगा} =1{1 दिन बाकी} other{{days} दिन बाकी}}",
+  "@trashDaysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "trashRestored": "वापस लाया गया।",
+  "settingsSecuritySection": "सुरक्षा",
+  "settingsBiometric": "बायोमेट्रिक अनलॉक",
+  "settingsBiometricUnavailable": "इस फ़ोन पर उपलब्ध नहीं",
+  "settingsChangePin": "PIN बदलें",
+  "settingsAutoLock": "ऑटो-लॉक",
+  "autoLockImmediately": "तुरंत",
+  "autoLock30s": "30 सेकंड बाद",
+  "autoLock1m": "1 मिनट बाद",
+  "autoLock5m": "5 मिनट बाद",
+  "settingsPrivacy": "निजता और सुरक्षा",
+  "settingsDataSection": "आपका डेटा",
+  "settingsStorage": "स्टोरेज उपयोग",
+  "settingsCategories": "श्रेणियाँ प्रबंधित करें",
+  "settingsExportAll": "सभी दस्तावेज़ एक्सपोर्ट करें",
+  "settingsErase": "सारा डेटा मिटाएँ",
+  "changePinCurrent": "अपना मौजूदा PIN डालें",
+  "changePinDone": "PIN बदल गया।",
+  "privacyLocalOnly": "सब कुछ इसी फ़ोन पर रहता है। DocSafe में कोई अकाउंट, सर्वर, विज्ञापन या एनालिटिक्स नहीं है।",
+  "privacyEncryption": "हर दस्तावेज़ अपनी अलग कुंजी (AES-256-GCM) से एन्क्रिप्ट होता है। ये कुंजियाँ Android Keystore से सुरक्षित हैं।",
+  "privacyIndex": "दस्तावेज़ों के नाम, टैग और नोट्स एन्क्रिप्टेड डेटाबेस में रखे जाते हैं।",
+  "privacyScreen": "DocSafe के अंदर स्क्रीनशॉट और हाल के ऐप्स का प्रीव्यू बंद है।",
+  "privacyKeyProtection": "इस फ़ोन पर कुंजी सुरक्षा",
+  "privacyLimitsTitle": "ये सीमाएँ जानना ज़रूरी है",
+  "privacyLimitRoot": "रूट किए गए या संक्रमित फ़ोन पर, DocSafe अनलॉक रहते हुए मैलवेयर आपके दस्तावेज़ों तक पहुँच सकता है।",
+  "privacyLimitExport": "एक्सपोर्ट की गई फ़ाइलें एन्क्रिप्टेड नहीं होतीं।",
+  "privacyLimitPin": "PIN भूल जाने पर एकमात्र विकल्प सब कुछ मिटाना है।",
+  "storageDocuments": "दस्तावेज़",
+  "storageUsed": "दस्तावेज़ों द्वारा उपयोग",
+  "storageFree": "फ़ोन पर खाली जगह",
+  "storageInTrash": "हाल ही में हटाए गए में",
+  "storageNote": "आकार मूल फ़ाइलों के हैं। एन्क्रिप्टेड कॉपी थोड़ी बड़ी होती हैं।",
+  "categoriesAdd": "नई श्रेणी",
+  "categoryNameLabel": "श्रेणी का नाम",
+  "categoriesDefaultNote": "डिफ़ॉल्ट श्रेणियों का नाम बदला या हटाया नहीं जा सकता।",
+  "categoryDeleteConfirm": "\"{name}\" हटाएँ? इसके दस्तावेज़ बिना श्रेणी के हो जाएँगे; कोई दस्तावेज़ नहीं हटेगा।",
+  "@categoryDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "exportAllBody": "हर दस्तावेज़ (हाल ही में हटाए गए को छोड़कर) की कॉपी आपके चुने नए फ़ोल्डर में बनाता है। ये कॉपी एन्क्रिप्टेड नहीं होतीं।",
+  "exportAllButton": "फ़ोल्डर चुनें और एक्सपोर्ट करें",
+  "exportAllResult": "{total} में से {exported} दस्तावेज़ एक्सपोर्ट हुए।",
+  "@exportAllResult": {
+    "placeholders": {
+      "exported": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "exportAllFailedNote": "{failed} एक्सपोर्ट नहीं हो सके। गंतव्य पर खाली जगह जाँचें।",
+  "@exportAllFailedNote": {
+    "placeholders": {
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "exportAllNothing": "एक्सपोर्ट करने के लिए कोई दस्तावेज़ नहीं है।",
+  "exportAllInProgress": "एक्सपोर्ट हो रहा है…",
+  "eraseBody": "इससे DocSafe के सभी दस्तावेज़, फ़ोल्डर, टैग और सेटिंग्स, आपका PIN, बायोमेट्रिक अनलॉक और एन्क्रिप्शन कुंजियाँ स्थायी रूप से मिट जाएँगी। यह वापस नहीं होगा। जो रखना है, उसे पहले एक्सपोर्ट करें।",
+  "eraseTypeToConfirm": "पुष्टि के लिए {word} टाइप करें",
+  "@eraseTypeToConfirm": {
+    "placeholders": {
+      "word": {
+        "type": "String"
+      }
+    }
+  },
+  "eraseButton": "सब कुछ मिटाएँ",
+  "eraseConfirmPin": "मिटाने के लिए अपना PIN डालें",
+  "eraseForgotPin": "PIN भूल गए?",
+  "eraseForgotBody": "PIN के बिना DocSafe नहीं खुल सकता और उसके दस्तावेज़ वापस नहीं मिल सकते। आप सब कुछ मिटाकर फिर से शुरू कर सकते हैं।",
+  "erasing": "मिटाया जा रहा है…"
 }

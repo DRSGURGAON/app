@@ -1,7 +1,10 @@
 import 'package:drift/drift.dart';
 
-/// Schema v1 (Phase 1). Later phases add folders, tags, metadata, reminders,
-/// purchases and recently-deleted through numbered migrations.
+/// Schema history:
+/// - v1 (Phase 1): categories, encrypted_files, documents, app_settings.
+/// - v2 (Phase 2): folders, tags, document_tags, document_metadata,
+///   recently_deleted; documents.folder_id and documents.is_favourite.
+/// Later phases add reminders and purchases through numbered migrations.
 ///
 /// Rules: no document contents, no ID numbers (Aadhaar/PAN), no key material.
 
@@ -34,9 +37,18 @@ class EncryptedFiles extends Table {
   Set<Column> get primaryKey => {id};
 }
 
+/// User folders (one level in V1).
+class Folders extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().withLength(min: 1, max: 80)();
+  DateTimeColumn get createdAt => dateTime()();
+  DateTimeColumn get updatedAt => dateTime()();
+}
+
 @TableIndex(name: 'idx_documents_created', columns: {#createdAt})
 @TableIndex(name: 'idx_documents_category', columns: {#categoryId})
 @TableIndex(name: 'idx_documents_file', columns: {#fileId}, unique: true)
+@TableIndex(name: 'idx_documents_folder', columns: {#folderId})
 class Documents extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get title => text().withLength(min: 1, max: 200)();
@@ -50,6 +62,57 @@ class Documents extends Table {
   )();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
+
+  // v2
+  IntColumn get folderId => integer().nullable().references(
+    Folders,
+    #id,
+    onDelete: KeyAction.setNull,
+  )();
+  BoolColumn get isFavourite => boolean().withDefault(const Constant(false))();
+}
+
+/// Free-form tags. [normalized] (trimmed, lower-case) enforces case-insensitive uniqueness.
+class Tags extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().withLength(min: 1, max: 40)();
+  TextColumn get normalized => text().withLength(min: 1, max: 40).unique()();
+}
+
+@TableIndex(name: 'idx_document_tags_tag', columns: {#tagId})
+class DocumentTags extends Table {
+  IntColumn get documentId =>
+      integer().references(Documents, #id, onDelete: KeyAction.cascade)();
+  IntColumn get tagId =>
+      integer().references(Tags, #id, onDelete: KeyAction.cascade)();
+
+  @override
+  Set<Column> get primaryKey => {documentId, tagId};
+}
+
+/// User-entered details. Dates are ISO `yyyy-MM-dd` (calendar dates, no time zone).
+/// OCR-suggested values are only stored after the user confirms them (Phase 5).
+@TableIndex(name: 'idx_document_metadata_expiry', columns: {#expiryDate})
+class DocumentMetadata extends Table {
+  IntColumn get documentId =>
+      integer().references(Documents, #id, onDelete: KeyAction.cascade)();
+  TextColumn get issueDate => text().nullable().withLength(min: 10, max: 10)();
+  TextColumn get expiryDate => text().nullable().withLength(min: 10, max: 10)();
+  TextColumn get notes => text().nullable().withLength(max: 2000)();
+
+  @override
+  Set<Column> get primaryKey => {documentId};
+}
+
+/// Documents in the trash. Hidden from the vault; purged after 30 days.
+@TableIndex(name: 'idx_recently_deleted_at', columns: {#deletedAt})
+class RecentlyDeleted extends Table {
+  IntColumn get documentId =>
+      integer().references(Documents, #id, onDelete: KeyAction.cascade)();
+  DateTimeColumn get deletedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {documentId};
 }
 
 /// Key/value settings that are only needed while unlocked.

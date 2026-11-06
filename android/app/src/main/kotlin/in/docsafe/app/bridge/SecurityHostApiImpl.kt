@@ -9,20 +9,27 @@ import `in`.docsafe.app.security.BiometricAvailabilityState
 import `in`.docsafe.app.security.BiometricResult
 import `in`.docsafe.app.security.KeystoreKeys
 import `in`.docsafe.app.security.VaultSession
+import `in`.docsafe.app.storage.DocumentExporter
 import `in`.docsafe.app.storage.DocumentImporter
+import `in`.docsafe.crypto.ExportNames
 import `in`.docsafe.crypto.FormatException
 import `in`.docsafe.crypto.InsufficientStorageException
 import `in`.docsafe.crypto.IntegrityException
 import `in`.docsafe.crypto.InvalidInputException
 import `in`.docsafe.crypto.KeyUnavailableException
 import `in`.docsafe.crypto.PinManager
+import `in`.docsafe.crypto.VaultStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/** Opens the system document picker; resolves with null if the user cancelled. */
-fun interface DocumentPicker {
-    suspend fun pick(mimeTypes: Array<String>): Uri?
+/** System Storage Access Framework dialogs. Each resolves with null if the user cancelled. */
+interface SystemDocumentUi {
+    suspend fun openDocument(mimeTypes: Array<String>): Uri?
+
+    suspend fun createDocument(fileName: String, mimeType: String): Uri?
+
+    suspend fun openDocumentTree(): Uri?
 }
 
 /**
@@ -35,7 +42,7 @@ fun interface DocumentPicker {
 class SecurityHostApiImpl(
     context: Context,
     private val activityProvider: () -> FragmentActivity?,
-    private val picker: DocumentPicker,
+    private val documentUi: SystemDocumentUi,
 ) : SecurityHostApi {
     private val appContext = context.applicationContext
     private val session = VaultSession.get(appContext)
@@ -128,7 +135,7 @@ class SecurityHostApiImpl(
         session.requireUnlocked()
         val allowed = mimeTypes.filter { it in DocumentImporter.SUPPORTED_TYPES }
         if (allowed.isEmpty()) throw InvalidInputException("No supported types requested")
-        val uri = picker.pick(allowed.toTypedArray()) ?: return@guard null
+        val uri = documentUi.openDocument(allowed.toTypedArray()) ?: return@guard null
         io {
             session.requireUnlocked()
             val r = DocumentImporter(appContext.contentResolver, session.vaultStore).import(uri)
@@ -181,6 +188,77 @@ class SecurityHostApiImpl(
             session.requireUnlocked()
             StorageInfo(session.vaultStore.totalVaultBytes(), session.vaultStore.vaultDir.usableSpace)
         }
+    }
+
+    override suspend fun changePin(currentPin: ByteArray, newPin: ByteArray): PinVerifyResult = guard {
+        val current = toPinChars(currentPin)
+        val next = try {
+            toPinChars(newPin)
+        } catch (e: Exception) {
+            current.fill('\u0000')
+            throw e
+        }
+        io {
+            try {
+                session.requireUnlocked()
+                // Reject a weak new PIN before spending an attempt on the current one.
+                PinManager.validateFormat(next)
+                when (val r = session.pinManager.verify(current)) {
+                    PinManager.VerifyResult.Success -> {
+                        session.pinManager.setPin(next)
+                        PinVerifyResult(PinOutcome.SUCCESS, 0, 0, PinManager.FREE_ATTEMPTS.toLong())
+                    }
+                    is PinManager.VerifyResult.Wrong ->
+                        PinVerifyResult(PinOutcome.WRONG, r.failedAttempts.toLong(), r.lockoutMillis, r.attemptsBeforeLockout.toLong())
+                    is PinManager.VerifyResult.LockedOut ->
+                        PinVerifyResult(PinOutcome.LOCKED_OUT, session.pinManager.status().failedAttempts.toLong(), r.remainingMillis, 0)
+                    PinManager.VerifyResult.NotSet -> PinVerifyResult(PinOutcome.NOT_SET, 0, 0, 0)
+                }
+            } finally {
+                current.fill('\u0000')
+                next.fill('\u0000')
+            }
+        }
+    }
+
+    override suspend fun exportDocument(fileId: String, fileName: String, mimeType: String): Boolean = guard {
+        session.requireUnlocked()
+        VaultStore.validateId(fileId)
+        if (mimeType !in DocumentImporter.SUPPORTED_TYPES) throw InvalidInputException("Unsupported type")
+        val target = documentUi.createDocument(ExportNames.forExport(fileName, mimeType), mimeType) ?: return@guard false
+        io {
+            session.requireUnlocked()
+            DocumentExporter(appContext.contentResolver, session.vaultStore).exportTo(target, fileId)
+        }
+        true
+    }
+
+    override suspend fun exportAllToFolder(folderName: String, items: List<ExportItem>): ExportSummary? = guard {
+        session.requireUnlocked()
+        val checked = items.map {
+            VaultStore.validateId(it.fileId)
+            if (it.mimeType !in DocumentImporter.SUPPORTED_TYPES) throw InvalidInputException("Unsupported type")
+            DocumentExporter.Item(it.fileId, it.fileName, it.mimeType)
+        }
+        val tree = documentUi.openDocumentTree() ?: return@guard null
+        io {
+            session.requireUnlocked()
+            val r = DocumentExporter(appContext.contentResolver, session.vaultStore).exportAll(tree, folderName, checked)
+            ExportSummary(r.exported.toLong(), r.failed.toLong())
+        }
+    }
+
+    override suspend fun eraseAllData() = guard {
+        io { session.eraseAll() }
+    }
+
+    override fun getAutoLockSeconds(): Long = prefs.getLong(KEY_AUTO_LOCK, DEFAULT_AUTO_LOCK).let {
+        if (it in AUTO_LOCK_CHOICES) it else DEFAULT_AUTO_LOCK
+    }
+
+    override fun setAutoLockSeconds(seconds: Long) {
+        if (seconds !in AUTO_LOCK_CHOICES) throw SecurityBridgeError(ERR_INVALID_INPUT, ERR_INVALID_INPUT)
+        prefs.edit().putLong(KEY_AUTO_LOCK, seconds).apply()
     }
 
     override fun getLanguage(): String? = prefs.getString(KEY_LANGUAGE, null)
@@ -250,6 +328,9 @@ class SecurityHostApiImpl(
     companion object {
         private const val TAG = "DocSafeSecurity"
         private const val KEY_LANGUAGE = "language"
+        private const val KEY_AUTO_LOCK = "auto_lock_seconds"
+        private const val DEFAULT_AUTO_LOCK = 30L
+        private val AUTO_LOCK_CHOICES = setOf(0L, 30L, 60L, 300L)
         const val ERR_LOCKED = "LOCKED"
         const val ERR_INTEGRITY = "INTEGRITY"
         const val ERR_LOW_STORAGE = "LOW_STORAGE"

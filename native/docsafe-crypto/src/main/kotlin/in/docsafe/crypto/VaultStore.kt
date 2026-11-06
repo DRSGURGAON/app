@@ -148,6 +148,9 @@ class VaultStore(
     /** Removes interrupted imports. Call on start before any import begins. */
     fun sweepPartials(): Int = SecureFiles.wipeDirectory(vaultDir) { it.name.endsWith(PART_SUFFIX) }
 
+    /** Erase-all: wipes every container, partial import and decrypted temp file. Returns files removed. */
+    fun wipeAll(): Int = SecureFiles.wipeDirectory(vaultDir) + SecureFiles.wipeDirectory(tempDir)
+
     fun delete(fileId: String): Boolean {
         validateId(fileId)
         return SecureFiles.bestEffortWipe(File(vaultDir, "$fileId$SUFFIX"))

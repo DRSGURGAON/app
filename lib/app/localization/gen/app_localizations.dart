@@ -553,6 +553,876 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Something went wrong. Try again.'**
   String get errorGeneric;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @rename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get rename;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @undo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get undo;
+
+  /// No description provided for @nameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name.'**
+  String get nameRequired;
+
+  /// No description provided for @clearValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearValue;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault'**
+  String get navVault;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @categoryIdentity.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity Documents'**
+  String get categoryIdentity;
+
+  /// No description provided for @categoryEducation.
+  ///
+  /// In en, this message translates to:
+  /// **'Education'**
+  String get categoryEducation;
+
+  /// No description provided for @categoryVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get categoryVehicle;
+
+  /// No description provided for @categoryFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get categoryFinance;
+
+  /// No description provided for @categoryInsurance.
+  ///
+  /// In en, this message translates to:
+  /// **'Insurance'**
+  String get categoryInsurance;
+
+  /// No description provided for @categoryMedical.
+  ///
+  /// In en, this message translates to:
+  /// **'Medical'**
+  String get categoryMedical;
+
+  /// No description provided for @categoryProperty.
+  ///
+  /// In en, this message translates to:
+  /// **'Property'**
+  String get categoryProperty;
+
+  /// No description provided for @categoryWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Work'**
+  String get categoryWork;
+
+  /// No description provided for @categoryBills.
+  ///
+  /// In en, this message translates to:
+  /// **'Bills & Receipts'**
+  String get categoryBills;
+
+  /// No description provided for @categoryPersonal.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get categoryPersonal;
+
+  /// No description provided for @categoryOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get categoryOther;
+
+  /// No description provided for @homeSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search titles, categories, tags'**
+  String get homeSearchHint;
+
+  /// No description provided for @homeSecurityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your vault is protected'**
+  String get homeSecurityTitle;
+
+  /// No description provided for @homeSecurityPinOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked with your PIN'**
+  String get homeSecurityPinOnly;
+
+  /// No description provided for @homeSecurityPinBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked with your PIN and biometrics'**
+  String get homeSecurityPinBiometric;
+
+  /// No description provided for @homeImportPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Import PDF'**
+  String get homeImportPdf;
+
+  /// No description provided for @homeImportImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Import image'**
+  String get homeImportImage;
+
+  /// No description provided for @homeCreateFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder'**
+  String get homeCreateFolder;
+
+  /// No description provided for @homeRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent documents'**
+  String get homeRecent;
+
+  /// No description provided for @homeFavourites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get homeFavourites;
+
+  /// No description provided for @homeCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get homeCategories;
+
+  /// No description provided for @homeExpiringSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring soon'**
+  String get homeExpiringSoon;
+
+  /// No description provided for @homeSeeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get homeSeeAll;
+
+  /// No description provided for @homeNoRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents you add will appear here.'**
+  String get homeNoRecent;
+
+  /// No description provided for @homeNoFavourites.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark a document as a favourite to find it quickly.'**
+  String get homeNoFavourites;
+
+  /// No description provided for @homeNoExpiring.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents expire in the next 30 days.'**
+  String get homeNoExpiring;
+
+  /// No description provided for @expiresOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String expiresOn(String date);
+
+  /// No description provided for @expiredOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired {date}'**
+  String expiredOn(String date);
+
+  /// No description provided for @documentCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No documents} =1{1 document} other{{count} documents}}'**
+  String documentCount(int count);
+
+  /// No description provided for @vaultFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get vaultFolders;
+
+  /// No description provided for @vaultAllDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'All documents'**
+  String get vaultAllDocuments;
+
+  /// No description provided for @sortLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get sortLabel;
+
+  /// No description provided for @sortNewest.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
+  String get sortNewest;
+
+  /// No description provided for @sortOldest.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
+  String get sortOldest;
+
+  /// No description provided for @sortTitleAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Name A–Z'**
+  String get sortTitleAsc;
+
+  /// No description provided for @sortTitleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Name Z–A'**
+  String get sortTitleDesc;
+
+  /// No description provided for @sortLargest.
+  ///
+  /// In en, this message translates to:
+  /// **'Largest first'**
+  String get sortLargest;
+
+  /// No description provided for @filterFavourites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites only'**
+  String get filterFavourites;
+
+  /// No description provided for @importChooseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a document'**
+  String get importChooseTitle;
+
+  /// No description provided for @importDetailsAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get importDetailsAction;
+
+  /// No description provided for @folderNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder name'**
+  String get folderNameLabel;
+
+  /// No description provided for @folderRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename folder'**
+  String get folderRename;
+
+  /// No description provided for @folderDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete folder'**
+  String get folderDelete;
+
+  /// No description provided for @folderDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Its documents move to All documents; no document is deleted.'**
+  String folderDeleteConfirm(String name);
+
+  /// No description provided for @folderEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'This folder is empty.'**
+  String get folderEmpty;
+
+  /// No description provided for @noFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'No folder'**
+  String get noFolder;
+
+  /// No description provided for @categoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents in this category.'**
+  String get categoryEmpty;
+
+  /// No description provided for @noCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No category'**
+  String get noCategory;
+
+  /// No description provided for @detailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Document details'**
+  String get detailsTitle;
+
+  /// No description provided for @detailsOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get detailsOpen;
+
+  /// No description provided for @detailsExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get detailsExport;
+
+  /// No description provided for @detailsDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get detailsDelete;
+
+  /// No description provided for @detailsFavourite.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favourites'**
+  String get detailsFavourite;
+
+  /// No description provided for @detailsUnfavourite.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favourites'**
+  String get detailsUnfavourite;
+
+  /// No description provided for @detailsTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get detailsTitleLabel;
+
+  /// No description provided for @detailsCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get detailsCategory;
+
+  /// No description provided for @detailsFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get detailsFolder;
+
+  /// No description provided for @detailsTags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get detailsTags;
+
+  /// No description provided for @detailsAddTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Add tag'**
+  String get detailsAddTag;
+
+  /// No description provided for @detailsTagLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get detailsTagLabel;
+
+  /// No description provided for @detailsIssueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue date'**
+  String get detailsIssueDate;
+
+  /// No description provided for @detailsExpiryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry date'**
+  String get detailsExpiryDate;
+
+  /// No description provided for @detailsNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get detailsNotes;
+
+  /// No description provided for @detailsNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. Avoid writing full ID numbers here.'**
+  String get detailsNotesHint;
+
+  /// No description provided for @detailsNotSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get detailsNotSet;
+
+  /// No description provided for @detailsFileInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'{type} · {size} · added {date}'**
+  String detailsFileInfo(String type, String size, String date);
+
+  /// No description provided for @detailsExpiryBeforeIssue.
+  ///
+  /// In en, this message translates to:
+  /// **'The expiry date can\'t be before the issue date.'**
+  String get detailsExpiryBeforeIssue;
+
+  /// No description provided for @detailsMovedToTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'Moved to Recently deleted. It will be removed permanently after 30 days.'**
+  String get detailsMovedToTrash;
+
+  /// No description provided for @detailsNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This document no longer exists.'**
+  String get detailsNotFound;
+
+  /// No description provided for @exportWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export a readable copy?'**
+  String get exportWarningTitle;
+
+  /// No description provided for @exportWarningBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The exported file is NOT encrypted. Anyone who can open the location you choose can read it.'**
+  String get exportWarningBody;
+
+  /// No description provided for @exportContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose location'**
+  String get exportContinue;
+
+  /// No description provided for @exportDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported.'**
+  String get exportDone;
+
+  /// No description provided for @searchEmptyQuery.
+  ///
+  /// In en, this message translates to:
+  /// **'Type to search titles, categories and tags.'**
+  String get searchEmptyQuery;
+
+  /// No description provided for @searchNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents match \"{query}\".'**
+  String searchNoResults(String query);
+
+  /// No description provided for @trashTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently deleted'**
+  String get trashTitle;
+
+  /// No description provided for @trashInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents here are removed permanently after 30 days.'**
+  String get trashInfo;
+
+  /// No description provided for @trashEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here.'**
+  String get trashEmpty;
+
+  /// No description provided for @trashRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get trashRestore;
+
+  /// No description provided for @trashDeleteForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete permanently'**
+  String get trashDeleteForever;
+
+  /// No description provided for @trashDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete \"{title}\"? This cannot be undone.'**
+  String trashDeleteConfirm(String title);
+
+  /// No description provided for @trashEmptyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty'**
+  String get trashEmptyAll;
+
+  /// No description provided for @trashEmptyConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete all {count} documents in Recently deleted? This cannot be undone.'**
+  String trashEmptyConfirm(int count);
+
+  /// No description provided for @trashDaysLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =0{Removed today} =1{1 day left} other{{days} days left}}'**
+  String trashDaysLeft(int days);
+
+  /// No description provided for @trashRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored.'**
+  String get trashRestored;
+
+  /// No description provided for @settingsSecuritySection.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get settingsSecuritySection;
+
+  /// No description provided for @settingsBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock'**
+  String get settingsBiometric;
+
+  /// No description provided for @settingsBiometricUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available on this phone'**
+  String get settingsBiometricUnavailable;
+
+  /// No description provided for @settingsChangePin.
+  ///
+  /// In en, this message translates to:
+  /// **'Change PIN'**
+  String get settingsChangePin;
+
+  /// No description provided for @settingsAutoLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-lock'**
+  String get settingsAutoLock;
+
+  /// No description provided for @autoLockImmediately.
+  ///
+  /// In en, this message translates to:
+  /// **'Immediately'**
+  String get autoLockImmediately;
+
+  /// No description provided for @autoLock30s.
+  ///
+  /// In en, this message translates to:
+  /// **'After 30 seconds'**
+  String get autoLock30s;
+
+  /// No description provided for @autoLock1m.
+  ///
+  /// In en, this message translates to:
+  /// **'After 1 minute'**
+  String get autoLock1m;
+
+  /// No description provided for @autoLock5m.
+  ///
+  /// In en, this message translates to:
+  /// **'After 5 minutes'**
+  String get autoLock5m;
+
+  /// No description provided for @settingsPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & security'**
+  String get settingsPrivacy;
+
+  /// No description provided for @settingsDataSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Your data'**
+  String get settingsDataSection;
+
+  /// No description provided for @settingsStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage usage'**
+  String get settingsStorage;
+
+  /// No description provided for @settingsCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage categories'**
+  String get settingsCategories;
+
+  /// No description provided for @settingsExportAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Export all documents'**
+  String get settingsExportAll;
+
+  /// No description provided for @settingsErase.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase all data'**
+  String get settingsErase;
+
+  /// No description provided for @changePinCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current PIN'**
+  String get changePinCurrent;
+
+  /// No description provided for @changePinDone.
+  ///
+  /// In en, this message translates to:
+  /// **'PIN changed.'**
+  String get changePinDone;
+
+  /// No description provided for @privacyLocalOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything stays on this phone. DocSafe has no account, no servers, no ads and no analytics.'**
+  String get privacyLocalOnly;
+
+  /// No description provided for @privacyEncryption.
+  ///
+  /// In en, this message translates to:
+  /// **'Each document is encrypted with its own key (AES-256-GCM). Those keys are protected by the Android Keystore.'**
+  String get privacyEncryption;
+
+  /// No description provided for @privacyIndex.
+  ///
+  /// In en, this message translates to:
+  /// **'Document names, tags and notes are kept in an encrypted database.'**
+  String get privacyIndex;
+
+  /// No description provided for @privacyScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Screenshots and the recent-apps preview are blocked inside DocSafe.'**
+  String get privacyScreen;
+
+  /// No description provided for @privacyKeyProtection.
+  ///
+  /// In en, this message translates to:
+  /// **'Key protection on this phone'**
+  String get privacyKeyProtection;
+
+  /// No description provided for @privacyLimitsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Limits you should know'**
+  String get privacyLimitsTitle;
+
+  /// No description provided for @privacyLimitRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'On a rooted or compromised phone, malware could reach your documents while DocSafe is unlocked.'**
+  String get privacyLimitRoot;
+
+  /// No description provided for @privacyLimitExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported files are not encrypted.'**
+  String get privacyLimitExport;
+
+  /// No description provided for @privacyLimitPin.
+  ///
+  /// In en, this message translates to:
+  /// **'If you forget your PIN, the only option is to erase everything.'**
+  String get privacyLimitPin;
+
+  /// No description provided for @storageDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents'**
+  String get storageDocuments;
+
+  /// No description provided for @storageUsed.
+  ///
+  /// In en, this message translates to:
+  /// **'Used by documents'**
+  String get storageUsed;
+
+  /// No description provided for @storageFree.
+  ///
+  /// In en, this message translates to:
+  /// **'Free on this phone'**
+  String get storageFree;
+
+  /// No description provided for @storageInTrash.
+  ///
+  /// In en, this message translates to:
+  /// **'In Recently deleted'**
+  String get storageInTrash;
+
+  /// No description provided for @storageNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Sizes are of the original files. Encrypted copies are slightly larger.'**
+  String get storageNote;
+
+  /// No description provided for @categoriesAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'New category'**
+  String get categoriesAdd;
+
+  /// No description provided for @categoryNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Category name'**
+  String get categoryNameLabel;
+
+  /// No description provided for @categoriesDefaultNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Default categories can\'t be renamed or deleted.'**
+  String get categoriesDefaultNote;
+
+  /// No description provided for @categoryDeleteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Its documents become uncategorised; no document is deleted.'**
+  String categoryDeleteConfirm(String name);
+
+  /// No description provided for @exportAllBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Copies every document (except Recently deleted) into a new folder you choose. The copies are NOT encrypted.'**
+  String get exportAllBody;
+
+  /// No description provided for @exportAllButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose folder and export'**
+  String get exportAllButton;
+
+  /// No description provided for @exportAllResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {exported} of {total} documents.'**
+  String exportAllResult(int exported, int total);
+
+  /// No description provided for @exportAllFailedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'{failed} could not be exported. Check free space at the destination.'**
+  String exportAllFailedNote(int failed);
+
+  /// No description provided for @exportAllNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no documents to export.'**
+  String get exportAllNothing;
+
+  /// No description provided for @exportAllInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting…'**
+  String get exportAllInProgress;
+
+  /// No description provided for @eraseBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This permanently deletes every document, folder, tag and setting in DocSafe, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.'**
+  String get eraseBody;
+
+  /// No description provided for @eraseTypeToConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Type {word} to confirm'**
+  String eraseTypeToConfirm(String word);
+
+  /// No description provided for @eraseButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Erase everything'**
+  String get eraseButton;
+
+  /// No description provided for @eraseConfirmPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your PIN to erase'**
+  String get eraseConfirmPin;
+
+  /// No description provided for @eraseForgotPin.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot PIN?'**
+  String get eraseForgotPin;
+
+  /// No description provided for @eraseForgotBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.'**
+  String get eraseForgotBody;
+
+  /// No description provided for @erasing.
+  ///
+  /// In en, this message translates to:
+  /// **'Erasing…'**
+  String get erasing;
 }
 
 class _AppLocalizationsDelegate

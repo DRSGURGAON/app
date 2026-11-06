@@ -9,6 +9,8 @@ export 'native/security_api.g.dart'
         BiometricOutcome,
         BiometricPromptText,
         DatabaseConfig,
+        ExportItem,
+        ExportSummary,
         ImportedFile,
         KeyProtection,
         PinOutcome,
@@ -37,6 +39,15 @@ abstract interface class SecurityService {
   Future<void> deleteEncryptedFile(String fileId);
   Future<List<String>> listEncryptedFileIds();
   Future<StorageInfo> getStorageInfo();
+  Future<PinVerifyResult> changePin(Uint8List current, Uint8List next);
+  Future<bool> exportDocument(String fileId, String fileName, String mimeType);
+  Future<ExportSummary?> exportAllToFolder(
+    String folderName,
+    List<ExportItem> items,
+  );
+  Future<void> eraseAllData();
+  Future<int> getAutoLockSeconds();
+  Future<void> setAutoLockSeconds(int seconds);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -119,6 +130,39 @@ class PigeonSecurityService implements SecurityService {
 
   @override
   Future<StorageInfo> getStorageInfo() => _guard(_api.getStorageInfo);
+
+  @override
+  Future<PinVerifyResult> changePin(Uint8List current, Uint8List next) async {
+    try {
+      return await _guard(() => _api.changePin(current, next));
+    } finally {
+      current.fillRange(0, current.length, 0);
+      next.fillRange(0, next.length, 0);
+    }
+  }
+
+  @override
+  Future<bool> exportDocument(
+    String fileId,
+    String fileName,
+    String mimeType,
+  ) => _guard(() => _api.exportDocument(fileId, fileName, mimeType));
+
+  @override
+  Future<ExportSummary?> exportAllToFolder(
+    String folderName,
+    List<ExportItem> items,
+  ) => _guard(() => _api.exportAllToFolder(folderName, items));
+
+  @override
+  Future<void> eraseAllData() => _guard(_api.eraseAllData);
+
+  @override
+  Future<int> getAutoLockSeconds() => _guard(_api.getAutoLockSeconds);
+
+  @override
+  Future<void> setAutoLockSeconds(int seconds) =>
+      _guard(() => _api.setAutoLockSeconds(seconds));
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

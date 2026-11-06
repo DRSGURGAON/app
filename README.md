@@ -8,20 +8,27 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 
 > DocSafe is not DigiLocker and does not verify or authenticate documents.
 
-## Status: Phase 1 (security foundation)
+## Status
+
+**Phase 1 — security foundation:** done; CI green including on-device Keystore tests. Physical-device checks pending (docs/TESTING.md).
+
+**Phase 2 — document vault:** implemented.
 
 | Area | State |
 |---|---|
-| Streaming AES-256-GCM file encryption, per-file keys wrapped by Android Keystore | Implemented, JVM-tested |
-| PIN (6 digits) with persistent, tamper-evident attempt limiting | Implemented, JVM- and Dart-tested |
-| Biometric unlock (BiometricPrompt + Keystore CryptoObject) | Implemented, **needs a device run** |
-| SQLCipher-encrypted metadata database (Drift) | Implemented, tested on host with SQLCipher |
-| Secure import via Storage Access Framework, decrypt-to-temp preview | Implemented, **needs a device run** |
-| Auto-lock, FLAG_SECURE, backup exclusion | Implemented |
-| Android build / on-device tests | Green on GitHub Actions (APK build, 5 Keystore tests, on-device flow on API 34 emulator) |
+| Home dashboard: search, security status, import PDF/image, new folder, recent, favourites, categories, expiring soon | Implemented, widget-tested |
+| Vault, folder and category views; sort; favourites filter | Implemented, widget-tested |
+| Document details: rename, favourite, category, folder, tags, issue/expiry dates, notes | Implemented, repository- and widget-tested |
+| Search by title, tag and (localised) category name | Implemented, tested |
+| Recently deleted (30-day retention), restore, delete permanently, empty | Implemented, tested |
+| Export one document (system "save as") / export all to a chosen folder — unencrypted, with warning | Implemented; native path **needs a device run** |
+| Settings: language, biometric, change PIN, auto-lock time, privacy & security, storage usage, manage categories | Implemented, tested |
+| Erase all data (from Settings with PIN, or "Forgot PIN?" on the lock screen) | Implemented, widget-tested; native wipe covered by the emulator test |
+| Duplicate detection (keyed fingerprint) | Warns on import |
+| Encrypted SQLite schema v2 with tested v1→v2 migration | Implemented |
 
-Phases 2–8 (full vault, scanner, PDF tools, OCR, reminders, billing, polish, release) have not been started.
-See [docs/TESTING.md](docs/TESTING.md) for exactly what has and has not been verified.
+Not started: Phase 3 (scanner), 4 (PDF tools), 5 (OCR, reminders/notifications), 6 (billing), 7–8.
+Bottom navigation shows Home, Vault and Settings; PDF Tools and Reminders tabs are added when those phases ship.
 
 ## Repository layout
 
@@ -31,7 +38,7 @@ lib/                      Flutter app (Riverpod, GoRouter, Material 3, gen-l10n)
   core/security/          Dart facade over the native bridge, lock controller
   core/database/          Drift schema + SQLCipher opener
   data/                   models, repositories
-  features/               onboarding, security (PIN, biometric, lock), vault
+  features/               onboarding, security, dashboard, vault, document, search, settings
 android/app/src/main/kotlin/in/docsafe/app/
   security/               Keystore keys, biometric, process session
   storage/                SAF document importer

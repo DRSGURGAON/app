@@ -555,6 +555,93 @@ data class StorageInfo (
     return "StorageInfo(vaultBytes=$vaultBytes, availableBytes=$availableBytes)"
   }
 }
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ExportItem (
+  val fileId: String,
+  /** Display file name (sanitised natively; extension added if missing). */
+  val fileName: String,
+  val mimeType: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ExportItem {
+      val fileId = pigeonVar_list[0] as String
+      val fileName = pigeonVar_list[1] as String
+      val mimeType = pigeonVar_list[2] as String
+      return ExportItem(fileId, fileName, mimeType)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      fileId,
+      fileName,
+      mimeType,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ExportItem
+    return SecurityApiPigeonUtils.deepEquals(this.fileId, other.fileId) && SecurityApiPigeonUtils.deepEquals(this.fileName, other.fileName) && SecurityApiPigeonUtils.deepEquals(this.mimeType, other.mimeType)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.fileId)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.fileName)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.mimeType)
+    return result
+  }
+  override fun toString(): String {
+    return "ExportItem(fileId=$fileId, fileName=$fileName, mimeType=$mimeType)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ExportSummary (
+  val exported: Long,
+  val failed: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ExportSummary {
+      val exported = pigeonVar_list[0] as Long
+      val failed = pigeonVar_list[1] as Long
+      return ExportSummary(exported, failed)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      exported,
+      failed,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ExportSummary
+    return SecurityApiPigeonUtils.deepEquals(this.exported, other.exported) && SecurityApiPigeonUtils.deepEquals(this.failed, other.failed)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.exported)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.failed)
+    return result
+  }
+  override fun toString(): String {
+    return "ExportSummary(exported=$exported, failed=$failed)"
+  }
+}
 private open class SecurityApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -608,6 +695,16 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
           StorageInfo.fromList(it)
         }
       }
+      139.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          ExportItem.fromList(it)
+        }
+      }
+      140.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          ExportSummary.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -653,6 +750,14 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         stream.write(138)
         writeValue(stream, value.toList())
       }
+      is ExportItem -> {
+        stream.write(139)
+        writeValue(stream, value.toList())
+      }
+      is ExportSummary -> {
+        stream.write(140)
+        writeValue(stream, value.toList())
+      }
       else -> super.writeValue(stream, value)
     }
   }
@@ -684,6 +789,31 @@ interface SecurityHostApi {
   suspend fun deleteEncryptedFile(fileId: String)
   suspend fun listEncryptedFileIds(): List<String>
   suspend fun getStorageInfo(): StorageInfo
+  /**
+   * Verifies [currentPin] (counts towards the attempt limit) and replaces it
+   * with [newPin]. Requires an unlocked session.
+   */
+  suspend fun changePin(currentPin: ByteArray, newPin: ByteArray): PinVerifyResult
+  /**
+   * Opens the system "save as" dialog and writes the DECRYPTED document to the
+   * chosen location. Returns false if the user cancelled. A failed export
+   * deletes the partially written destination file.
+   */
+  suspend fun exportDocument(fileId: String, fileName: String, mimeType: String): Boolean
+  /**
+   * Asks the user for a folder, creates [folderName] inside it and writes the
+   * decrypted documents there. Returns null if the user cancelled.
+   */
+  suspend fun exportAllToFolder(folderName: String, items: List<ExportItem>): ExportSummary?
+  /**
+   * Permanently deletes every document, the database, the PIN, biometric
+   * enrolment and all DocSafe Keystore keys. Works locked or unlocked.
+   * The Dart side must close the database first.
+   */
+  suspend fun eraseAllData()
+  /** Background time before auto-lock: 0, 30, 60 or 300 seconds. */
+  fun getAutoLockSeconds(): Long
+  fun setAutoLockSeconds(seconds: Long)
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -988,6 +1118,118 @@ interface SecurityHostApi {
               }
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.changePin$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val currentPinArg = args[0] as ByteArray
+            val newPinArg = args[1] as ByteArray
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.changePin(currentPinArg, newPinArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.exportDocument$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileIdArg = args[0] as String
+            val fileNameArg = args[1] as String
+            val mimeTypeArg = args[2] as String
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.exportDocument(fileIdArg, fileNameArg, mimeTypeArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.exportAllToFolder$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val folderNameArg = args[0] as String
+            val itemsArg = args[1] as List<ExportItem>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.exportAllToFolder(folderNameArg, itemsArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.eraseAllData$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.eraseAllData()
+                listOf(null)
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.getAutoLockSeconds$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.getAutoLockSeconds())
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.setAutoLockSeconds$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val secondsArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              api.setAutoLockSeconds(secondsArg)
+              listOf(null)
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

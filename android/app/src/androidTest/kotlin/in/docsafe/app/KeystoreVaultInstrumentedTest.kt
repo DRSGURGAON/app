@@ -87,6 +87,18 @@ class KeystoreVaultInstrumentedTest {
     }
 
     @Test
+    fun deletingKeystoreKeysMakesOldContainersUnrecoverable() {
+        val id = store().import(ByteArrayInputStream(Random(9).nextBytes(10_000)), null).fileId
+        KeystoreKeys.deleteAll() // what erase-all does after wiping files
+        try {
+            store().decryptToTemp(id, "pdf")
+            fail("expected IntegrityException")
+        } catch (_: IntegrityException) {
+        }
+        assertTrue(temp.listFiles().isNullOrEmpty())
+    }
+
+    @Test
     fun importerSniffsRealContentType() {
         assertEquals("application/pdf", DocumentImporter.sniff("%PDF-1.7".toByteArray(), 8))
         assertNull(DocumentImporter.sniff("MZ\u0090\u0000".toByteArray(), 4))

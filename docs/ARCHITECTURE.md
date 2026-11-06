@@ -27,14 +27,29 @@ Flutter UI (features/*)  ──►  Riverpod providers / controllers (core/secur
 - **Database lifecycle**: `databaseProvider` opens SQLCipher only while unlocked and closes it on lock.
 - **Repositories** own all DB access; widgets never touch Drift directly.
 
-## Schema (v1)
+## Schema (v2)
 
-`categories` (11 default keys, localised in UI), `encrypted_files` (id = container id, sizes,
-keyed fingerprint), `documents` (title, MIME, FK → encrypted_files, FK → categories),
-`app_settings`. Indexes on created_at, category, fingerprint, unique file_id.
+| Table | Purpose |
+|---|---|
+| `categories` | 11 default keys (localised in UI) + custom names |
+| `encrypted_files` | container id, sizes, keyed fingerprint |
+| `folders` | one-level folders |
+| `documents` | title, MIME, FK file, FK category (set null), FK folder (set null), favourite |
+| `tags`, `document_tags` | case-insensitive unique tags, many-to-many (cascade) |
+| `document_metadata` | issue/expiry date (ISO `yyyy-MM-dd`), notes |
+| `recently_deleted` | trash marker + deletion time |
+| `app_settings` | key/value (unlocked-only settings) |
 
-Later phases add `folders`, `document_tags`, `document_metadata`, `reminders`, `purchases`,
-`recently_deleted` through numbered Drift migrations.
+Migrations use Drift's `make-migrations` workflow: schema snapshots in `drift_schemas/`,
+step-by-step migrations in `app_database.steps.dart`, and generated + hand-written data-integrity
+tests in `test/drift/`. Non-sensitive UI preferences needed before unlock (language, auto-lock time)
+live natively in SharedPreferences.
+
+## Navigation
+
+`StatefulShellRoute` with three tabs (Home, Vault, Settings); document details, viewer and search
+are full-screen routes above the shell. `lockRedirect` sends every route to the lock screen while
+locked, except the "Forgot PIN?" erase page.
 
 ## Platform choices
 

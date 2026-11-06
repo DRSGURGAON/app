@@ -1,33 +1,75 @@
+import 'dart:async';
+
 import 'package:docsafe/app/app.dart';
+import 'package:docsafe/core/database/app_database.dart';
+import 'package:docsafe/core/database/database_opener.dart';
+import 'package:docsafe/core/database/database_provider.dart';
 import 'package:docsafe/core/security/lock_controller.dart';
-import 'package:docsafe/data/repositories/document_repository.dart';
+import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'fake_document_repository.dart';
 import 'fake_security_service.dart';
 
-Future<FakeDocumentRepository> pumpApp(
+/// Pumps the whole app with the fake native layer and a REAL in-memory
+/// SQLCipher database. The database is created, used and closed inside the
+/// widget test's fake-async zone (mixing zones deadlocks Drift).
+/// Call [TestApp.dispose] at the end of every test.
+class TestApp {
+  TestApp(this.tester, this.db, this.container);
+  final WidgetTester tester;
+  final AppDatabase db;
+  final ProviderContainer container;
+
+  Future<void> dispose() async {
+    await tester.pumpWidget(const SizedBox());
+    await tester.pump(const Duration(milliseconds: 50));
+    container.dispose();
+    // Drift's close completes via timers: pump the fake clock until it does.
+    var closed = false;
+    unawaited(db.close().whenComplete(() => closed = true));
+    for (var i = 0; i < 100 && !closed; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    expect(closed, isTrue, reason: 'database did not close');
+  }
+}
+
+Future<TestApp> pumpApp(
   WidgetTester tester,
-  FakeSecurityService fake,
-) async {
-  tester.view.physicalSize = const Size(1080, 2400);
+  FakeSecurityService fake, {
+  Size size = const Size(1080, 2400),
+}) async {
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+  tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 2.5;
   addTearDown(tester.view.reset);
-  final repo = FakeDocumentRepository(fake);
-  addTearDown(repo.dispose);
-  await tester.pumpWidget(
-    ProviderScope(
-      overrides: [
-        securityServiceProvider.overrideWithValue(fake),
-        documentRepositoryProvider.overrideWith((ref) async => repo),
-      ],
-      child: const DocSafeApp(),
-    ),
+  final db = openEncryptedMemoryDatabase('c' * 64);
+  final container = ProviderContainer(
+    overrides: [
+      securityServiceProvider.overrideWithValue(fake),
+      databaseProvider.overrideWith((ref) async => db),
+    ],
   );
-  await tester.pumpAndSettle();
-  return repo;
+  await tester.pumpWidget(
+    UncontrolledProviderScope(container: container, child: const DocSafeApp()),
+  );
+  await settle(tester);
+  return TestApp(tester, db, container);
+}
+
+/// pumpAndSettle with a bounded number of frames (lists may show spinners
+/// briefly while Drift streams emit).
+Future<void> settle(WidgetTester tester) async {
+  for (var i = 0; i < 5; i++) {
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  await tester.pumpAndSettle(
+    const Duration(milliseconds: 50),
+    EnginePhase.sendSemanticsUpdate,
+    const Duration(seconds: 10),
+  );
 }
 
 Future<void> enterPin(WidgetTester tester, String pin) async {
@@ -35,7 +77,7 @@ Future<void> enterPin(WidgetTester tester, String pin) async {
     await tester.tap(find.text(ch).last);
     await tester.pump();
   }
-  await tester.pumpAndSettle();
+  await settle(tester);
 }
 
 /// Scrolls the first scrollable until [finder] is built and visible, then taps.
@@ -46,5 +88,5 @@ Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
     scrollable: find.byType(Scrollable).first,
   );
   await tester.tap(finder);
-  await tester.pumpAndSettle();
+  await settle(tester);
 }

@@ -68,9 +68,9 @@ void main() {
     await tester.tap(find.byType(OutlinedButton));
     await settle(tester);
 
-    // Vault opened -> SQLCipher database created with the Keystore-wrapped key.
-    expect(find.text(hi.vaultTitle), findsOneWidget);
-    expect(find.text(hi.vaultEmptyTitle), findsOneWidget);
+    // Home opened -> SQLCipher database created with the Keystore-wrapped key.
+    expect(find.text(hi.homeRecent), findsOneWidget);
+    expect(find.text(hi.homeNoRecent), findsOneWidget);
 
     // Lock: native session locked, DB closed.
     await tester.tap(find.byTooltip(hi.vaultLock));
@@ -93,7 +93,29 @@ void main() {
     // Correct PIN unlocks and the encrypted DB re-opens with the same key.
     await enterPin(tester, '258036');
     await settle(tester);
-    expect(find.text(hi.vaultTitle), findsOneWidget);
-    expect(find.text(hi.vaultEmptyTitle), findsOneWidget);
+    expect(find.text(hi.homeRecent), findsOneWidget);
+    expect(find.text(hi.homeNoRecent), findsOneWidget);
+
+    // Erase everything through Settings: real native wipe of the vault,
+    // database, PIN and Keystore keys, back to first-run onboarding.
+    await tester.tap(find.text(hi.navSettings));
+    await settle(tester);
+    await tester.scrollUntilVisible(
+      find.text(hi.settingsErase),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.text(hi.settingsErase));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'ERASE');
+    await tester.pump();
+    await tester.tap(find.text(hi.eraseButton));
+    await settle(tester);
+    await enterPin(tester, '258036');
+    await settle(tester, seconds: 8);
+    expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
+    final after = await container.read(securityServiceProvider).getStatus();
+    expect(after.pinSet, isFalse);
+    expect(after.unlocked, isFalse);
   });
 }

@@ -87,6 +87,14 @@ object KeystoreKeys {
         if (keyStore.containsAlias(BIOMETRIC_ALIAS)) keyStore.deleteEntry(BIOMETRIC_ALIAS)
     }
 
+    /** Erase-all: destroys every DocSafe key. Data encrypted under them becomes unrecoverable. */
+    @Synchronized
+    fun deleteAll() {
+        for (alias in listOf(KEK_ALIAS, HMAC_ALIAS, BIOMETRIC_ALIAS)) {
+            if (keyStore.containsAlias(alias)) keyStore.deleteEntry(alias)
+        }
+    }
+
     /** Where the KEK lives. Reported to the user as-is; never claimed stronger than measured. */
     fun kekProtection(): Protection = try {
         val key = kek()

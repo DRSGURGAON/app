@@ -50,3 +50,27 @@ class BrandMark extends StatelessWidget {
     );
   }
 }
+
+/// Compact logo for app bars and headers.
+class BrandMarkSmall extends StatelessWidget {
+  const BrandMarkSmall({super.key, this.size = 36});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: scheme.primary,
+        borderRadius: BorderRadius.circular(size * .28),
+      ),
+      child: Icon(
+        Icons.shield_outlined,
+        color: scheme.onPrimary,
+        size: size * .58,
+      ),
+    );
+  }
+}

@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/router/app_router.dart';
 import '../../app/widgets/brand_mark.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
@@ -176,7 +178,7 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 24),
+                      padding: const EdgeInsets.only(bottom: 8),
                       child: PinPad(
                         enabled: !_busy && !lockedOut,
                         onDigit: _onDigit,
@@ -195,6 +197,11 @@ class _LockScreenState extends ConsumerState<LockScreen> {
                             : null,
                       ),
                     ),
+                    TextButton(
+                      onPressed: () => context.push(Routes.eraseLocked),
+                      child: Text(l.eraseForgotPin),
+                    ),
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),

@@ -42,10 +42,37 @@ final securityServiceProvider = Provider<SecurityService>(
   (ref) => PigeonSecurityService(),
 );
 
-/// Time the app may spend in the background before it locks itself.
-final autoLockTimeoutProvider = Provider<Duration>(
-  (ref) => const Duration(seconds: 30),
+/// Allowed auto-lock choices (seconds in background before locking).
+const autoLockChoices = [0, 30, 60, 300];
+
+/// Time the app may spend in the background before it locks itself. Stored
+/// natively as a non-sensitive preference so it applies before unlock.
+final autoLockTimeoutProvider = NotifierProvider<AutoLockController, Duration>(
+  AutoLockController.new,
 );
+
+class AutoLockController extends Notifier<Duration> {
+  @override
+  Duration build() {
+    Future.microtask(_load);
+    return const Duration(seconds: 30);
+  }
+
+  Future<void> _load() async {
+    try {
+      final s = await ref.read(securityServiceProvider).getAutoLockSeconds();
+      if (autoLockChoices.contains(s)) state = Duration(seconds: s);
+    } on SecurityFailure {
+      // Keep the default.
+    }
+  }
+
+  Future<void> set(int seconds) async {
+    if (!autoLockChoices.contains(seconds)) throw ArgumentError('choice');
+    await ref.read(securityServiceProvider).setAutoLockSeconds(seconds);
+    state = Duration(seconds: seconds);
+  }
+}
 
 final clockProvider = Provider<DateTime Function()>((ref) => DateTime.now);
 
@@ -124,6 +151,48 @@ class LockController extends Notifier<LockState> {
         await refresh();
         return outcome;
       });
+
+  /// Changes the PIN. Returns the interpretation of the CURRENT PIN check;
+  /// throws [SecurityFailure] with [SecurityErrorCode.invalidInput] if the
+  /// new PIN is too weak (no attempt is consumed in that case).
+  Future<PinAttempt> changePin(List<int> current, List<int> next) async {
+    final r = await _service.changePin(
+      Uint8List.fromList(current),
+      Uint8List.fromList(next),
+    );
+    await refresh();
+    return switch (r.outcome) {
+      PinOutcome.success => const PinAccepted(),
+      PinOutcome.lockedOut => PinLockedOut(
+        Duration(milliseconds: r.lockoutMillis),
+      ),
+      PinOutcome.wrong when r.lockoutMillis > 0 => PinLockedOut(
+        Duration(milliseconds: r.lockoutMillis),
+      ),
+      PinOutcome.wrong => PinRejected(r.attemptsBeforeLockout),
+      PinOutcome.notSet => const PinRejected(0),
+    };
+  }
+
+  /// Verifies the PIN without changing lock state semantics (used to confirm
+  /// destructive actions while unlocked). Counts towards the attempt limit.
+  Future<PinAttempt> confirmPin(List<int> digits) => submitPin(digits);
+
+  Future<void> disableBiometric() async {
+    await _service.disableBiometric();
+    await refresh();
+  }
+
+  /// First step of erasing: leave the vault (screens show the splash) so no
+  /// database stream is active while the database is closed and deleted.
+  void beginErase() => state = const LockState(LockPhase.loading);
+
+  /// Permanently erases all DocSafe data and returns to first-run state.
+  /// Call through [EraseService], which closes the database first.
+  Future<void> eraseAll() async {
+    await _service.eraseAllData();
+    await refresh();
+  }
 
   Future<void> lock() async {
     try {
