@@ -341,5 +341,65 @@
   "eraseConfirmPin": "Enter your PIN to erase",
   "eraseForgotPin": "Forgot PIN?",
   "eraseForgotBody": "Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.",
-  "erasing": "Erasing…"
+  "erasing": "Erasing…",
+  "scanDocument": "Scan document",
+  "scanPageCount": "{count, plural, =1{1 page} other{{count} pages}}",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanStarting": "Opening scanner…",
+  "scanAddPages": "Add pages",
+  "scanRotate": "Rotate",
+  "scanMoveUp": "Move up",
+  "scanMoveDown": "Move down",
+  "scanDeletePage": "Delete page",
+  "scanPageLabel": "Page {number}",
+  "@scanPageLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "scanReorderHint": "Drag the handle to reorder pages. Tap a page to view it.",
+  "scanNoPages": "No pages",
+  "scanNoPagesBody": "All pages were removed. Scan again, or discard.",
+  "scanDiscardTitle": "Discard this scan?",
+  "scanDiscardBody": "The scanned pages will be deleted. Nothing has been saved.",
+  "scanDiscard": "Discard",
+  "scanContinue": "Continue",
+  "scanSaveTitle": "Save scan",
+  "scanFormatLabel": "Save as",
+  "scanFormatPdf": "One PDF",
+  "scanFormatImages": "Separate images",
+  "scanFormatImagesNote": "Each page is saved as its own image document.",
+  "scanTagsLabel": "Tags (optional)",
+  "scanTagsHint": "Separate tags with commas",
+  "scanSaving": "Encrypting and saving…",
+  "scanSaved": "Scan encrypted and saved.",
+  "scanDefaultTitle": "Scan {date}",
+  "@scanDefaultTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scanUnavailable": "The document scanner isn't available on this phone. It needs up-to-date Google Play services.",
+  "scanPrivacyNote": "Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when DocSafe locks.",
+  "scanPreviewTitle": "Page {number} of {total}",
+  "@scanPreviewTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

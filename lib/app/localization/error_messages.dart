@@ -11,6 +11,7 @@ extension SecurityErrorText on AppLocalizations {
     SecurityErrorCode.locked => errorLocked,
     SecurityErrorCode.busy => errorBusy,
     SecurityErrorCode.databaseKey => errorDatabaseKey,
+    SecurityErrorCode.scannerUnavailable => scanUnavailable,
     SecurityErrorCode.noActivity || SecurityErrorCode.unknown => errorGeneric,
   };
 

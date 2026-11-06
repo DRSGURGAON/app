@@ -341,5 +341,65 @@
   "eraseConfirmPin": "मिटाने के लिए अपना PIN डालें",
   "eraseForgotPin": "PIN भूल गए?",
   "eraseForgotBody": "PIN के बिना DocSafe नहीं खुल सकता और उसके दस्तावेज़ वापस नहीं मिल सकते। आप सब कुछ मिटाकर फिर से शुरू कर सकते हैं।",
-  "erasing": "मिटाया जा रहा है…"
+  "erasing": "मिटाया जा रहा है…",
+  "scanDocument": "दस्तावेज़ स्कैन करें",
+  "scanPageCount": "{count, plural, =1{1 पेज} other{{count} पेज}}",
+  "@scanPageCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "scanStarting": "स्कैनर खुल रहा है…",
+  "scanAddPages": "पेज जोड़ें",
+  "scanRotate": "घुमाएँ",
+  "scanMoveUp": "ऊपर ले जाएँ",
+  "scanMoveDown": "नीचे ले जाएँ",
+  "scanDeletePage": "पेज हटाएँ",
+  "scanPageLabel": "पेज {number}",
+  "@scanPageLabel": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "scanReorderHint": "क्रम बदलने के लिए हैंडल खींचें। देखने के लिए पेज पर टैप करें।",
+  "scanNoPages": "कोई पेज नहीं",
+  "scanNoPagesBody": "सभी पेज हटा दिए गए। फिर से स्कैन करें, या रद्द करें।",
+  "scanDiscardTitle": "यह स्कैन रद्द करें?",
+  "scanDiscardBody": "स्कैन किए गए पेज मिटा दिए जाएँगे। कुछ भी सेव नहीं हुआ है।",
+  "scanDiscard": "रद्द करें",
+  "scanContinue": "आगे बढ़ें",
+  "scanSaveTitle": "स्कैन सेव करें",
+  "scanFormatLabel": "इस रूप में सेव करें",
+  "scanFormatPdf": "एक PDF",
+  "scanFormatImages": "अलग-अलग इमेज",
+  "scanFormatImagesNote": "हर पेज अलग इमेज दस्तावेज़ के रूप में सेव होगा।",
+  "scanTagsLabel": "टैग (वैकल्पिक)",
+  "scanTagsHint": "टैग को कॉमा से अलग करें",
+  "scanSaving": "एन्क्रिप्ट करके सेव हो रहा है…",
+  "scanSaved": "स्कैन एन्क्रिप्ट करके सेव किया गया।",
+  "scanDefaultTitle": "स्कैन {date}",
+  "@scanDefaultTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "scanUnavailable": "इस फ़ोन पर दस्तावेज़ स्कैनर उपलब्ध नहीं है। इसके लिए अपडेटेड Google Play सेवाएँ चाहिए।",
+  "scanPrivacyNote": "स्कैनिंग इसी फ़ोन पर Google Play सेवाओं के ज़रिए होती है। सेव करने पर पेज एन्क्रिप्ट होते हैं; DocSafe लॉक होने पर बिना सेव किए पेज मिट जाते हैं।",
+  "scanPreviewTitle": "पेज {number} / {total}",
+  "@scanPreviewTitle": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

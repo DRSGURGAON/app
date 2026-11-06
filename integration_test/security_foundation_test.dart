@@ -37,7 +37,7 @@ void main() {
   testWidgets('setup, lock, wrong PIN, unlock, encrypted DB opens', (
     tester,
   ) async {
-    final container = ProviderContainer();
+    var container = ProviderContainer();
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -95,6 +95,33 @@ void main() {
     await settle(tester);
     expect(find.text(hi.homeRecent), findsOneWidget);
     expect(find.text(hi.homeNoRecent), findsOneWidget);
+
+    // Metadata survives an app restart: create a folder, rebuild the whole
+    // Dart app state (new ProviderContainer), unlock again, folder is there.
+    await tester.tap(find.text(hi.homeCreateFolder));
+    await settle(tester);
+    await tester.enterText(find.byType(TextField), 'RestartCheck');
+    await tester.tap(find.text(hi.create));
+    await settle(tester);
+    await container.read(lockControllerProvider.notifier).lock();
+    await tester.pumpWidget(const SizedBox());
+    await settle(tester, seconds: 2);
+    final restarted = ProviderContainer();
+    addTearDown(restarted.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: restarted,
+        child: const DocSafeApp(),
+      ),
+    );
+    await settle(tester);
+    expect(find.text(hi.lockTitle), findsOneWidget);
+    await enterPin(tester, '258036');
+    await settle(tester);
+    await tester.tap(find.text(hi.navVault));
+    await settle(tester);
+    expect(find.text('RestartCheck'), findsOneWidget);
+    container = restarted;
 
     // Erase everything through Settings: real native wipe of the vault,
     // database, PIN and Keystore keys, back to first-run onboarding.

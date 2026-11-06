@@ -4,12 +4,12 @@
 
 | Suite | Command | Where it runs | Result (this commit) |
 |---|---|---|---|
-| Crypto core (JVM) — 35 tests | `cd native/docsafe-crypto && ./gradlew test` | Any JVM, CI | **Passed locally** |
-| Dart unit + widget + migration — 67 tests (real SQLCipher on host, incl. widget tests) | `flutter test` | Host, CI | **Passed locally** |
+| Crypto core (JVM) — 46 tests (incl. push encryptor, JPEG parser, PDF writer validated with PDFBox) | `cd native/docsafe-crypto && ./gradlew test` | Any JVM, CI | **Passed locally** |
+| Dart unit + widget + migration — 83 tests (real SQLCipher on host, incl. widget tests) | `flutter test` | Host, CI | **Passed locally** |
 | Static analysis | `flutter analyze` | Host, CI | **No issues** |
-| Debug APK build | `flutter build apk --debug` | CI | **Passed** (CI run 12) |
-| Keystore instrumented tests — 6 tests | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
-| On-device flow (setup → lock → wrong PIN → unlock → SQLCipher → erase all) | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
+| Debug + release APK build, release permission audit | `flutter build apk --debug/--release` | CI | **Passed** (CI run 12) |
+| Android instrumented tests — 12 tests (Keystore vault incl. 64 MB streaming; scan save path with `PdfRenderer`) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
+| On-device flow (setup → lock → wrong PIN → unlock → SQLCipher → restart persistence → erase all) | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
 
 All suites run in `.github/workflows/ci.yml` on every push (branch `docsafe-main` of DRSGURGAON/app).
 Emulator results cover the real Android Keystore, PinManager and SQLCipher on Android 14;
@@ -62,3 +62,15 @@ they do not replace the physical-device checks below (OEM Keystore quirks, real 
 Widget tests use a real in-memory SQLCipher database created, used and closed inside the test's
 fake-async zone (`test/helpers/pump_app.dart`). Mixing zones deadlocks Drift, and closing the
 database needs the fake clock to be pumped.
+
+## Phase 3 manual device checklist (needs Google Play services)
+
+1. Home → Scan document: the ML Kit scanner opens (first use may download the module). Cancel → back on Home, nothing saved.
+2. Scan 1 page → review shows it → Continue → save as PDF → document opens and renders.
+3. Scan 3 pages; in ML Kit adjust a crop and apply a filter; in review rotate one page, drag another to a new position, delete one; save → the PDF shows the order and rotation.
+4. Add pages to an existing review; save as separate images → one image document per page.
+5. Scan from inside a folder and from a category → saved there; tags appear in details and search.
+6. During review: press Home and wait past the auto-lock time → app locks; after unlock the scan is gone.
+7. Kill the app during review → relaunch → `adb shell run-as in.docsafe.app ls -R cache` shows no leftover pages.
+8. Fill storage to < 50 MB free → save shows the low-storage message; pages are kept; free space and save again.
+9. Device without Play services (or module disabled) → the "scanner isn't available" message.

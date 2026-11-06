@@ -98,6 +98,42 @@ class KeystoreVaultInstrumentedTest {
         assertTrue(temp.listFiles().isNullOrEmpty())
     }
 
+    /** 64 MB streamed through import and decrypt without being held in memory. */
+    @Test
+    fun largeDocumentStreamsWithoutLoadingIntoMemory() {
+        val size = 64L * 1024 * 1024
+        val sourceDigest = java.security.MessageDigest.getInstance("SHA-256")
+        val source = object : java.io.InputStream() {
+            var pos = 0L
+            val block = ByteArray(64 * 1024) { (it * 31 + 7).toByte() }
+            override fun read(): Int = throw UnsupportedOperationException()
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                if (pos >= size) return -1
+                val n = minOf(len.toLong(), size - pos, block.size.toLong()).toInt()
+                System.arraycopy(block, 0, b, off, n)
+                block[0] = (block[0] + 1).toByte() // vary content per read
+                sourceDigest.update(b, off, n)
+                pos += n
+                return n
+            }
+        }
+        val s = store()
+        val imported = s.import(source, size)
+        assertEquals(size, imported.plaintextBytes)
+        val out = s.decryptToTemp(imported.fileId, "pdf")
+        val outDigest = java.security.MessageDigest.getInstance("SHA-256")
+        java.io.FileInputStream(out).use { input ->
+            val buf = ByteArray(256 * 1024)
+            while (true) {
+                val n = input.read(buf)
+                if (n < 0) break
+                outDigest.update(buf, 0, n)
+            }
+        }
+        assertArrayEquals(sourceDigest.digest(), outDigest.digest())
+        assertTrue(s.deleteTemp(out.path))
+    }
+
     @Test
     fun importerSniffsRealContentType() {
         assertEquals("application/pdf", DocumentImporter.sniff("%PDF-1.7".toByteArray(), 8))

@@ -228,49 +228,127 @@ class DocumentRepository {
   }) async {
     final imported = await _security.pickAndImportDocument(kind.mimeTypes);
     if (imported == null) return const ImportCancelled();
+    final recorded = await _recordAll(
+      [imported],
+      titles: [titleFromFileName(imported.displayName)],
+      folderId: folderId,
+      categoryId: categoryId,
+    );
+    AppLogger.event('import_ok');
+    return ImportSucceeded(
+      recorded.documents.single,
+      isDuplicate: recorded.anyDuplicate,
+    );
+  }
+
+  /// Encrypts reviewed scanner pages (natively, no plaintext file) and records
+  /// the result. The scanned page files are discarded only after the database
+  /// rows are committed; if anything fails they are kept so the user can retry.
+  Future<List<VaultDocument>> saveScan({
+    required List<ScanPageSpec> pages,
+    required ScanSaveFormat format,
+    required String title,
+    int? folderId,
+    int? categoryId,
+    List<String> tags = const [],
+  }) async {
+    if (pages.isEmpty) throw ArgumentError('No pages');
+    final base = cleanTitle(title);
+    final files = await _security.saveScan(pages, format);
+    final titles = files.length == 1
+        ? [base]
+        : [
+            for (var i = 0; i < files.length; i++)
+              cleanTitle('$base (${i + 1})'),
+          ];
+    final recorded = await _recordAll(
+      files,
+      titles: titles,
+      folderId: folderId,
+      categoryId: categoryId,
+      tags: tags,
+    );
+    try {
+      await _security.discardScan([for (final p in pages) p.path]);
+    } catch (_) {
+      // Pages are wiped on lock and on the next start anyway.
+      AppLogger.event('scan_discard_deferred');
+    }
+    AppLogger.event('scan_saved');
+    return recorded.documents;
+  }
+
+  /// Records encrypted containers as documents in one transaction. If it
+  /// fails, every container is deleted so nothing is orphaned.
+  Future<({List<VaultDocument> documents, bool anyDuplicate})> _recordAll(
+    List<ImportedFile> files, {
+    required List<String> titles,
+    int? folderId,
+    int? categoryId,
+    List<String> tags = const [],
+  }) async {
     try {
       final now = _clock();
       var duplicate = false;
-      final id = await _db.transaction(() async {
-        final fp = imported.fingerprint;
-        if (fp != null) {
-          final existing = await (_db.select(
-            _db.encryptedFiles,
-          )..where((t) => t.fingerprint.equals(fp))).get();
-          duplicate = existing.isNotEmpty;
+      final ids = await _db.transaction(() async {
+        final ids = <int>[];
+        for (var i = 0; i < files.length; i++) {
+          final f = files[i];
+          final fp = f.fingerprint;
+          if (fp != null) {
+            final existing = await (_db.select(
+              _db.encryptedFiles,
+            )..where((t) => t.fingerprint.equals(fp))).get();
+            if (existing.isNotEmpty) duplicate = true;
+          }
+          await _db
+              .into(_db.encryptedFiles)
+              .insert(
+                EncryptedFilesCompanion.insert(
+                  id: f.fileId,
+                  formatVersion: 1,
+                  plaintextBytes: f.plaintextBytes,
+                  ciphertextBytes: f.ciphertextBytes,
+                  fingerprint: Value(f.fingerprint),
+                  createdAt: now,
+                ),
+              );
+          final id = await _db
+              .into(_db.documents)
+              .insert(
+                DocumentsCompanion.insert(
+                  title: titles[i],
+                  mimeType: f.mimeType,
+                  fileId: f.fileId,
+                  createdAt: now,
+                  updatedAt: now,
+                  folderId: Value(folderId),
+                  categoryId: Value(categoryId),
+                ),
+              );
+          ids.add(id);
         }
-        await _db
-            .into(_db.encryptedFiles)
-            .insert(
-              EncryptedFilesCompanion.insert(
-                id: imported.fileId,
-                formatVersion: 1,
-                plaintextBytes: imported.plaintextBytes,
-                ciphertextBytes: imported.ciphertextBytes,
-                fingerprint: Value(imported.fingerprint),
-                createdAt: now,
-              ),
-            );
-        return _db
-            .into(_db.documents)
-            .insert(
-              DocumentsCompanion.insert(
-                title: titleFromFileName(imported.displayName),
-                mimeType: imported.mimeType,
-                fileId: imported.fileId,
-                createdAt: now,
-                updatedAt: now,
-                folderId: Value(folderId),
-                categoryId: Value(categoryId),
-              ),
-            );
+        if (tags.isNotEmpty) {
+          for (final id in ids) {
+            await setTags(id, tags);
+          }
+        }
+        return ids;
       });
-      final doc = await byId(id);
-      AppLogger.event('import_ok');
-      return ImportSucceeded(doc!, isDuplicate: duplicate);
+      final docs = <VaultDocument>[];
+      for (final id in ids) {
+        docs.add((await byId(id))!);
+      }
+      return (documents: docs, anyDuplicate: duplicate);
     } catch (e) {
-      AppLogger.event('import_record_failed');
-      await _security.deleteEncryptedFile(imported.fileId);
+      AppLogger.event('record_failed');
+      for (final f in files) {
+        try {
+          await _security.deleteEncryptedFile(f.fileId);
+        } catch (_) {
+          // The orphan sweep removes it on the next unlock.
+        }
+      }
       rethrow;
     }
   }

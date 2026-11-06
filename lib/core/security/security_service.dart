@@ -15,6 +15,9 @@ export 'native/security_api.g.dart'
         KeyProtection,
         PinOutcome,
         PinVerifyResult,
+        ScanPageSpec,
+        ScanSaveFormat,
+        ScannedPage,
         SecurityStatus,
         StorageInfo;
 
@@ -48,6 +51,15 @@ abstract interface class SecurityService {
   Future<void> eraseAllData();
   Future<int> getAutoLockSeconds();
   Future<void> setAutoLockSeconds(int seconds);
+  Future<List<ScannedPage>?> startScan({
+    required int pageLimit,
+    required bool allowGalleryImport,
+  });
+  Future<List<ImportedFile>> saveScan(
+    List<ScanPageSpec> pages,
+    ScanSaveFormat format,
+  );
+  Future<void> discardScan(List<String> paths);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -163,6 +175,22 @@ class PigeonSecurityService implements SecurityService {
   @override
   Future<void> setAutoLockSeconds(int seconds) =>
       _guard(() => _api.setAutoLockSeconds(seconds));
+
+  @override
+  Future<List<ScannedPage>?> startScan({
+    required int pageLimit,
+    required bool allowGalleryImport,
+  }) => _guard(() => _api.startScan(pageLimit, allowGalleryImport));
+
+  @override
+  Future<List<ImportedFile>> saveScan(
+    List<ScanPageSpec> pages,
+    ScanSaveFormat format,
+  ) => _guard(() => _api.saveScan(pages, format));
+
+  @override
+  Future<void> discardScan(List<String> paths) =>
+      _guard(() => _api.discardScan(paths));
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

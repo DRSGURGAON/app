@@ -8,6 +8,7 @@ import '../../features/document/document_details_screen.dart';
 import '../../features/document/document_preview_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/onboarding/splash_screen.dart';
+import '../../features/scanner/scan_review_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/security/biometric_setup_screen.dart';
 import '../../features/security/lock_screen.dart';
@@ -53,6 +54,14 @@ abstract final class Routes {
 
   // Full-screen routes.
   static const search = '/search';
+  static const scan = '/scan';
+  static String scanInto({int? folderId, int? categoryId}) => Uri(
+    path: scan,
+    queryParameters: {
+      if (folderId != null) 'folder': '$folderId',
+      if (categoryId != null) 'category': '$categoryId',
+    },
+  ).toString();
   static String details(int id) => '/doc/$id';
   static String viewer(int id) => '/doc/$id/view';
 }
@@ -179,6 +188,14 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
         ],
+      ),
+      GoRoute(
+        path: Routes.scan,
+        parentNavigatorKey: _rootKey,
+        builder: (_, s) => ScanReviewScreen(
+          folderId: int.tryParse(s.uri.queryParameters['folder'] ?? ''),
+          categoryId: int.tryParse(s.uri.queryParameters['category'] ?? ''),
+        ),
       ),
       GoRoute(
         path: Routes.search,

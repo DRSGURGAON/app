@@ -766,4 +766,111 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get erasing => 'मिटाया जा रहा है…';
+
+  @override
+  String get scanDocument => 'दस्तावेज़ स्कैन करें';
+
+  @override
+  String scanPageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count पेज',
+      one: '1 पेज',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanStarting => 'स्कैनर खुल रहा है…';
+
+  @override
+  String get scanAddPages => 'पेज जोड़ें';
+
+  @override
+  String get scanRotate => 'घुमाएँ';
+
+  @override
+  String get scanMoveUp => 'ऊपर ले जाएँ';
+
+  @override
+  String get scanMoveDown => 'नीचे ले जाएँ';
+
+  @override
+  String get scanDeletePage => 'पेज हटाएँ';
+
+  @override
+  String scanPageLabel(int number) {
+    return 'पेज $number';
+  }
+
+  @override
+  String get scanReorderHint =>
+      'क्रम बदलने के लिए हैंडल खींचें। देखने के लिए पेज पर टैप करें।';
+
+  @override
+  String get scanNoPages => 'कोई पेज नहीं';
+
+  @override
+  String get scanNoPagesBody =>
+      'सभी पेज हटा दिए गए। फिर से स्कैन करें, या रद्द करें।';
+
+  @override
+  String get scanDiscardTitle => 'यह स्कैन रद्द करें?';
+
+  @override
+  String get scanDiscardBody =>
+      'स्कैन किए गए पेज मिटा दिए जाएँगे। कुछ भी सेव नहीं हुआ है।';
+
+  @override
+  String get scanDiscard => 'रद्द करें';
+
+  @override
+  String get scanContinue => 'आगे बढ़ें';
+
+  @override
+  String get scanSaveTitle => 'स्कैन सेव करें';
+
+  @override
+  String get scanFormatLabel => 'इस रूप में सेव करें';
+
+  @override
+  String get scanFormatPdf => 'एक PDF';
+
+  @override
+  String get scanFormatImages => 'अलग-अलग इमेज';
+
+  @override
+  String get scanFormatImagesNote =>
+      'हर पेज अलग इमेज दस्तावेज़ के रूप में सेव होगा।';
+
+  @override
+  String get scanTagsLabel => 'टैग (वैकल्पिक)';
+
+  @override
+  String get scanTagsHint => 'टैग को कॉमा से अलग करें';
+
+  @override
+  String get scanSaving => 'एन्क्रिप्ट करके सेव हो रहा है…';
+
+  @override
+  String get scanSaved => 'स्कैन एन्क्रिप्ट करके सेव किया गया।';
+
+  @override
+  String scanDefaultTitle(String date) {
+    return 'स्कैन $date';
+  }
+
+  @override
+  String get scanUnavailable =>
+      'इस फ़ोन पर दस्तावेज़ स्कैनर उपलब्ध नहीं है। इसके लिए अपडेटेड Google Play सेवाएँ चाहिए।';
+
+  @override
+  String get scanPrivacyNote =>
+      'स्कैनिंग इसी फ़ोन पर Google Play सेवाओं के ज़रिए होती है। सेव करने पर पेज एन्क्रिप्ट होते हैं; DocSafe लॉक होने पर बिना सेव किए पेज मिट जाते हैं।';
+
+  @override
+  String scanPreviewTitle(int number, int total) {
+    return 'पेज $number / $total';
+  }
 }

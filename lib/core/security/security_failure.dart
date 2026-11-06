@@ -12,6 +12,7 @@ enum SecurityErrorCode {
   noActivity,
   busy,
   databaseKey,
+  scannerUnavailable,
   unknown;
 
   static SecurityErrorCode fromNative(String code) => switch (code) {
@@ -23,6 +24,7 @@ enum SecurityErrorCode {
     'IO' => io,
     'NO_ACTIVITY' => noActivity,
     'BUSY' => busy,
+    'SCANNER_UNAVAILABLE' => scannerUnavailable,
     _ => unknown,
   };
 }

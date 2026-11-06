@@ -51,6 +51,26 @@ live natively in SharedPreferences.
 are full-screen routes above the shell. `lockRedirect` sends every route to the lock screen while
 locked, except the "Forgot PIN?" erase page.
 
+## Scanner (Phase 3)
+
+```
+Home / import sheet ──► /scan ScanReviewScreen ──► ScanSaveScreen
+                              │ ScanController (autoDispose; discards unsaved pages on dispose)
+                              ▼
+SecurityService.startScan ──► ScannerLauncher (ML Kit GmsDocumentScanning, IntentSender
+                              via MainActivity's activity-result launcher)
+                              └► ScanStore.register(pages in app cache) + pending list
+DocumentRepository.saveScan ─► SecurityService.saveScan ─► ScanStore.save
+                                   PDF:    VaultStore.importWriting { JpegPdfWriter.write(...) }
+                                   images: VaultStore.importWriting { copy or rotate+compress }
+                              ─► DB rows (+ tags) in one transaction ─► discardScan(pages)
+```
+
+`VaultStore.importWriting` uses `StreamingAead.openEncryptor`, a push-style encryptor producing
+the same DSF1 format as the pull-style `encrypt` (tested byte-for-byte compatible at chunk
+boundaries). ML Kit is used directly (`play-services-mlkit-document-scanner:16.0.0`) rather than
+through the Flutter plugin, for explicit cancel/unavailable handling and one less dependency.
+
 ## Platform choices
 
 - minSdk 26, target/compile SDK from Flutter (36). `FlutterFragmentActivity` (needed by BiometricPrompt).

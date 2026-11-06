@@ -8,6 +8,9 @@ import `in`.docsafe.app.security.BiometricAuthenticator
 import `in`.docsafe.app.security.BiometricAvailabilityState
 import `in`.docsafe.app.security.BiometricResult
 import `in`.docsafe.app.security.KeystoreKeys
+import `in`.docsafe.app.scanner.ScanStore
+import `in`.docsafe.app.scanner.ScannerLauncher
+import `in`.docsafe.app.scanner.ScannerUnavailableException
 import `in`.docsafe.app.security.VaultSession
 import `in`.docsafe.app.storage.DocumentExporter
 import `in`.docsafe.app.storage.DocumentImporter
@@ -30,6 +33,9 @@ interface SystemDocumentUi {
     suspend fun createDocument(fileName: String, mimeType: String): Uri?
 
     suspend fun openDocumentTree(): Uri?
+
+    /** Launches an IntentSender (ML Kit scanner); null if it could not deliver a result. */
+    suspend fun launchIntentSender(sender: android.content.IntentSender): androidx.activity.result.ActivityResult?
 }
 
 /**
@@ -252,6 +258,45 @@ class SecurityHostApiImpl(
         io { session.eraseAll() }
     }
 
+    override suspend fun startScan(pageLimit: Long, allowGalleryImport: Boolean): List<ScannedPage>? = guard {
+        session.requireUnlocked()
+        val activity = activityProvider() ?: throw SecurityBridgeError(ERR_NO_ACTIVITY, "No activity")
+        val files = ScannerLauncher(appContext.cacheDir).scan(
+            activity,
+            launch = { sender -> documentUi.launchIntentSender(sender) },
+            pageLimit = pageLimit.toInt(),
+            allowGalleryImport = allowGalleryImport,
+        ) ?: return@guard null
+        io {
+            session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+        }
+    }
+
+    override suspend fun saveScan(pages: List<ScanPageSpec>, format: ScanSaveFormat): List<ImportedFile> = guard {
+        io {
+            session.requireUnlocked()
+            val specs = pages.map { ScanStore.PageSpec(it.path, it.rotation.toInt()) }
+            val (fmt, mime) = when (format) {
+                ScanSaveFormat.PDF -> ScanStore.Format.PDF to "application/pdf"
+                ScanSaveFormat.IMAGES -> ScanStore.Format.IMAGES to "image/jpeg"
+            }
+            session.scanStore.save(specs, fmt).map {
+                ImportedFile(
+                    fileId = it.fileId,
+                    displayName = "",
+                    mimeType = mime,
+                    plaintextBytes = it.plaintextBytes,
+                    ciphertextBytes = it.ciphertextBytes,
+                    fingerprint = it.fingerprint,
+                )
+            }
+        }
+    }
+
+    override suspend fun discardScan(paths: List<String>) = guard {
+        io { session.scanStore.discard(paths) }
+    }
+
     override fun getAutoLockSeconds(): Long = prefs.getLong(KEY_AUTO_LOCK, DEFAULT_AUTO_LOCK).let {
         if (it in AUTO_LOCK_CHOICES) it else DEFAULT_AUTO_LOCK
     }
@@ -279,6 +324,7 @@ class SecurityHostApiImpl(
     } catch (e: Throwable) {
         val code = when (e) {
             is VaultSession.SessionLockedException -> ERR_LOCKED
+            is ScannerUnavailableException -> ERR_SCANNER_UNAVAILABLE
             is IntegrityException -> ERR_INTEGRITY
             is FormatException -> ERR_INTEGRITY
             is InsufficientStorageException -> ERR_LOW_STORAGE
@@ -339,6 +385,7 @@ class SecurityHostApiImpl(
         const val ERR_IO = "IO"
         const val ERR_NO_ACTIVITY = "NO_ACTIVITY"
         const val ERR_BUSY = "BUSY"
+        const val ERR_SCANNER_UNAVAILABLE = "SCANNER_UNAVAILABLE"
         const val ERR_UNKNOWN = "UNKNOWN"
     }
 }

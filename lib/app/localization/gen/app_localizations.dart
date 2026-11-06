@@ -1423,6 +1423,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Erasing…'**
   String get erasing;
+
+  /// No description provided for @scanDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan document'**
+  String get scanDocument;
+
+  /// No description provided for @scanPageCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 page} other{{count} pages}}'**
+  String scanPageCount(int count);
+
+  /// No description provided for @scanStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening scanner…'**
+  String get scanStarting;
+
+  /// No description provided for @scanAddPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Add pages'**
+  String get scanAddPages;
+
+  /// No description provided for @scanRotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate'**
+  String get scanRotate;
+
+  /// No description provided for @scanMoveUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Move up'**
+  String get scanMoveUp;
+
+  /// No description provided for @scanMoveDown.
+  ///
+  /// In en, this message translates to:
+  /// **'Move down'**
+  String get scanMoveDown;
+
+  /// No description provided for @scanDeletePage.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete page'**
+  String get scanDeletePage;
+
+  /// No description provided for @scanPageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number}'**
+  String scanPageLabel(int number);
+
+  /// No description provided for @scanReorderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the handle to reorder pages. Tap a page to view it.'**
+  String get scanReorderHint;
+
+  /// No description provided for @scanNoPages.
+  ///
+  /// In en, this message translates to:
+  /// **'No pages'**
+  String get scanNoPages;
+
+  /// No description provided for @scanNoPagesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'All pages were removed. Scan again, or discard.'**
+  String get scanNoPagesBody;
+
+  /// No description provided for @scanDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard this scan?'**
+  String get scanDiscardTitle;
+
+  /// No description provided for @scanDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The scanned pages will be deleted. Nothing has been saved.'**
+  String get scanDiscardBody;
+
+  /// No description provided for @scanDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get scanDiscard;
+
+  /// No description provided for @scanContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get scanContinue;
+
+  /// No description provided for @scanSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save scan'**
+  String get scanSaveTitle;
+
+  /// No description provided for @scanFormatLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as'**
+  String get scanFormatLabel;
+
+  /// No description provided for @scanFormatPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'One PDF'**
+  String get scanFormatPdf;
+
+  /// No description provided for @scanFormatImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate images'**
+  String get scanFormatImages;
+
+  /// No description provided for @scanFormatImagesNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Each page is saved as its own image document.'**
+  String get scanFormatImagesNote;
+
+  /// No description provided for @scanTagsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags (optional)'**
+  String get scanTagsLabel;
+
+  /// No description provided for @scanTagsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Separate tags with commas'**
+  String get scanTagsHint;
+
+  /// No description provided for @scanSaving.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting and saving…'**
+  String get scanSaving;
+
+  /// No description provided for @scanSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan encrypted and saved.'**
+  String get scanSaved;
+
+  /// No description provided for @scanDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan {date}'**
+  String scanDefaultTitle(String date);
+
+  /// No description provided for @scanUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The document scanner isn\'t available on this phone. It needs up-to-date Google Play services.'**
+  String get scanUnavailable;
+
+  /// No description provided for @scanPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when DocSafe locks.'**
+  String get scanPrivacyNote;
+
+  /// No description provided for @scanPreviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number} of {total}'**
+  String scanPreviewTitle(int number, int total);
 }
 
 class _AppLocalizationsDelegate

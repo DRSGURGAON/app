@@ -77,6 +77,14 @@ class HomeScreen extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: _QuickAction(
+                        icon: Icons.document_scanner_outlined,
+                        label: l.scanDocument,
+                        onTap: () => context.push(Routes.scan),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: _QuickAction(
                         icon: Icons.picture_as_pdf_outlined,
                         label: l.homeImportPdf,
                         onTap: () =>

@@ -60,7 +60,10 @@ class _DocumentPreviewScreenState extends ConsumerState<DocumentPreviewScreen> {
   void dispose() {
     final path = _path;
     if (path != null) {
-      if (_doc?.isImage ?? false) FileImage(File(path)).evict();
+      if (_doc?.isImage ?? false) {
+        // Drop the decoded pixels from the image cache as well.
+        PaintingBinding.instance.imageCache.clear();
+      }
       _repo?.closePreview(path).catchError((_) {});
     }
     super.dispose();
@@ -97,8 +100,14 @@ class _DocumentPreviewScreenState extends ConsumerState<DocumentPreviewScreen> {
           : InteractiveViewer(
               maxScale: 6,
               child: Center(
-                child: Image.file(
-                  File(path),
+                child: Image(
+                  // Decode at screen size (x3 for zoom) instead of full
+                  // resolution: a 48 MP photo would otherwise need ~190 MB.
+                  image: ResizeImage(
+                    FileImage(File(path)),
+                    width: previewDecodeWidth(context),
+                    policy: ResizeImagePolicy.fit,
+                  ),
                   errorBuilder: (_, _, _) =>
                       _PreviewError(message: l.errorIntegrity),
                 ),
@@ -130,4 +139,10 @@ class _PreviewError extends StatelessWidget {
       ),
     ),
   );
+}
+
+/// Pixel width used to decode image previews.
+int previewDecodeWidth(BuildContext context) {
+  final mq = MediaQuery.of(context);
+  return (mq.size.width * mq.devicePixelRatio * 3).round().clamp(1024, 4096);
 }

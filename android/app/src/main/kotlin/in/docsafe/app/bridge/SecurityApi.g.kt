@@ -256,6 +256,17 @@ enum class KeyProtection(val raw: Int) {
   }
 }
 
+enum class ScanSaveFormat(val raw: Int) {
+  PDF(0),
+  IMAGES(1);
+
+  companion object {
+    fun ofRaw(raw: Int): ScanSaveFormat? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
 /** Generated class from Pigeon that represents data sent in messages. */
 data class SecurityStatus (
   val pinSet: Boolean,
@@ -642,6 +653,100 @@ data class ExportSummary (
     return "ExportSummary(exported=$exported, failed=$failed)"
   }
 }
+
+/**
+ * A page produced by the document scanner (a JPEG in app-private cache).
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class ScannedPage (
+  val path: String,
+  val width: Long,
+  val height: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ScannedPage {
+      val path = pigeonVar_list[0] as String
+      val width = pigeonVar_list[1] as Long
+      val height = pigeonVar_list[2] as Long
+      return ScannedPage(path, width, height)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      path,
+      width,
+      height,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ScannedPage
+    return SecurityApiPigeonUtils.deepEquals(this.path, other.path) && SecurityApiPigeonUtils.deepEquals(this.width, other.width) && SecurityApiPigeonUtils.deepEquals(this.height, other.height)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.path)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.width)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.height)
+    return result
+  }
+  override fun toString(): String {
+    return "ScannedPage(path=$path, width=$width, height=$height)"
+  }
+}
+
+/**
+ * A page to save, in final order, with its clockwise rotation (0/90/180/270).
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class ScanPageSpec (
+  val path: String,
+  val rotation: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ScanPageSpec {
+      val path = pigeonVar_list[0] as String
+      val rotation = pigeonVar_list[1] as Long
+      return ScanPageSpec(path, rotation)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      path,
+      rotation,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ScanPageSpec
+    return SecurityApiPigeonUtils.deepEquals(this.path, other.path) && SecurityApiPigeonUtils.deepEquals(this.rotation, other.rotation)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.path)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.rotation)
+    return result
+  }
+  override fun toString(): String {
+    return "ScanPageSpec(path=$path, rotation=$rotation)"
+  }
+}
 private open class SecurityApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -666,43 +771,58 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         }
       }
       133.toByte() -> {
-        (readValue(buffer) as? List<Any?>)?.let {
-          SecurityStatus.fromList(it)
+        (readValue(buffer) as Long?)?.let {
+          ScanSaveFormat.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          PinVerifyResult.fromList(it)
+          SecurityStatus.fromList(it)
         }
       }
       135.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          BiometricPromptText.fromList(it)
+          PinVerifyResult.fromList(it)
         }
       }
       136.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ImportedFile.fromList(it)
+          BiometricPromptText.fromList(it)
         }
       }
       137.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          DatabaseConfig.fromList(it)
+          ImportedFile.fromList(it)
         }
       }
       138.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          StorageInfo.fromList(it)
+          DatabaseConfig.fromList(it)
         }
       }
       139.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ExportItem.fromList(it)
+          StorageInfo.fromList(it)
         }
       }
       140.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
+          ExportItem.fromList(it)
+        }
+      }
+      141.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
           ExportSummary.fromList(it)
+        }
+      }
+      142.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          ScannedPage.fromList(it)
+        }
+      }
+      143.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          ScanPageSpec.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -726,36 +846,48 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         stream.write(132)
         writeValue(stream, value.raw.toLong())
       }
-      is SecurityStatus -> {
+      is ScanSaveFormat -> {
         stream.write(133)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw.toLong())
       }
-      is PinVerifyResult -> {
+      is SecurityStatus -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is BiometricPromptText -> {
+      is PinVerifyResult -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is ImportedFile -> {
+      is BiometricPromptText -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is DatabaseConfig -> {
+      is ImportedFile -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is StorageInfo -> {
+      is DatabaseConfig -> {
         stream.write(138)
         writeValue(stream, value.toList())
       }
-      is ExportItem -> {
+      is StorageInfo -> {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is ExportSummary -> {
+      is ExportItem -> {
         stream.write(140)
+        writeValue(stream, value.toList())
+      }
+      is ExportSummary -> {
+        stream.write(141)
+        writeValue(stream, value.toList())
+      }
+      is ScannedPage -> {
+        stream.write(142)
+        writeValue(stream, value.toList())
+      }
+      is ScanPageSpec -> {
+        stream.write(143)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -814,6 +946,24 @@ interface SecurityHostApi {
   /** Background time before auto-lock: 0, 30, 60 or 300 seconds. */
   fun getAutoLockSeconds(): Long
   fun setAutoLockSeconds(seconds: Long)
+  /**
+   * Launches the Google ML Kit document scanner (edge detection, auto crop,
+   * manual crop, rotate and filters happen in its UI). Returns null if the
+   * user cancelled. Errors: SCANNER_UNAVAILABLE (no Google Play services
+   * module / unsupported device), IO.
+   * Pages stay in app-private cache until [saveScan] + [discardScan], lock,
+   * erase or the next app start.
+   */
+  suspend fun startScan(pageLimit: Long, allowGalleryImport: Boolean): List<ScannedPage>?
+  /**
+   * Encrypts the pages into the vault without writing any plaintext file:
+   * one PDF (pages embedded unchanged, rotation as page metadata) or one
+   * JPEG document per page. Source pages are NOT deleted here, so a failed
+   * save can be retried; call [discardScan] once the result is recorded.
+   */
+  suspend fun saveScan(pages: List<ScanPageSpec>, format: ScanSaveFormat): List<ImportedFile>
+  /** Wipes scanned page files (after a confirmed save, or on cancel). */
+  suspend fun discardScan(paths: List<String>)
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -1230,6 +1380,66 @@ interface SecurityHostApi {
               SecurityApiPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.startScan$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pageLimitArg = args[0] as Long
+            val allowGalleryImportArg = args[1] as Boolean
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.startScan(pageLimitArg, allowGalleryImportArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.saveScan$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pagesArg = args[0] as List<ScanPageSpec>
+            val formatArg = args[1] as ScanSaveFormat
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.saveScan(pagesArg, formatArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.discardScan$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pathsArg = args[0] as List<String>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.discardScan(pathsArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
           }
         } else {
           channel.setMessageHandler(null)

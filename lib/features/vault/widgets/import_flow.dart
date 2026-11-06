@@ -58,7 +58,9 @@ Future<void> runImport(
   }
 }
 
-/// Bottom sheet offering PDF or image import.
+const _scanChoice = 'scan';
+
+/// Bottom sheet offering scan, PDF or image import.
 Future<void> showImportSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -66,7 +68,7 @@ Future<void> showImportSheet(
   int? categoryId,
 }) async {
   final l = AppLocalizations.of(context);
-  final kind = await showModalBottomSheet<ImportKind>(
+  final kind = await showModalBottomSheet<Object>(
     context: context,
     showDragHandle: true,
     builder: (context) => SafeArea(
@@ -79,6 +81,11 @@ Future<void> showImportSheet(
               l.importChooseTitle,
               style: Theme.of(context).textTheme.titleMedium,
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.document_scanner_outlined),
+            title: Text(l.scanDocument),
+            onTap: () => Navigator.pop(context, _scanChoice),
           ),
           ListTile(
             leading: const Icon(Icons.picture_as_pdf_outlined),
@@ -96,6 +103,13 @@ Future<void> showImportSheet(
     ),
   );
   if (kind == null || !context.mounted) return;
+  if (kind == _scanChoice) {
+    await context.push(
+      Routes.scanInto(folderId: folderId, categoryId: categoryId),
+    );
+    return;
+  }
+  if (kind is! ImportKind) return;
   await runImport(
     context,
     ref,

@@ -84,6 +84,106 @@ class StreamingAead(private val random: SecureRandom = SecureRandom()) {
         }
     }
 
+    /**
+     * Push-style encryptor producing exactly the same DSF1 format as [encrypt], for
+     * producers that write (e.g. a PDF generator) rather than expose an InputStream.
+     * The header is written immediately; call [EncryptingOutputStream.finish] to emit
+     * the final chunk. [close] finishes but does NOT close [sink] (the caller owns it).
+     * If the producer fails, simply discard [sink]'s output: without the final chunk the
+     * container never authenticates.
+     */
+    fun openEncryptor(
+        sink: OutputStream,
+        keyWrapper: KeyWrapper,
+        fileId: ByteArray,
+        chunkSize: Int = DEFAULT_CHUNK_SIZE,
+    ): EncryptingOutputStream {
+        require(fileId.size == FILE_ID_LEN) { "fileId must be $FILE_ID_LEN bytes" }
+        require(chunkSize in MIN_CHUNK_SIZE..MAX_CHUNK_SIZE) { "Unsupported chunk size" }
+        return EncryptingOutputStream(sink, keyWrapper, fileId, chunkSize)
+    }
+
+    inner class EncryptingOutputStream internal constructor(
+        private val sink: OutputStream,
+        keyWrapper: KeyWrapper,
+        fileId: ByteArray,
+        private val chunkSize: Int,
+    ) : OutputStream() {
+        private val dek = ByteArray(DEK_LEN).also(random::nextBytes)
+        private val header: ByteArray
+        private val key: SecretKeySpec
+        private val cipher = Cipher.getInstance(TRANSFORMATION)
+        private val buf = ByteArray(chunkSize)
+        private val out = ByteArray(chunkSize + TAG_LEN)
+        private var filled = 0
+        private var index = 0L
+        private var plainTotal = 0L
+        private var cipherTotal = 0L
+        private var result: EncryptResult? = null
+
+        init {
+            try {
+                val wrapped = keyWrapper.wrap(dek, dekAad(fileId))
+                if (wrapped.size > MAX_WRAPPED_DEK_LEN) throw FormatException("Wrapped key too large")
+                header = encodeHeader(chunkSize, fileId, wrapped)
+                sink.write(header)
+                cipherTotal = header.size.toLong()
+                key = SecretKeySpec(dek, "AES")
+            } finally {
+                dek.fill(0)
+            }
+        }
+
+        override fun write(b: Int) {
+            write(byteArrayOf(b.toByte()), 0, 1)
+        }
+
+        override fun write(b: ByteArray, off: Int, len: Int) {
+            check(result == null) { "Encryptor already finished" }
+            var o = off
+            var remaining = len
+            while (remaining > 0) {
+                // A full buffer is only emitted (as non-final) once more data arrives,
+                // so the last chunk is always flagged final — same as encrypt().
+                if (filled == chunkSize) emit(isFinal = false)
+                val n = minOf(remaining, chunkSize - filled)
+                System.arraycopy(b, o, buf, filled, n)
+                filled += n
+                o += n
+                remaining -= n
+                plainTotal += n
+            }
+        }
+
+        private fun emit(isFinal: Boolean) {
+            cipher.init(Cipher.ENCRYPT_MODE, key, GCMParameterSpec(TAG_LEN * 8, nonce(index)))
+            cipher.updateAAD(chunkAad(header, index, isFinal))
+            val n = cipher.doFinal(buf, 0, filled, out, 0)
+            sink.write(out, 0, n)
+            cipherTotal += n
+            index++
+            filled = 0
+        }
+
+        /** Emits the final chunk (possibly empty). Idempotent. */
+        fun finish(): EncryptResult {
+            result?.let { return it }
+            emit(isFinal = true)
+            sink.flush()
+            buf.fill(0)
+            return EncryptResult(plainTotal, cipherTotal).also { result = it }
+        }
+
+        /** Flushes the sink only; never emits a partial chunk. */
+        override fun flush() {
+            sink.flush()
+        }
+
+        override fun close() {
+            finish()
+        }
+    }
+
     /** Reads and validates the header (structure only; authenticity is established when chunks verify). */
     fun readHeader(input: InputStream): Header {
         val fixed = ByteArray(4 + 1 + 4 + FILE_ID_LEN + 2)

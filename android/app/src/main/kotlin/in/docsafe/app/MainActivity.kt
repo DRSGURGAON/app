@@ -2,9 +2,12 @@ package `in`.docsafe.app
 
 import android.app.Activity
 import android.content.Intent
+import android.content.IntentSender
 import android.net.Uri
 import android.os.Bundle
 import android.view.WindowManager
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -33,7 +36,26 @@ class MainActivity : FlutterFragmentActivity() {
         if (cont?.isActive == true) cont.resume(uri)
     }
 
+    private var pendingSender: CancellableContinuation<ActivityResult?>? = null
+
+    private val senderLauncher = registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        val cont = pendingSender
+        pendingSender = null
+        if (cont?.isActive == true) cont.resume(result)
+    }
+
     private val documentUi = object : SystemDocumentUi {
+        override suspend fun launchIntentSender(sender: IntentSender): ActivityResult? =
+            suspendCancellableCoroutine { cont ->
+                if (pendingSender != null || pending != null) {
+                    cont.resumeWith(Result.failure(SecurityBridgeError(SecurityHostApiImpl.ERR_BUSY, SecurityHostApiImpl.ERR_BUSY)))
+                    return@suspendCancellableCoroutine
+                }
+                pendingSender = cont
+                cont.invokeOnCancellation { pendingSender = null }
+                senderLauncher.launch(IntentSenderRequest.Builder(sender).build())
+            }
+
         override suspend fun openDocument(mimeTypes: Array<String>): Uri? = launch(
             Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                 addCategory(Intent.CATEGORY_OPENABLE)
@@ -90,6 +112,8 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onDestroy() {
         pending?.let { if (it.isActive) it.resume(null) }
         pending = null
+        pendingSender?.let { if (it.isActive) it.resume(null) }
+        pendingSender = null
         super.onDestroy()
     }
 }

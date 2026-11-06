@@ -26,6 +26,15 @@ class FakeSecurityService implements SecurityService {
   List<ExportItem>? lastExportAll;
   bool exportCancelled = false;
   int autoLockSeconds = 30;
+
+  /// Scanner simulation: next result of [startScan] (null = user cancelled).
+  List<ScannedPage>? nextScan;
+  SecurityFailure? nextScanFailure;
+  SecurityFailure? nextSaveScanFailure;
+  final Set<String> pendingScanPages = {};
+  List<ScanPageSpec>? lastSavedScan;
+  ScanSaveFormat? lastScanFormat;
+  int scanCounter = 0;
   int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
@@ -105,6 +114,7 @@ class FakeSecurityService implements SecurityService {
     lockCalls++;
     unlocked = false;
     tempFiles.clear();
+    pendingScanPages.clear();
   }
 
   @override
@@ -247,6 +257,59 @@ class FakeSecurityService implements SecurityService {
   @override
   Future<void> setAutoLockSeconds(int seconds) async =>
       autoLockSeconds = seconds;
+
+  @override
+  Future<List<ScannedPage>?> startScan({
+    required int pageLimit,
+    required bool allowGalleryImport,
+  }) async {
+    _requireUnlocked();
+    final failure = nextScanFailure;
+    if (failure != null) throw failure;
+    final pages = nextScan;
+    nextScan = null;
+    if (pages != null) pendingScanPages.addAll(pages.map((p) => p.path));
+    return pages;
+  }
+
+  @override
+  Future<List<ImportedFile>> saveScan(
+    List<ScanPageSpec> pages,
+    ScanSaveFormat format,
+  ) async {
+    _requireUnlocked();
+    final failure = nextSaveScanFailure;
+    if (failure != null) throw failure;
+    for (final p in pages) {
+      if (!pendingScanPages.contains(p.path)) {
+        throw const SecurityFailure(SecurityErrorCode.invalidInput);
+      }
+    }
+    lastSavedScan = pages;
+    lastScanFormat = format;
+    ImportedFile make(String mime) {
+      scanCounter++;
+      final id = 'e${scanCounter.toRadixString(16).padLeft(31, '0')}';
+      filesOnDisk.add(id);
+      return ImportedFile(
+        fileId: id,
+        displayName: '',
+        mimeType: mime,
+        plaintextBytes: 1000 * pages.length,
+        ciphertextBytes: 1100 * pages.length,
+        fingerprint: 'scan-$id',
+      );
+    }
+
+    return format == ScanSaveFormat.pdf
+        ? [make('application/pdf')]
+        : [for (final _ in pages) make('image/jpeg')];
+  }
+
+  @override
+  Future<void> discardScan(List<String> paths) async {
+    pendingScanPages.removeAll(paths);
+  }
 
   @override
   Future<String?> getLanguage() async => language;

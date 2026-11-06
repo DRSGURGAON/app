@@ -5,7 +5,6 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.io.FilterInputStream
 import java.io.FilterOutputStream
 import java.io.IOException
 import java.io.InputStream
@@ -56,7 +55,15 @@ class VaultStore(
      * Encrypts [source] into the vault. [source] is consumed but not closed.
      * @param expectedSize plaintext size if known (e.g. from the content provider), for the preflight space check.
      */
-    fun import(source: InputStream, expectedSize: Long?): ImportResult {
+    fun import(source: InputStream, expectedSize: Long?): ImportResult =
+        importWriting(expectedSize) { out -> source.copyTo(out, chunkSize) }
+
+    /**
+     * Encrypts whatever [producer] writes into a new vault container. Used for
+     * generated documents (e.g. a PDF assembled from scanned pages) so no plaintext
+     * file is ever written. If [producer] throws, nothing is left behind.
+     */
+    fun importWriting(expectedSize: Long?, producer: (OutputStream) -> Unit): ImportResult {
         val required = if (expectedSize != null && expectedSize >= 0) {
             StreamingAead.ciphertextSizeBound(expectedSize, chunkSize) + reserveBytes
         } else {
@@ -72,8 +79,10 @@ class VaultStore(
         try {
             val result = FileOutputStream(part).use { fos ->
                 val guarded = SpaceGuardOutputStream(BufferedOutputStream(fos, chunkSize), vaultDir)
-                val input = if (mac != null) MacInputStream(source, mac) else source
-                val r = aead.encrypt(input, guarded, keyWrapper, idBytes, chunkSize)
+                val encryptor = aead.openEncryptor(guarded, keyWrapper, idBytes, chunkSize)
+                val sink = if (mac != null) MacOutputStream(encryptor, mac) else encryptor
+                producer(sink)
+                val r = encryptor.finish()
                 guarded.flush()
                 fos.fd.sync()
                 r
@@ -214,20 +223,19 @@ class VaultStore(
         }
     }
 
-    private class MacInputStream(input: InputStream, private val mac: javax.crypto.Mac) : FilterInputStream(input) {
-        override fun read(): Int {
-            val r = super.read()
-            if (r >= 0) mac.update(r.toByte())
-            return r
+    /** Updates [mac] with everything written; does not close the encryptor. */
+    private class MacOutputStream(private val target: OutputStream, private val mac: javax.crypto.Mac) : OutputStream() {
+        override fun write(b: Int) {
+            mac.update(b.toByte())
+            target.write(b)
         }
 
-        override fun read(b: ByteArray, off: Int, len: Int): Int {
-            val n = super.read(b, off, len)
-            if (n > 0) mac.update(b, off, n)
-            return n
+        override fun write(b: ByteArray, off: Int, len: Int) {
+            mac.update(b, off, len)
+            target.write(b, off, len)
         }
 
-        override fun close() { /* caller owns the source stream */ }
+        override fun flush() = target.flush()
     }
 
     private object NullOutputStream : OutputStream() {

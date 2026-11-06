@@ -121,6 +121,8 @@ enum PinOutcome { success, wrong, lockedOut, notSet }
 
 enum KeyProtection { strongBox, trustedEnvironment, software, unknown }
 
+enum ScanSaveFormat { pdf, images }
+
 class SecurityStatus {
   SecurityStatus({
     required this.pinSet,
@@ -592,6 +594,104 @@ class ExportSummary {
   }
 }
 
+/// A page produced by the document scanner (a JPEG in app-private cache).
+class ScannedPage {
+  ScannedPage({required this.path, required this.width, required this.height});
+
+  String path;
+
+  int width;
+
+  int height;
+
+  List<Object?> _toList() {
+    return <Object?>[path, width, height];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ScannedPage decode(Object result) {
+    result as List<Object?>;
+    return ScannedPage(
+      path: result[0]! as String,
+      width: result[1]! as int,
+      height: result[2]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ScannedPage || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(path, other.path) &&
+        _deepEquals(width, other.width) &&
+        _deepEquals(height, other.height);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ScannedPage(path: $path, width: $width, height: $height)';
+  }
+}
+
+/// A page to save, in final order, with its clockwise rotation (0/90/180/270).
+class ScanPageSpec {
+  ScanPageSpec({required this.path, required this.rotation});
+
+  String path;
+
+  int rotation;
+
+  List<Object?> _toList() {
+    return <Object?>[path, rotation];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ScanPageSpec decode(Object result) {
+    result as List<Object?>;
+    return ScanPageSpec(
+      path: result[0]! as String,
+      rotation: result[1]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ScanPageSpec || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(path, other.path) &&
+        _deepEquals(rotation, other.rotation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ScanPageSpec(path: $path, rotation: $rotation)';
+  }
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -611,29 +711,38 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is KeyProtection) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    } else if (value is SecurityStatus) {
+    } else if (value is ScanSaveFormat) {
       buffer.putUint8(133);
-      writeValue(buffer, value.encode());
-    } else if (value is PinVerifyResult) {
+      writeValue(buffer, value.index);
+    } else if (value is SecurityStatus) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    } else if (value is BiometricPromptText) {
+    } else if (value is PinVerifyResult) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is ImportedFile) {
+    } else if (value is BiometricPromptText) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is DatabaseConfig) {
+    } else if (value is ImportedFile) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    } else if (value is StorageInfo) {
+    } else if (value is DatabaseConfig) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    } else if (value is ExportItem) {
+    } else if (value is StorageInfo) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    } else if (value is ExportSummary) {
+    } else if (value is ExportItem) {
       buffer.putUint8(140);
+      writeValue(buffer, value.encode());
+    } else if (value is ExportSummary) {
+      buffer.putUint8(141);
+      writeValue(buffer, value.encode());
+    } else if (value is ScannedPage) {
+      buffer.putUint8(142);
+      writeValue(buffer, value.encode());
+    } else if (value is ScanPageSpec) {
+      buffer.putUint8(143);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -656,21 +765,28 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : KeyProtection.values[value];
       case 133:
-        return SecurityStatus.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : ScanSaveFormat.values[value];
       case 134:
-        return PinVerifyResult.decode(readValue(buffer)!);
+        return SecurityStatus.decode(readValue(buffer)!);
       case 135:
-        return BiometricPromptText.decode(readValue(buffer)!);
+        return PinVerifyResult.decode(readValue(buffer)!);
       case 136:
-        return ImportedFile.decode(readValue(buffer)!);
+        return BiometricPromptText.decode(readValue(buffer)!);
       case 137:
-        return DatabaseConfig.decode(readValue(buffer)!);
+        return ImportedFile.decode(readValue(buffer)!);
       case 138:
-        return StorageInfo.decode(readValue(buffer)!);
+        return DatabaseConfig.decode(readValue(buffer)!);
       case 139:
-        return ExportItem.decode(readValue(buffer)!);
+        return StorageInfo.decode(readValue(buffer)!);
       case 140:
+        return ExportItem.decode(readValue(buffer)!);
+      case 141:
         return ExportSummary.decode(readValue(buffer)!);
+      case 142:
+        return ScannedPage.decode(readValue(buffer)!);
+      case 143:
+        return ScanPageSpec.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1147,6 +1263,85 @@ class SecurityHostApi {
     );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
       <Object?>[seconds],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+  }
+
+  /// Launches the Google ML Kit document scanner (edge detection, auto crop,
+  /// manual crop, rotate and filters happen in its UI). Returns null if the
+  /// user cancelled. Errors: SCANNER_UNAVAILABLE (no Google Play services
+  /// module / unsupported device), IO.
+  /// Pages stay in app-private cache until [saveScan] + [discardScan], lock,
+  /// erase or the next app start.
+  Future<List<ScannedPage>?> startScan(
+    int pageLimit,
+    bool allowGalleryImport,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.startScan$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pageLimit, allowGalleryImport],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return (pigeonVar_replyValue as List<Object?>?)?.cast<ScannedPage>();
+  }
+
+  /// Encrypts the pages into the vault without writing any plaintext file:
+  /// one PDF (pages embedded unchanged, rotation as page metadata) or one
+  /// JPEG document per page. Source pages are NOT deleted here, so a failed
+  /// save can be retried; call [discardScan] once the result is recorded.
+  Future<List<ImportedFile>> saveScan(
+    List<ScanPageSpec> pages,
+    ScanSaveFormat format,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.saveScan$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pages, format],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<ImportedFile>();
+  }
+
+  /// Wipes scanned page files (after a confirmed save, or on cancel).
+  Future<void> discardScan(List<String> paths) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.discardScan$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[paths],
     );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 

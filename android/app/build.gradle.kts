@@ -48,6 +48,9 @@ kotlin {
 dependencies {
     implementation("in.docsafe:docsafe-crypto")
     implementation("androidx.biometric:biometric:1.1.0")
+    // Google ML Kit document scanner (UI and camera run inside Google Play services;
+    // no camera permission in DocSafe). Same artifact/version the Flutter plugin pins.
+    implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
 
     // Versions aligned with what Flutter's integration_test plugin puts on the debug runtime

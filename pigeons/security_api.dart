@@ -150,6 +150,25 @@ class ExportSummary {
   int failed;
 }
 
+/// A page produced by the document scanner (a JPEG in app-private cache).
+class ScannedPage {
+  ScannedPage({required this.path, required this.width, required this.height});
+
+  String path;
+  int width;
+  int height;
+}
+
+/// A page to save, in final order, with its clockwise rotation (0/90/180/270).
+class ScanPageSpec {
+  ScanPageSpec({required this.path, required this.rotation});
+
+  String path;
+  int rotation;
+}
+
+enum ScanSaveFormat { pdf, images }
+
 @HostApi()
 abstract class SecurityHostApi {
   @async
@@ -231,6 +250,26 @@ abstract class SecurityHostApi {
   int getAutoLockSeconds();
 
   void setAutoLockSeconds(int seconds);
+
+  /// Launches the Google ML Kit document scanner (edge detection, auto crop,
+  /// manual crop, rotate and filters happen in its UI). Returns null if the
+  /// user cancelled. Errors: SCANNER_UNAVAILABLE (no Google Play services
+  /// module / unsupported device), IO.
+  /// Pages stay in app-private cache until [saveScan] + [discardScan], lock,
+  /// erase or the next app start.
+  @async
+  List<ScannedPage>? startScan(int pageLimit, bool allowGalleryImport);
+
+  /// Encrypts the pages into the vault without writing any plaintext file:
+  /// one PDF (pages embedded unchanged, rotation as page metadata) or one
+  /// JPEG document per page. Source pages are NOT deleted here, so a failed
+  /// save can be retried; call [discardScan] once the result is recorded.
+  @async
+  List<ImportedFile> saveScan(List<ScanPageSpec> pages, ScanSaveFormat format);
+
+  /// Wipes scanned page files (after a confirmed save, or on cancel).
+  @async
+  void discardScan(List<String> paths);
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();

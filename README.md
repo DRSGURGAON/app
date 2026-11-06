@@ -27,7 +27,17 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 | Duplicate detection (keyed fingerprint) | Warns on import |
 | Encrypted SQLite schema v2 with tested v1→v2 migration | Implemented |
 
-Not started: Phase 3 (scanner), 4 (PDF tools), 5 (OCR, reminders/notifications), 6 (billing), 7–8.
+**Phase 3 — document scanner:** implemented (needs a physical-device run with Google Play services).
+
+| Area | State |
+|---|---|
+| Google ML Kit document scanner (full mode): edge detection, auto crop, manual crop, rotate, filters, gallery import | Launched natively via Play services; **verify on a device** (emulators often lack the module) |
+| Review: page thumbnails, full-screen view, reorder (drag or move up/down), rotate, delete, add pages | Implemented, widget-tested |
+| Save as one PDF (JPEG pages embedded unchanged) or one image per page; title, category, folder, tags | Implemented; PDF writer JVM-tested with PDFBox, save path instrumented-tested with Android `PdfRenderer` |
+| Encrypted straight from the pages — no plaintext PDF/JPEG is written by DocSafe | Implemented, tested |
+| Unsaved pages wiped on save, discard, lock, erase and next app start | Implemented, tested |
+
+Not started: Phase 4 (PDF tools), 5 (OCR, reminders/notifications), 6 (billing), 7–8.
 Bottom navigation shows Home, Vault and Settings; PDF Tools and Reminders tabs are added when those phases ship.
 
 ## Repository layout
@@ -38,10 +48,11 @@ lib/                      Flutter app (Riverpod, GoRouter, Material 3, gen-l10n)
   core/security/          Dart facade over the native bridge, lock controller
   core/database/          Drift schema + SQLCipher opener
   data/                   models, repositories
-  features/               onboarding, security, dashboard, vault, document, search, settings
+  features/               onboarding, security, dashboard, vault, document, search, scanner, settings
 android/app/src/main/kotlin/in/docsafe/app/
   security/               Keystore keys, biometric, process session
-  storage/                SAF document importer
+  storage/                SAF document importer / exporter
+  scanner/                ML Kit launcher, ScanStore (pending pages -> encrypted documents)
   bridge/                 Pigeon-generated API + implementation
 native/docsafe-crypto/    Pure-JVM security core (format, vault store, PIN) + unit tests
 pigeons/                  Bridge definition (source of generated code)

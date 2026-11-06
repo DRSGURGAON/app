@@ -32,6 +32,8 @@ kotlin {
 dependencies {
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    // Independent PDF parser used only to validate JpegPdfWriter output in tests.
+    testImplementation("org.apache.pdfbox:pdfbox:3.0.4")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

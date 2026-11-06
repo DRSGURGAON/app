@@ -1,4 +1,4 @@
-# DocSafe security design (Phases 1–2)
+# DocSafe security design (Phases 1–3)
 
 This document describes what is implemented, the reasoning, and the limits. It must stay
 accurate: do not add claims here that the code does not back up.
@@ -148,7 +148,29 @@ whose rows are gone are removed by the orphan sweep.
 database. The notes field asks users not to type full ID numbers. Text inputs disable keyboard
 suggestions/autocorrect so IMEs are not taught document names.
 
-## 10. Known limitations
+## 10. Document scanner (Phase 3)
+
+- **Capture** runs in Google ML Kit's document scanner, which lives in Google Play services
+  (camera, edge detection, crop, filters). DocSafe needs no camera permission. ML Kit processes
+  on the device; DocSafe sends nothing anywhere.
+- **Scanner output** is JPEG pages written by ML Kit into DocSafe's app-private cache. These are
+  plaintext by necessity while the user reviews them. `ScanStore` registers each page (only files
+  inside the app cache are accepted), persists the list of *paths* (no content) and wipes the pages:
+  after a confirmed save, on discard, when a page is deleted, on lock (including auto-lock), on
+  erase-all and on the next app start (covers crashes). Leftover ML Kit output directories in the
+  cache are swept too.
+- **Saving** streams the pages into the vault encryptor: one PDF assembled on the fly by
+  `JpegPdfWriter` (JPEGs embedded unchanged, rotation as `/Rotate`), or one encrypted JPEG per
+  page (rotated pages are re-encoded in memory). No plaintext PDF or image file is written by
+  DocSafe. The pages are discarded only after the database rows commit; if encryption fails
+  (e.g. low storage) or the database write fails, nothing is recorded, any container is deleted,
+  and the pages are kept so the user can retry.
+- **Limits:** the ML Kit UI is a Google Play services activity, so DocSafe's `FLAG_SECURE`
+  does not cover it (screenshots may be possible while scanning). Pages exist as plaintext in the
+  app cache during review (best-effort wipe, flash caveats as in §4). Devices without the Play
+  services module cannot scan (clear error message).
+
+## 11. Known limitations
 
 - Biometric prompt, SAF import, PDF rendering and Keystore behaviour on real OEM devices have not
   been verified on physical hardware yet (see TESTING.md).

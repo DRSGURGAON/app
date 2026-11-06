@@ -34,6 +34,11 @@ class VaultSession private constructor(context: Context) {
         )
     }
 
+    /** Plaintext scanner pages awaiting review (wiped on start, lock and erase). */
+    val scanStore: `in`.docsafe.app.scanner.ScanStore by lazy {
+        `in`.docsafe.app.scanner.ScanStore(appContext.cacheDir, File(securityDir, "pending_scans.v1"), vaultStore)
+    }
+
     val biometric: BiometricState by lazy { BiometricState(File(securityDir, "biometric.v1")) }
 
     val databaseFile: File get() = File(appContext.noBackupFilesDir, "db/docsafe.db").also { it.parentFile?.mkdirs() }
@@ -49,6 +54,7 @@ class VaultSession private constructor(context: Context) {
     fun lock() {
         unlocked = false
         vaultStore.sweepTemp()
+        scanStore.sweep()
     }
 
     fun requireUnlocked() {
@@ -59,6 +65,7 @@ class VaultSession private constructor(context: Context) {
     fun startupSweep() {
         vaultStore.sweepPartials()
         vaultStore.sweepTemp()
+        scanStore.sweep()
     }
 
     /**
@@ -83,6 +90,7 @@ class VaultSession private constructor(context: Context) {
     @Synchronized
     fun eraseAll() {
         unlocked = false
+        scanStore.sweep()
         vaultStore.wipeAll()
         val db = databaseFile
         for (suffix in listOf("", "-journal", "-wal", "-shm")) {

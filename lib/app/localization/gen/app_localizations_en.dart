@@ -764,4 +764,111 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get erasing => 'Erasing…';
+
+  @override
+  String get scanDocument => 'Scan document';
+
+  @override
+  String scanPageCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count pages',
+      one: '1 page',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get scanStarting => 'Opening scanner…';
+
+  @override
+  String get scanAddPages => 'Add pages';
+
+  @override
+  String get scanRotate => 'Rotate';
+
+  @override
+  String get scanMoveUp => 'Move up';
+
+  @override
+  String get scanMoveDown => 'Move down';
+
+  @override
+  String get scanDeletePage => 'Delete page';
+
+  @override
+  String scanPageLabel(int number) {
+    return 'Page $number';
+  }
+
+  @override
+  String get scanReorderHint =>
+      'Drag the handle to reorder pages. Tap a page to view it.';
+
+  @override
+  String get scanNoPages => 'No pages';
+
+  @override
+  String get scanNoPagesBody =>
+      'All pages were removed. Scan again, or discard.';
+
+  @override
+  String get scanDiscardTitle => 'Discard this scan?';
+
+  @override
+  String get scanDiscardBody =>
+      'The scanned pages will be deleted. Nothing has been saved.';
+
+  @override
+  String get scanDiscard => 'Discard';
+
+  @override
+  String get scanContinue => 'Continue';
+
+  @override
+  String get scanSaveTitle => 'Save scan';
+
+  @override
+  String get scanFormatLabel => 'Save as';
+
+  @override
+  String get scanFormatPdf => 'One PDF';
+
+  @override
+  String get scanFormatImages => 'Separate images';
+
+  @override
+  String get scanFormatImagesNote =>
+      'Each page is saved as its own image document.';
+
+  @override
+  String get scanTagsLabel => 'Tags (optional)';
+
+  @override
+  String get scanTagsHint => 'Separate tags with commas';
+
+  @override
+  String get scanSaving => 'Encrypting and saving…';
+
+  @override
+  String get scanSaved => 'Scan encrypted and saved.';
+
+  @override
+  String scanDefaultTitle(String date) {
+    return 'Scan $date';
+  }
+
+  @override
+  String get scanUnavailable =>
+      'The document scanner isn\'t available on this phone. It needs up-to-date Google Play services.';
+
+  @override
+  String get scanPrivacyNote =>
+      'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when DocSafe locks.';
+
+  @override
+  String scanPreviewTitle(int number, int total) {
+    return 'Page $number of $total';
+  }
 }

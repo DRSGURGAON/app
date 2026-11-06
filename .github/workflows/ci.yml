@@ -64,6 +64,21 @@ jobs:
         run: flutter test
       - name: Build debug APK
         run: flutter build apk --debug
+      - name: Build release APK (R8) and audit its permissions
+        # Release signing is configured in Phase 8; this build is debug-signed
+        # and only used to verify minification and the merged manifest.
+        run: |
+          flutter build apk --release
+          AAPT2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
+          "$AAPT2" dump permissions build/app/outputs/flutter-apk/app-release.apk | tee release-permissions.txt
+          if grep -E "permission: android.permission.(CAMERA|RECORD_AUDIO|INTERNET|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|READ_MEDIA_[A-Z_]+|ACCESS_(FINE|COARSE)_LOCATION|READ_CONTACTS|READ_PHONE_STATE)" release-permissions.txt; then
+            echo "::error::Unexpected permission in the release APK"
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-permissions
+          path: release-permissions.txt
       - uses: actions/upload-artifact@v4
         with:
           name: docsafe-debug-apk
