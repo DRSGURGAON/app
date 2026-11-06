@@ -871,4 +871,185 @@ class AppLocalizationsEn extends AppLocalizations {
   String scanPreviewTitle(int number, int total) {
     return 'Page $number of $total';
   }
+
+  @override
+  String get navTools => 'PDF Tools';
+
+  @override
+  String get toolEditPages => 'Edit pages';
+
+  @override
+  String get toolEditPagesDesc => 'Rotate, reorder or remove pages';
+
+  @override
+  String get toolImagesToPdf => 'Images to PDF';
+
+  @override
+  String get toolImagesToPdfDesc =>
+      'Combine images from your vault into one PDF';
+
+  @override
+  String get toolMerge => 'Merge PDFs';
+
+  @override
+  String get toolMergeDesc => 'Join two or more PDFs into one';
+
+  @override
+  String get toolSplit => 'Split PDF';
+
+  @override
+  String get toolSplitDesc => 'Extract pages, or save each page separately';
+
+  @override
+  String get toolCompress => 'Compress PDF';
+
+  @override
+  String get toolCompressDesc =>
+      'Reduce file size — one or several PDFs at once';
+
+  @override
+  String get premiumBadge => 'Premium';
+
+  @override
+  String get toolsPremiumNote =>
+      'Premium tools are open to everyone in this test version. Subscriptions arrive in a later update.';
+
+  @override
+  String get toolsPrivacyNote =>
+      'Everything runs on this phone. Results are saved as new encrypted documents.';
+
+  @override
+  String get pickPdf => 'Choose a PDF';
+
+  @override
+  String get pickPdfs => 'Choose PDFs';
+
+  @override
+  String get pickImages => 'Choose images';
+
+  @override
+  String get pickNoneAvailable =>
+      'No matching documents in your vault yet. Import or scan some first.';
+
+  @override
+  String pickSelectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get pickNext => 'Next';
+
+  @override
+  String pickMinimum(int count) {
+    return 'Choose at least $count.';
+  }
+
+  @override
+  String get editPagesHint =>
+      'Drag to reorder. Rotate or remove pages, then save.';
+
+  @override
+  String get removePage => 'Remove page';
+
+  @override
+  String get restorePage => 'Put page back';
+
+  @override
+  String get keepOriginal => 'Keep the original document';
+
+  @override
+  String get keepOriginalOffNote => 'The original moves to Recently deleted.';
+
+  @override
+  String get saveAsNew => 'Save as new document';
+
+  @override
+  String editedTitle(String title) {
+    return '$title (edited)';
+  }
+
+  @override
+  String get mergeDefaultTitle => 'Merged document';
+
+  @override
+  String get mergeOrderHint =>
+      'Arrange the PDFs in the order they should appear.';
+
+  @override
+  String get splitModeExtract => 'Extract selected pages';
+
+  @override
+  String get splitModeEach => 'Each page as a separate PDF';
+
+  @override
+  String get splitSelectHint => 'Select the pages to extract.';
+
+  @override
+  String splitPageTitle(String title, int number) {
+    return '$title (page $number)';
+  }
+
+  @override
+  String extractedTitle(String title) {
+    return '$title (extract)';
+  }
+
+  @override
+  String get compressLevelHigh => 'High quality';
+
+  @override
+  String get compressLevelBalanced => 'Balanced';
+
+  @override
+  String get compressLevelSmallest => 'Smallest';
+
+  @override
+  String get compressNote =>
+      'Pages are converted to images: text in the result can\'t be selected or searched. Originals are kept.';
+
+  @override
+  String compressedTitle(String title) {
+    return '$title (compressed)';
+  }
+
+  @override
+  String get compressNotSmaller =>
+      'Already compact — no smaller copy was made.';
+
+  @override
+  String get compressRun => 'Compress';
+
+  @override
+  String get imagesOrderHint =>
+      'Arrange the images in page order. Rotate any that are sideways.';
+
+  @override
+  String get imagesPdfDefaultTitle => 'Images as PDF';
+
+  @override
+  String get toolWorking => 'Working on this phone…';
+
+  @override
+  String toolDoneCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new encrypted documents saved',
+      one: '1 new encrypted document saved',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorPdfUnreadable =>
+      'This PDF can\'t be processed. It may be damaged or protected with a password.';
+
+  @override
+  String get errorTooLarge =>
+      'These documents are too large to process together (limit 150 MB).';
+
+  @override
+  String pageLabelOf(int number, int total) {
+    return 'Page $number of $total';
+  }
 }

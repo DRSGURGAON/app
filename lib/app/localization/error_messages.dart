@@ -12,6 +12,8 @@ extension SecurityErrorText on AppLocalizations {
     SecurityErrorCode.busy => errorBusy,
     SecurityErrorCode.databaseKey => errorDatabaseKey,
     SecurityErrorCode.scannerUnavailable => scanUnavailable,
+    SecurityErrorCode.pdfUnreadable => errorPdfUnreadable,
+    SecurityErrorCode.tooLarge => errorTooLarge,
     SecurityErrorCode.noActivity || SecurityErrorCode.unknown => errorGeneric,
   };
 

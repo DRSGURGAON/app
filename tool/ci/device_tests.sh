@@ -21,6 +21,9 @@ flutter test integration_test/security_foundation_test.dart -d "$DEVICE"
 echo "== 3. Preview robustness (fresh install)"
 flutter test integration_test/preview_test.dart -d "$DEVICE"
 
+echo "== 3b. PDF tools (real PDFium + native image/compress)"
+flutter test integration_test/pdf_tools_test.dart -d "$DEVICE"
+
 echo "== 4. True process restart"
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
 flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall

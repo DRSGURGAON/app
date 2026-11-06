@@ -278,6 +278,20 @@ class DocumentRepository {
     return recorded.documents;
   }
 
+  /// Records containers produced by PDF tools (already encrypted natively).
+  /// On failure the containers are deleted.
+  Future<List<VaultDocument>> recordGenerated(
+    List<ImportedFile> files, {
+    required List<String> titles,
+    int? folderId,
+    int? categoryId,
+  }) async => (await _recordAll(
+    files,
+    titles: [for (final t in titles) cleanTitle(t)],
+    folderId: folderId,
+    categoryId: categoryId,
+  )).documents;
+
   /// Records encrypted containers as documents in one transaction. If it
   /// fails, every container is deleted so nothing is orphaned.
   Future<({List<VaultDocument> documents, bool anyDuplicate})> _recordAll(

@@ -13,6 +13,8 @@ enum SecurityErrorCode {
   busy,
   databaseKey,
   scannerUnavailable,
+  pdfUnreadable,
+  tooLarge,
   unknown;
 
   static SecurityErrorCode fromNative(String code) => switch (code) {
@@ -25,6 +27,7 @@ enum SecurityErrorCode {
     'NO_ACTIVITY' => noActivity,
     'BUSY' => busy,
     'SCANNER_UNAVAILABLE' => scannerUnavailable,
+    'PDF_UNREADABLE' => pdfUnreadable,
     _ => unknown,
   };
 }

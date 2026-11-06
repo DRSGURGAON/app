@@ -123,6 +123,9 @@ enum KeyProtection { strongBox, trustedEnvironment, software, unknown }
 
 enum ScanSaveFormat { pdf, images }
 
+/// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
+enum CompressionLevel { high, balanced, smallest }
+
 class SecurityStatus {
   SecurityStatus({
     required this.pinSet,
@@ -692,6 +695,61 @@ class ScanPageSpec {
   }
 }
 
+/// An image document (JPEG/PNG in the vault) used as a page, with clockwise rotation.
+class ImagePageSpec {
+  ImagePageSpec({
+    required this.fileId,
+    required this.mimeType,
+    required this.rotation,
+  });
+
+  String fileId;
+
+  String mimeType;
+
+  int rotation;
+
+  List<Object?> _toList() {
+    return <Object?>[fileId, mimeType, rotation];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ImagePageSpec decode(Object result) {
+    result as List<Object?>;
+    return ImagePageSpec(
+      fileId: result[0]! as String,
+      mimeType: result[1]! as String,
+      rotation: result[2]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ImagePageSpec || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(fileId, other.fileId) &&
+        _deepEquals(mimeType, other.mimeType) &&
+        _deepEquals(rotation, other.rotation);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ImagePageSpec(fileId: $fileId, mimeType: $mimeType, rotation: $rotation)';
+  }
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -714,35 +772,41 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is ScanSaveFormat) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    } else if (value is SecurityStatus) {
+    } else if (value is CompressionLevel) {
       buffer.putUint8(134);
-      writeValue(buffer, value.encode());
-    } else if (value is PinVerifyResult) {
+      writeValue(buffer, value.index);
+    } else if (value is SecurityStatus) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    } else if (value is BiometricPromptText) {
+    } else if (value is PinVerifyResult) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    } else if (value is ImportedFile) {
+    } else if (value is BiometricPromptText) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    } else if (value is DatabaseConfig) {
+    } else if (value is ImportedFile) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    } else if (value is StorageInfo) {
+    } else if (value is DatabaseConfig) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    } else if (value is ExportItem) {
+    } else if (value is StorageInfo) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    } else if (value is ExportSummary) {
+    } else if (value is ExportItem) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    } else if (value is ScannedPage) {
+    } else if (value is ExportSummary) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is ScanPageSpec) {
+    } else if (value is ScannedPage) {
       buffer.putUint8(143);
+      writeValue(buffer, value.encode());
+    } else if (value is ScanPageSpec) {
+      buffer.putUint8(144);
+      writeValue(buffer, value.encode());
+    } else if (value is ImagePageSpec) {
+      buffer.putUint8(145);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -768,25 +832,30 @@ class _PigeonCodec extends StandardMessageCodec {
         final value = readValue(buffer) as int?;
         return value == null ? null : ScanSaveFormat.values[value];
       case 134:
-        return SecurityStatus.decode(readValue(buffer)!);
+        final value = readValue(buffer) as int?;
+        return value == null ? null : CompressionLevel.values[value];
       case 135:
-        return PinVerifyResult.decode(readValue(buffer)!);
+        return SecurityStatus.decode(readValue(buffer)!);
       case 136:
-        return BiometricPromptText.decode(readValue(buffer)!);
+        return PinVerifyResult.decode(readValue(buffer)!);
       case 137:
-        return ImportedFile.decode(readValue(buffer)!);
+        return BiometricPromptText.decode(readValue(buffer)!);
       case 138:
-        return DatabaseConfig.decode(readValue(buffer)!);
+        return ImportedFile.decode(readValue(buffer)!);
       case 139:
-        return StorageInfo.decode(readValue(buffer)!);
+        return DatabaseConfig.decode(readValue(buffer)!);
       case 140:
-        return ExportItem.decode(readValue(buffer)!);
+        return StorageInfo.decode(readValue(buffer)!);
       case 141:
-        return ExportSummary.decode(readValue(buffer)!);
+        return ExportItem.decode(readValue(buffer)!);
       case 142:
-        return ScannedPage.decode(readValue(buffer)!);
+        return ExportSummary.decode(readValue(buffer)!);
       case 143:
+        return ScannedPage.decode(readValue(buffer)!);
+      case 144:
         return ScanPageSpec.decode(readValue(buffer)!);
+      case 145:
+        return ImagePageSpec.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1350,6 +1419,80 @@ class SecurityHostApi {
       pigeonVar_channelName,
       isNullValid: true,
     );
+  }
+
+  /// Encrypts a PDF produced in memory by a page operation (edit, merge,
+  /// split). Must start with `%PDF-`. Never written to disk as plaintext.
+  Future<ImportedFile> importPdfBytes(Uint8List bytes) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.importPdfBytes$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[bytes],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as ImportedFile;
+  }
+
+  /// Builds one PDF from image documents in the vault: each image is
+  /// decrypted in memory one at a time and embedded (JPEG unchanged, PNG
+  /// converted), streamed into the encryptor.
+  Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.imagesToPdf$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[images],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as ImportedFile;
+  }
+
+  /// Re-renders every page of a vault PDF as a JPEG at the preset's
+  /// resolution/quality and saves the result as a NEW encrypted PDF. Text
+  /// in the result is no longer selectable. Errors: PDF_UNREADABLE.
+  Future<ImportedFile> compressPdf(
+    String fileId,
+    CompressionLevel level,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.compressPdf$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, level],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as ImportedFile;
   }
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").

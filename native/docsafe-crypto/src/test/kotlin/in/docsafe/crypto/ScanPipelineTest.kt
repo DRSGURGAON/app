@@ -169,7 +169,7 @@ class ScanPipelineTest {
     fun scanSavedAsEncryptedPdfDecryptsToValidPdf() {
         val pages = listOf(page(jpeg(600, 800)), page(jpeg(600, 800, color = Color.GREEN), 180))
         val s = store()
-        val imported = s.importWriting(pages.sumOf { it.length }) { out -> JpegPdfWriter.write(out, pages) }
+        val imported = s.importWriting(pages.sumOf { it.length ?: 0L }) { out -> JpegPdfWriter.write(out, pages) }
         // Nothing but the encrypted container exists...
         val files = root.walkTopDown().filter { it.isFile }.toList()
         assertEquals(1, files.size)
@@ -193,6 +193,29 @@ class ScanPipelineTest {
             s.importWriting(null) { out -> JpegPdfWriter.write(out, listOf(lying)) }
         }
         assertTrue(root.walkTopDown().none { it.isFile })
+    }
+
+    @Test
+    fun lazilyOpenedPagesWithUnknownSizeProduceValidPdf() {
+        // Pages produced on demand (rendered / decrypted), size unknown up front.
+        val opened = mutableListOf<Int>()
+        val pages = (0 until 3).map { i ->
+            JpegPdfWriter.Page(if (i == 1) 90 else 0) {
+                opened += i
+                val bytes = jpeg(300 + i * 10, 400, color = Color.MAGENTA)
+                JpegPdfWriter.Opened(JpegInfo.read(ByteArrayInputStream(bytes)), ByteArrayInputStream(bytes))
+            }
+        }
+        val out = ByteArrayOutputStream()
+        JpegPdfWriter.write(out, pages)
+        assertEquals(listOf(0, 1, 2), opened, "pages opened once, in order")
+        Loader.loadPDF(out.toByteArray()).use { doc ->
+            assertEquals(3, doc.numberOfPages)
+            assertEquals(90, doc.getPage(1).rotation)
+            val img = doc.getPage(2).resources.let { r -> r.getXObject(r.xObjectNames.single()) as PDImageXObject }
+            assertEquals(320, img.width)
+            PDFRenderer(doc).renderImage(0, 0.3f)
+        }
     }
 
     @Test

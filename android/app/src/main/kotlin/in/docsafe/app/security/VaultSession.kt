@@ -39,6 +39,8 @@ class VaultSession private constructor(context: Context) {
         `in`.docsafe.app.scanner.ScanStore(appContext.cacheDir, File(securityDir, "pending_scans.v1"), vaultStore)
     }
 
+    val pdfOps: `in`.docsafe.app.pdf.PdfOps by lazy { `in`.docsafe.app.pdf.PdfOps(vaultStore) }
+
     val biometric: BiometricState by lazy { BiometricState(File(securityDir, "biometric.v1")) }
 
     val databaseFile: File get() = File(appContext.noBackupFilesDir, "db/docsafe.db").also { it.parentFile?.mkdirs() }

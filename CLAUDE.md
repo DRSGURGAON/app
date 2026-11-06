@@ -3,8 +3,9 @@
 Privacy-first Android document vault (Flutter + Kotlin). Hindi default, English option.
 Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what is verified.
 
-- Phases: 0–2 done (CI green), 3 (scanner) implemented. Physical-device checks pending.
-  Do not start Phase 4 until the user approves.
+- Phases: 0–3 done (CI green), 4 (PDF Assistant) implemented. Physical-device checks
+  (docs/DEVICE_TESTING.md) still pending. Premium tools are not gated until Phase 6 (billing).
+  Do not start Phase 5 until the user approves.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge;
   hardcode user-facing strings (use ARB files); add network/analytics/ads SDKs; claim untested
   features work.

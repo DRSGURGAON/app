@@ -8,6 +8,8 @@ export 'native/security_api.g.dart'
         BiometricAvailability,
         BiometricOutcome,
         BiometricPromptText,
+        CompressionLevel,
+        ImagePageSpec,
         DatabaseConfig,
         ExportItem,
         ExportSummary,
@@ -60,6 +62,9 @@ abstract interface class SecurityService {
     ScanSaveFormat format,
   );
   Future<void> discardScan(List<String> paths);
+  Future<ImportedFile> importPdfBytes(Uint8List bytes);
+  Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images);
+  Future<ImportedFile> compressPdf(String fileId, CompressionLevel level);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -191,6 +196,18 @@ class PigeonSecurityService implements SecurityService {
   @override
   Future<void> discardScan(List<String> paths) =>
       _guard(() => _api.discardScan(paths));
+
+  @override
+  Future<ImportedFile> importPdfBytes(Uint8List bytes) =>
+      _guard(() => _api.importPdfBytes(bytes));
+
+  @override
+  Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images) =>
+      _guard(() => _api.imagesToPdf(images));
+
+  @override
+  Future<ImportedFile> compressPdf(String fileId, CompressionLevel level) =>
+      _guard(() => _api.compressPdf(fileId, level));
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

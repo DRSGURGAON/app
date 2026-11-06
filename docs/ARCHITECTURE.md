@@ -47,7 +47,7 @@ live natively in SharedPreferences.
 
 ## Navigation
 
-`StatefulShellRoute` with three tabs (Home, Vault, Settings); document details, viewer and search
+`StatefulShellRoute` with four tabs (Home, Vault, PDF Tools, Settings); document details, viewer and search
 are full-screen routes above the shell. `lockRedirect` sends every route to the lock screen while
 locked, except the "Forgot PIN?" erase page.
 
@@ -70,6 +70,22 @@ DocumentRepository.saveScan ─► SecurityService.saveScan ─► ScanStore.sav
 the same DSF1 format as the pull-style `encrypt` (tested byte-for-byte compatible at chunk
 boundaries). ML Kit is used directly (`play-services-mlkit-document-scanner:16.0.0`) rather than
 through the Flutter plugin, for explicit cancel/unavailable handling and one less dependency.
+
+## PDF Assistant (Phase 4)
+
+```
+PDF Tools tab / document details ─► picker / page editor / ordered list / compress screens
+        └► PdfToolsService (data/services)
+             edit, merge, extract, split ─► DocumentRepository.openForPreview (temp) ─► PdfEngine (PDFium via pdfrx)
+                                             ─► bytes ─► SecurityService.importPdfBytes ─► VaultStore.import
+             images -> PDF ───────────────► SecurityService.imagesToPdf ─► PdfOps ─► JpegPdfWriter ─► importWriting
+             compress (batch) ────────────► SecurityService.compressPdf ─► PdfOps (PdfRenderer) ─► JpegPdfWriter ─► importWriting
+             every result ────────────────► DocumentRepository.recordGenerated (same rollback as imports)
+```
+
+`JpegPdfWriter` now writes image lengths as indirect objects, so pages produced lazily (rendered or
+decrypted on demand) need no size up front. `PdfEngine` is an interface so widget tests run on the
+host without PDFium; the real engine is exercised on the emulator (`integration_test/pdf_tools_test.dart`).
 
 ## Platform choices
 

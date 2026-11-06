@@ -1,4 +1,4 @@
-# DocSafe security design (Phases 1–3)
+# DocSafe security design (Phases 1–4)
 
 This document describes what is implemented, the reasoning, and the limits. It must stay
 accurate: do not add claims here that the code does not back up.
@@ -180,7 +180,8 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 4 | Other scanner output in the same directory | as 3 | ML Kit | When the scan session ends, lock, erase, next start (recorded scan directories) | No |
 | 5 | Decoded images in memory | Flutter image cache | Viewer / thumbnails | Viewer close (cache cleared) | — |
 | 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |
-| 7 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
+| 7 | PDF tool inputs / output | inputs as #1; output PDF in memory only | Tool runs | When the tool finishes | No |
+| 8 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
 
 Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
 keys, the PIN verifier. In-progress imports (`*.dsf.part`) are ciphertext. The pending-scan list
@@ -194,7 +195,27 @@ belong to Google Play services and are not covered by DocSafe's FLAG_SECURE; PDF
 documents the user imports (a malicious PDF targets a native parser); anything with root access
 can read the cache while it exists.
 
-## 12. Known limitations
+## 12. PDF Assistant (Phase 4)
+
+- **Inputs** are decrypted to the same short-lived `cache/vault_tmp` files used by the viewer and
+  wiped in `finally` when the operation ends (and on lock / next start).
+- **Edit pages, merge, split** run in PDFium (pdfrx) in the app process. The output PDF is
+  produced **in memory** and handed to the native layer, which encrypts it straight into a new
+  vault container (`importPdfBytes`); it is never written to disk as plaintext. This is the one
+  case where plaintext document bytes cross the Dart↔Kotlin bridge (in-process memory only).
+  Inputs are capped at 150 MB per operation to avoid running out of memory.
+- **Images to PDF** decrypts one vault image at a time into memory and streams the PDF into the
+  encryptor (JPEG embedded unchanged, PNG converted with a white background).
+- **Compress** renders each page with Android `PdfRenderer`, re-encodes it as JPEG and streams the
+  new PDF into the encryptor. Text in the result is no longer selectable (stated in the UI).
+  A result that is not smaller is deleted.
+- Damaged or password-protected PDFs are reported (`PDF_UNREADABLE`); nothing is saved.
+- Each result is a new document recorded with the same rollback rules as imports (if the database
+  write fails, the new container is deleted).
+- In memory while a tool runs: decoded page bitmaps, PDFium document structures, the output PDF.
+  Released when the operation ends.
+
+## 13. Known limitations
 
 - Biometric prompt, SAF import, PDF rendering and Keystore behaviour on real OEM devices have not
   been verified on physical hardware yet (see TESTING.md).

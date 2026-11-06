@@ -401,5 +401,116 @@
         "type": "int"
       }
     }
+  },
+  "navTools": "PDF Tools",
+  "toolEditPages": "Edit pages",
+  "toolEditPagesDesc": "Rotate, reorder or remove pages",
+  "toolImagesToPdf": "Images to PDF",
+  "toolImagesToPdfDesc": "Combine images from your vault into one PDF",
+  "toolMerge": "Merge PDFs",
+  "toolMergeDesc": "Join two or more PDFs into one",
+  "toolSplit": "Split PDF",
+  "toolSplitDesc": "Extract pages, or save each page separately",
+  "toolCompress": "Compress PDF",
+  "toolCompressDesc": "Reduce file size — one or several PDFs at once",
+  "premiumBadge": "Premium",
+  "toolsPremiumNote": "Premium tools are open to everyone in this test version. Subscriptions arrive in a later update.",
+  "toolsPrivacyNote": "Everything runs on this phone. Results are saved as new encrypted documents.",
+  "pickPdf": "Choose a PDF",
+  "pickPdfs": "Choose PDFs",
+  "pickImages": "Choose images",
+  "pickNoneAvailable": "No matching documents in your vault yet. Import or scan some first.",
+  "pickSelectedCount": "{count} selected",
+  "@pickSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickNext": "Next",
+  "pickMinimum": "Choose at least {count}.",
+  "@pickMinimum": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editPagesHint": "Drag to reorder. Rotate or remove pages, then save.",
+  "removePage": "Remove page",
+  "restorePage": "Put page back",
+  "keepOriginal": "Keep the original document",
+  "keepOriginalOffNote": "The original moves to Recently deleted.",
+  "saveAsNew": "Save as new document",
+  "editedTitle": "{title} (edited)",
+  "@editedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeDefaultTitle": "Merged document",
+  "mergeOrderHint": "Arrange the PDFs in the order they should appear.",
+  "splitModeExtract": "Extract selected pages",
+  "splitModeEach": "Each page as a separate PDF",
+  "splitSelectHint": "Select the pages to extract.",
+  "splitPageTitle": "{title} (page {number})",
+  "@splitPageTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "extractedTitle": "{title} (extract)",
+  "@extractedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compressLevelHigh": "High quality",
+  "compressLevelBalanced": "Balanced",
+  "compressLevelSmallest": "Smallest",
+  "compressNote": "Pages are converted to images: text in the result can't be selected or searched. Originals are kept.",
+  "compressedTitle": "{title} (compressed)",
+  "@compressedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compressNotSmaller": "Already compact — no smaller copy was made.",
+  "compressRun": "Compress",
+  "imagesOrderHint": "Arrange the images in page order. Rotate any that are sideways.",
+  "imagesPdfDefaultTitle": "Images as PDF",
+  "toolWorking": "Working on this phone…",
+  "toolDoneCount": "{count, plural, =1{1 new encrypted document saved} other{{count} new encrypted documents saved}}",
+  "@toolDoneCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errorPdfUnreadable": "This PDF can't be processed. It may be damaged or protected with a password.",
+  "errorTooLarge": "These documents are too large to process together (limit 150 MB).",
+  "pageLabelOf": "Page {number} of {total}",
+  "@pageLabelOf": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -15,6 +15,7 @@ import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/repositories/folder_repository.dart';
 import '../../data/repositories/text_rules.dart';
+import '../pdf_tools/pdf_tools_screen.dart';
 import '../vault/widgets/document_list.dart';
 import '../vault/widgets/document_tile.dart';
 
@@ -164,6 +165,31 @@ class _DetailsView extends ConsumerWidget {
                       icon: const Icon(Icons.ios_share_outlined),
                       label: Text(l.detailsExport),
                     ),
+                  ),
+                ],
+              ),
+            ),
+          if (!inTrash && doc.isPdf)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  ActionChip(
+                    avatar: const Icon(Icons.edit_document, size: 18),
+                    label: Text(l.toolEditPages),
+                    onPressed: () => PdfToolFlows.editPages(context, doc: doc),
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.call_split, size: 18),
+                    label: Text(l.toolSplit),
+                    onPressed: () => PdfToolFlows.split(context, doc: doc),
+                  ),
+                  ActionChip(
+                    avatar: const Icon(Icons.compress, size: 18),
+                    label: Text(l.toolCompress),
+                    onPressed: () => PdfToolFlows.compress(context, doc: doc),
                   ),
                 ],
               ),

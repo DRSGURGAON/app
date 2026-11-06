@@ -35,6 +35,15 @@ class FakeSecurityService implements SecurityService {
   List<ScanPageSpec>? lastSavedScan;
   ScanSaveFormat? lastScanFormat;
   int scanCounter = 0;
+
+  /// PDF tools simulation.
+  final List<int> importedPdfSizes = [];
+  List<ImagePageSpec>? lastImagesToPdf;
+  final List<(String, CompressionLevel)> compressCalls = [];
+
+  /// Size (bytes) the "compressed" output gets, per source fileId; default 100.
+  final Map<String, int> compressedSize = {};
+  final Set<String> compressFailures = {};
   int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
@@ -309,6 +318,50 @@ class FakeSecurityService implements SecurityService {
   @override
   Future<void> discardScan(List<String> paths) async {
     pendingScanPages.removeAll(paths);
+  }
+
+  ImportedFile _generated(int size, {String mime = 'application/pdf'}) {
+    scanCounter++;
+    final id = 'f${scanCounter.toRadixString(16).padLeft(31, '0')}';
+    filesOnDisk.add(id);
+    return ImportedFile(
+      fileId: id,
+      displayName: '',
+      mimeType: mime,
+      plaintextBytes: size,
+      ciphertextBytes: size + 100,
+      fingerprint: 'gen-$id',
+    );
+  }
+
+  @override
+  Future<ImportedFile> importPdfBytes(Uint8List bytes) async {
+    _requireUnlocked();
+    if (bytes.length < 5 || String.fromCharCodes(bytes.take(5)) != '%PDF-') {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    importedPdfSizes.add(bytes.length);
+    return _generated(bytes.length);
+  }
+
+  @override
+  Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images) async {
+    _requireUnlocked();
+    lastImagesToPdf = images;
+    return _generated(5000 * images.length);
+  }
+
+  @override
+  Future<ImportedFile> compressPdf(
+    String fileId,
+    CompressionLevel level,
+  ) async {
+    _requireUnlocked();
+    compressCalls.add((fileId, level));
+    if (compressFailures.contains(fileId)) {
+      throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
+    }
+    return _generated(compressedSize[fileId] ?? 100);
   }
 
   @override

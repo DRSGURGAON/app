@@ -116,6 +116,22 @@ Use real files in addition to the generated ones covered by CI:
 4. Open/close the large photo 10 times quickly → no crash, no slowdown.
 Expected: renders or shows "This document failed its integrity check…" — never a crash.
 
+## 8. PDF Assistant (Phase 4)
+
+| # | Step | Expected |
+|---|---|---|
+| T1 | PDF Tools → Edit pages → pick a real multi-page PDF; rotate one page, remove one, drag one | New "(edited)" document opens with those changes; original unchanged |
+| T2 | Edit pages with "Keep the original" OFF | Original appears in Recently deleted |
+| T3 | Merge 3 real PDFs (one from a bank, one scanned, one generated) in a custom order | One document, pages in that order, all render |
+| T4 | Split → select pages 2 and 4 → Extract | New 2-page document |
+| T5 | Split → Each page as a separate PDF on a 10-page PDF | 10 documents "(page n)" |
+| T6 | Images to PDF with a camera photo and a PNG screenshot, rotate one | 2-page PDF, rotation applied, PNG background white |
+| T7 | Compress a 20+ MB scanned PDF at each preset | Smaller results; text not selectable; originals kept |
+| T8 | Compress a small text-only PDF | "Already compact" message, no new document |
+| T9 | Any tool on a password-protected PDF | "This PDF can't be processed…" |
+| T10 | Merge PDFs totalling > 150 MB | "too large to process together" |
+| T11 | After each tool: `adb shell run-as $APP ls cache/vault_tmp` | Empty |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -126,3 +142,4 @@ Expected: renders or shows "This document failed its integrity check…" — nev
 | Temp files (§5) | | | ML Kit output directory: |
 | Backups (§6) | | | |
 | Preview (§7) | | | |
+| PDF tools (§8) | | | |

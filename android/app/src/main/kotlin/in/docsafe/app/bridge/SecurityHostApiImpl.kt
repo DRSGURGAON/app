@@ -8,6 +8,8 @@ import `in`.docsafe.app.security.BiometricAuthenticator
 import `in`.docsafe.app.security.BiometricAvailabilityState
 import `in`.docsafe.app.security.BiometricResult
 import `in`.docsafe.app.security.KeystoreKeys
+import `in`.docsafe.app.pdf.PdfOps
+import `in`.docsafe.app.pdf.PdfUnreadableException
 import `in`.docsafe.app.scanner.ScanStore
 import `in`.docsafe.app.scanner.ScannerLauncher
 import `in`.docsafe.app.scanner.ScannerUnavailableException
@@ -297,6 +299,42 @@ class SecurityHostApiImpl(
         io { session.scanStore.discard(paths) }
     }
 
+    override suspend fun importPdfBytes(bytes: ByteArray): ImportedFile = guard {
+        io {
+            session.requireUnlocked()
+            session.pdfOps.importPdfBytes(bytes).toPigeon("application/pdf")
+        }
+    }
+
+    override suspend fun imagesToPdf(images: List<ImagePageSpec>): ImportedFile = guard {
+        io {
+            session.requireUnlocked()
+            session.pdfOps.imagesToPdf(images.map { PdfOps.ImageSpec(it.fileId, it.mimeType, it.rotation.toInt()) })
+                .toPigeon("application/pdf")
+        }
+    }
+
+    override suspend fun compressPdf(fileId: String, level: CompressionLevel): ImportedFile = guard {
+        io {
+            session.requireUnlocked()
+            val preset = when (level) {
+                CompressionLevel.HIGH -> PdfOps.Preset.HIGH
+                CompressionLevel.BALANCED -> PdfOps.Preset.BALANCED
+                CompressionLevel.SMALLEST -> PdfOps.Preset.SMALLEST
+            }
+            session.pdfOps.compress(fileId, preset).toPigeon("application/pdf")
+        }
+    }
+
+    private fun VaultStore.ImportResult.toPigeon(mime: String) = ImportedFile(
+        fileId = fileId,
+        displayName = "",
+        mimeType = mime,
+        plaintextBytes = plaintextBytes,
+        ciphertextBytes = ciphertextBytes,
+        fingerprint = fingerprint,
+    )
+
     override fun getAutoLockSeconds(): Long = prefs.getLong(KEY_AUTO_LOCK, DEFAULT_AUTO_LOCK).let {
         if (it in AUTO_LOCK_CHOICES) it else DEFAULT_AUTO_LOCK
     }
@@ -325,6 +363,7 @@ class SecurityHostApiImpl(
         val code = when (e) {
             is VaultSession.SessionLockedException -> ERR_LOCKED
             is ScannerUnavailableException -> ERR_SCANNER_UNAVAILABLE
+            is PdfUnreadableException -> ERR_PDF_UNREADABLE
             is IntegrityException -> ERR_INTEGRITY
             is FormatException -> ERR_INTEGRITY
             is InsufficientStorageException -> ERR_LOW_STORAGE
@@ -386,6 +425,7 @@ class SecurityHostApiImpl(
         const val ERR_NO_ACTIVITY = "NO_ACTIVITY"
         const val ERR_BUSY = "BUSY"
         const val ERR_SCANNER_UNAVAILABLE = "SCANNER_UNAVAILABLE"
+        const val ERR_PDF_UNREADABLE = "PDF_UNREADABLE"
         const val ERR_UNKNOWN = "UNKNOWN"
     }
 }

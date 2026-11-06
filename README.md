@@ -37,7 +37,21 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 | Encrypted straight from the pages — no plaintext PDF/JPEG is written by DocSafe | Implemented, tested |
 | Unsaved pages wiped on save, discard, lock, erase and next app start | Implemented, tested |
 
-Not started: Phase 4 (PDF tools), 5 (OCR, reminders/notifications), 6 (billing), 7–8.
+**Phase 4 — PDF Assistant:** implemented (physical-device checks pending; see docs/DEVICE_TESTING.md §8).
+
+| Tool | Tier (spec) | Engine | State |
+|---|---|---|---|
+| Edit pages: rotate, reorder, remove | Free | PDFium (pdfrx) | Implemented, tested (host + emulator) |
+| Images to PDF (JPEG/PNG from the vault) | Free | Native streaming writer | Implemented, tested (host + emulator) |
+| Merge PDFs | Premium | PDFium | Implemented, tested |
+| Split: extract pages / every page separately | Premium | PDFium | Implemented, tested |
+| Compress (three presets, one or many PDFs = batch) | Premium | Android PdfRenderer -> JPEG pages | Implemented, tested; result discarded if not smaller |
+
+Premium tools are labelled but **not yet gated**: billing arrives in Phase 6. Every tool saves a
+NEW encrypted document; originals are kept (edit pages can optionally move the original to
+Recently deleted). Not supported: editing text inside PDFs, opening password-protected PDFs.
+
+Not started: Phase 5 (OCR, reminders/notifications), 6 (billing), 7–8.
 Bottom navigation shows Home, Vault and Settings; PDF Tools and Reminders tabs are added when those phases ship.
 
 ## Repository layout
@@ -48,11 +62,12 @@ lib/                      Flutter app (Riverpod, GoRouter, Material 3, gen-l10n)
   core/security/          Dart facade over the native bridge, lock controller
   core/database/          Drift schema + SQLCipher opener
   data/                   models, repositories
-  features/               onboarding, security, dashboard, vault, document, search, scanner, settings
+  features/               onboarding, security, dashboard, vault, document, search, scanner, pdf_tools, settings
 android/app/src/main/kotlin/in/docsafe/app/
   security/               Keystore keys, biometric, process session
   storage/                SAF document importer / exporter
   scanner/                ML Kit launcher, ScanStore (pending pages -> encrypted documents)
+  pdf/                    PdfOps: images -> PDF, compression (PdfRenderer), PDF bytes import
   bridge/                 Pigeon-generated API + implementation
 native/docsafe-crypto/    Pure-JVM security core (format, vault store, PIN) + unit tests
 pigeons/                  Bridge definition (source of generated code)

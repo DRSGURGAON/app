@@ -3,8 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import '../localization/gen/app_localizations.dart';
 
-/// Bottom navigation. PDF Tools and Reminders tabs are added in Phases 4–5,
-/// when they have working screens (no placeholder tabs).
+/// Bottom navigation. The Reminders tab is added in Phase 5, when it has a
+/// working screen (no placeholder tabs).
 class AppShell extends StatelessWidget {
   const AppShell({super.key, required this.shell});
 
@@ -29,6 +29,11 @@ class AppShell extends StatelessWidget {
             icon: const Icon(Icons.folder_outlined),
             selectedIcon: const Icon(Icons.folder),
             label: l.navVault,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.picture_as_pdf_outlined),
+            selectedIcon: const Icon(Icons.picture_as_pdf),
+            label: l.navTools,
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined),

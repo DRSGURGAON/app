@@ -80,7 +80,7 @@ class ScanStore(
                 val pdfPages = pages.map { (file, info, rotation) ->
                     JpegPdfWriter.Page(info, file.length(), rotation) { FileInputStream(file) }
                 }
-                listOf(vault.importWriting(pdfPages.sumOf { it.length }) { out -> JpegPdfWriter.write(out, pdfPages) })
+                listOf(vault.importWriting(pdfPages.sumOf { it.length ?: 0L }) { out -> JpegPdfWriter.write(out, pdfPages) })
             }
             Format.IMAGES -> {
                 val created = mutableListOf<VaultStore.ImportResult>()

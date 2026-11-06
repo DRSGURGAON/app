@@ -169,6 +169,22 @@ class ScanPageSpec {
 
 enum ScanSaveFormat { pdf, images }
 
+/// An image document (JPEG/PNG in the vault) used as a page, with clockwise rotation.
+class ImagePageSpec {
+  ImagePageSpec({
+    required this.fileId,
+    required this.mimeType,
+    required this.rotation,
+  });
+
+  String fileId;
+  String mimeType;
+  int rotation;
+}
+
+/// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
+enum CompressionLevel { high, balanced, smallest }
+
 @HostApi()
 abstract class SecurityHostApi {
   @async
@@ -270,6 +286,23 @@ abstract class SecurityHostApi {
   /// Wipes scanned page files (after a confirmed save, or on cancel).
   @async
   void discardScan(List<String> paths);
+
+  /// Encrypts a PDF produced in memory by a page operation (edit, merge,
+  /// split). Must start with `%PDF-`. Never written to disk as plaintext.
+  @async
+  ImportedFile importPdfBytes(Uint8List bytes);
+
+  /// Builds one PDF from image documents in the vault: each image is
+  /// decrypted in memory one at a time and embedded (JPEG unchanged, PNG
+  /// converted), streamed into the encryptor.
+  @async
+  ImportedFile imagesToPdf(List<ImagePageSpec> images);
+
+  /// Re-renders every page of a vault PDF as a JPEG at the preset's
+  /// resolution/quality and saves the result as a NEW encrypted PDF. Text
+  /// in the result is no longer selectable. Errors: PDF_UNREADABLE.
+  @async
+  ImportedFile compressPdf(String fileId, CompressionLevel level);
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();

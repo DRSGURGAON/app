@@ -401,5 +401,116 @@
         "type": "int"
       }
     }
+  },
+  "navTools": "PDF टूल्स",
+  "toolEditPages": "पेज संपादित करें",
+  "toolEditPagesDesc": "पेज घुमाएँ, क्रम बदलें या हटाएँ",
+  "toolImagesToPdf": "इमेज से PDF",
+  "toolImagesToPdfDesc": "वॉल्ट की इमेज को एक PDF में जोड़ें",
+  "toolMerge": "PDF जोड़ें",
+  "toolMergeDesc": "दो या ज़्यादा PDF को एक में जोड़ें",
+  "toolSplit": "PDF अलग करें",
+  "toolSplitDesc": "पेज निकालें, या हर पेज अलग सेव करें",
+  "toolCompress": "PDF छोटा करें",
+  "toolCompressDesc": "फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ",
+  "premiumBadge": "प्रीमियम",
+  "toolsPremiumNote": "इस परीक्षण संस्करण में प्रीमियम टूल सभी के लिए खुले हैं। सदस्यता बाद के अपडेट में आएगी।",
+  "toolsPrivacyNote": "सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।",
+  "pickPdf": "एक PDF चुनें",
+  "pickPdfs": "PDF चुनें",
+  "pickImages": "इमेज चुनें",
+  "pickNoneAvailable": "आपके वॉल्ट में अभी कोई मेल खाता दस्तावेज़ नहीं। पहले कुछ इम्पोर्ट या स्कैन करें।",
+  "pickSelectedCount": "{count} चुने गए",
+  "@pickSelectedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickNext": "आगे",
+  "pickMinimum": "कम से कम {count} चुनें।",
+  "@pickMinimum": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editPagesHint": "क्रम बदलने के लिए खींचें। पेज घुमाएँ या हटाएँ, फिर सेव करें।",
+  "removePage": "पेज हटाएँ",
+  "restorePage": "पेज वापस लाएँ",
+  "keepOriginal": "मूल दस्तावेज़ रखें",
+  "keepOriginalOffNote": "मूल दस्तावेज़ 'हाल ही में हटाए गए' में चला जाएगा।",
+  "saveAsNew": "नए दस्तावेज़ के रूप में सेव करें",
+  "editedTitle": "{title} (संपादित)",
+  "@editedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "mergeDefaultTitle": "जोड़ा गया दस्तावेज़",
+  "mergeOrderHint": "PDF को उसी क्रम में लगाएँ जिसमें वे दिखने चाहिए।",
+  "splitModeExtract": "चुने गए पेज निकालें",
+  "splitModeEach": "हर पेज अलग PDF के रूप में",
+  "splitSelectHint": "निकालने के लिए पेज चुनें।",
+  "splitPageTitle": "{title} (पेज {number})",
+  "@splitPageTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "extractedTitle": "{title} (अंश)",
+  "@extractedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compressLevelHigh": "उच्च गुणवत्ता",
+  "compressLevelBalanced": "संतुलित",
+  "compressLevelSmallest": "सबसे छोटा",
+  "compressNote": "पेज इमेज में बदल दिए जाते हैं: परिणाम में टेक्स्ट चुना या खोजा नहीं जा सकेगा। मूल दस्तावेज़ रखे जाते हैं।",
+  "compressedTitle": "{title} (छोटा)",
+  "@compressedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "compressNotSmaller": "पहले से छोटा है — छोटी कॉपी नहीं बनी।",
+  "compressRun": "छोटा करें",
+  "imagesOrderHint": "इमेज को पेज के क्रम में लगाएँ। तिरछी इमेज घुमाएँ।",
+  "imagesPdfDefaultTitle": "इमेज PDF",
+  "toolWorking": "इसी फ़ोन पर काम हो रहा है…",
+  "toolDoneCount": "{count, plural, =1{1 नया एन्क्रिप्टेड दस्तावेज़ सेव हुआ} other{{count} नए एन्क्रिप्टेड दस्तावेज़ सेव हुए}}",
+  "@toolDoneCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "errorPdfUnreadable": "इस PDF को प्रोसेस नहीं किया जा सकता। यह खराब हो सकता है या पासवर्ड से सुरक्षित हो सकता है।",
+  "errorTooLarge": "ये दस्तावेज़ एक साथ प्रोसेस करने के लिए बहुत बड़े हैं (सीमा 150 MB)।",
+  "pageLabelOf": "पेज {number} / {total}",
+  "@pageLabelOf": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -1597,6 +1597,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Page {number} of {total}'**
   String scanPreviewTitle(int number, int total);
+
+  /// No description provided for @navTools.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Tools'**
+  String get navTools;
+
+  /// No description provided for @toolEditPages.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit pages'**
+  String get toolEditPages;
+
+  /// No description provided for @toolEditPagesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotate, reorder or remove pages'**
+  String get toolEditPagesDesc;
+
+  /// No description provided for @toolImagesToPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Images to PDF'**
+  String get toolImagesToPdf;
+
+  /// No description provided for @toolImagesToPdfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Combine images from your vault into one PDF'**
+  String get toolImagesToPdfDesc;
+
+  /// No description provided for @toolMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge PDFs'**
+  String get toolMerge;
+
+  /// No description provided for @toolMergeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Join two or more PDFs into one'**
+  String get toolMergeDesc;
+
+  /// No description provided for @toolSplit.
+  ///
+  /// In en, this message translates to:
+  /// **'Split PDF'**
+  String get toolSplit;
+
+  /// No description provided for @toolSplitDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract pages, or save each page separately'**
+  String get toolSplitDesc;
+
+  /// No description provided for @toolCompress.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress PDF'**
+  String get toolCompress;
+
+  /// No description provided for @toolCompressDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduce file size — one or several PDFs at once'**
+  String get toolCompressDesc;
+
+  /// No description provided for @premiumBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium'**
+  String get premiumBadge;
+
+  /// No description provided for @toolsPremiumNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium tools are open to everyone in this test version. Subscriptions arrive in a later update.'**
+  String get toolsPremiumNote;
+
+  /// No description provided for @toolsPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything runs on this phone. Results are saved as new encrypted documents.'**
+  String get toolsPrivacyNote;
+
+  /// No description provided for @pickPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a PDF'**
+  String get pickPdf;
+
+  /// No description provided for @pickPdfs.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose PDFs'**
+  String get pickPdfs;
+
+  /// No description provided for @pickImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose images'**
+  String get pickImages;
+
+  /// No description provided for @pickNoneAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching documents in your vault yet. Import or scan some first.'**
+  String get pickNoneAvailable;
+
+  /// No description provided for @pickSelectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String pickSelectedCount(int count);
+
+  /// No description provided for @pickNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get pickNext;
+
+  /// No description provided for @pickMinimum.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least {count}.'**
+  String pickMinimum(int count);
+
+  /// No description provided for @editPagesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag to reorder. Rotate or remove pages, then save.'**
+  String get editPagesHint;
+
+  /// No description provided for @removePage.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove page'**
+  String get removePage;
+
+  /// No description provided for @restorePage.
+  ///
+  /// In en, this message translates to:
+  /// **'Put page back'**
+  String get restorePage;
+
+  /// No description provided for @keepOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the original document'**
+  String get keepOriginal;
+
+  /// No description provided for @keepOriginalOffNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The original moves to Recently deleted.'**
+  String get keepOriginalOffNote;
+
+  /// No description provided for @saveAsNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as new document'**
+  String get saveAsNew;
+
+  /// No description provided for @editedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (edited)'**
+  String editedTitle(String title);
+
+  /// No description provided for @mergeDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Merged document'**
+  String get mergeDefaultTitle;
+
+  /// No description provided for @mergeOrderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange the PDFs in the order they should appear.'**
+  String get mergeOrderHint;
+
+  /// No description provided for @splitModeExtract.
+  ///
+  /// In en, this message translates to:
+  /// **'Extract selected pages'**
+  String get splitModeExtract;
+
+  /// No description provided for @splitModeEach.
+  ///
+  /// In en, this message translates to:
+  /// **'Each page as a separate PDF'**
+  String get splitModeEach;
+
+  /// No description provided for @splitSelectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the pages to extract.'**
+  String get splitSelectHint;
+
+  /// No description provided for @splitPageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (page {number})'**
+  String splitPageTitle(String title, int number);
+
+  /// No description provided for @extractedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (extract)'**
+  String extractedTitle(String title);
+
+  /// No description provided for @compressLevelHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High quality'**
+  String get compressLevelHigh;
+
+  /// No description provided for @compressLevelBalanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Balanced'**
+  String get compressLevelBalanced;
+
+  /// No description provided for @compressLevelSmallest.
+  ///
+  /// In en, this message translates to:
+  /// **'Smallest'**
+  String get compressLevelSmallest;
+
+  /// No description provided for @compressNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Pages are converted to images: text in the result can\'t be selected or searched. Originals are kept.'**
+  String get compressNote;
+
+  /// No description provided for @compressedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (compressed)'**
+  String compressedTitle(String title);
+
+  /// No description provided for @compressNotSmaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Already compact — no smaller copy was made.'**
+  String get compressNotSmaller;
+
+  /// No description provided for @compressRun.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress'**
+  String get compressRun;
+
+  /// No description provided for @imagesOrderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrange the images in page order. Rotate any that are sideways.'**
+  String get imagesOrderHint;
+
+  /// No description provided for @imagesPdfDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Images as PDF'**
+  String get imagesPdfDefaultTitle;
+
+  /// No description provided for @toolWorking.
+  ///
+  /// In en, this message translates to:
+  /// **'Working on this phone…'**
+  String get toolWorking;
+
+  /// No description provided for @toolDoneCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 new encrypted document saved} other{{count} new encrypted documents saved}}'**
+  String toolDoneCount(int count);
+
+  /// No description provided for @errorPdfUnreadable.
+  ///
+  /// In en, this message translates to:
+  /// **'This PDF can\'t be processed. It may be damaged or protected with a password.'**
+  String get errorPdfUnreadable;
+
+  /// No description provided for @errorTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'These documents are too large to process together (limit 150 MB).'**
+  String get errorTooLarge;
+
+  /// No description provided for @pageLabelOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {number} of {total}'**
+  String pageLabelOf(int number, int total);
 }
 
 class _AppLocalizationsDelegate

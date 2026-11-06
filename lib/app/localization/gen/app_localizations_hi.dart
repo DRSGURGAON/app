@@ -873,4 +873,183 @@ class AppLocalizationsHi extends AppLocalizations {
   String scanPreviewTitle(int number, int total) {
     return 'पेज $number / $total';
   }
+
+  @override
+  String get navTools => 'PDF टूल्स';
+
+  @override
+  String get toolEditPages => 'पेज संपादित करें';
+
+  @override
+  String get toolEditPagesDesc => 'पेज घुमाएँ, क्रम बदलें या हटाएँ';
+
+  @override
+  String get toolImagesToPdf => 'इमेज से PDF';
+
+  @override
+  String get toolImagesToPdfDesc => 'वॉल्ट की इमेज को एक PDF में जोड़ें';
+
+  @override
+  String get toolMerge => 'PDF जोड़ें';
+
+  @override
+  String get toolMergeDesc => 'दो या ज़्यादा PDF को एक में जोड़ें';
+
+  @override
+  String get toolSplit => 'PDF अलग करें';
+
+  @override
+  String get toolSplitDesc => 'पेज निकालें, या हर पेज अलग सेव करें';
+
+  @override
+  String get toolCompress => 'PDF छोटा करें';
+
+  @override
+  String get toolCompressDesc => 'फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ';
+
+  @override
+  String get premiumBadge => 'प्रीमियम';
+
+  @override
+  String get toolsPremiumNote =>
+      'इस परीक्षण संस्करण में प्रीमियम टूल सभी के लिए खुले हैं। सदस्यता बाद के अपडेट में आएगी।';
+
+  @override
+  String get toolsPrivacyNote =>
+      'सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।';
+
+  @override
+  String get pickPdf => 'एक PDF चुनें';
+
+  @override
+  String get pickPdfs => 'PDF चुनें';
+
+  @override
+  String get pickImages => 'इमेज चुनें';
+
+  @override
+  String get pickNoneAvailable =>
+      'आपके वॉल्ट में अभी कोई मेल खाता दस्तावेज़ नहीं। पहले कुछ इम्पोर्ट या स्कैन करें।';
+
+  @override
+  String pickSelectedCount(int count) {
+    return '$count चुने गए';
+  }
+
+  @override
+  String get pickNext => 'आगे';
+
+  @override
+  String pickMinimum(int count) {
+    return 'कम से कम $count चुनें।';
+  }
+
+  @override
+  String get editPagesHint =>
+      'क्रम बदलने के लिए खींचें। पेज घुमाएँ या हटाएँ, फिर सेव करें।';
+
+  @override
+  String get removePage => 'पेज हटाएँ';
+
+  @override
+  String get restorePage => 'पेज वापस लाएँ';
+
+  @override
+  String get keepOriginal => 'मूल दस्तावेज़ रखें';
+
+  @override
+  String get keepOriginalOffNote =>
+      'मूल दस्तावेज़ \'हाल ही में हटाए गए\' में चला जाएगा।';
+
+  @override
+  String get saveAsNew => 'नए दस्तावेज़ के रूप में सेव करें';
+
+  @override
+  String editedTitle(String title) {
+    return '$title (संपादित)';
+  }
+
+  @override
+  String get mergeDefaultTitle => 'जोड़ा गया दस्तावेज़';
+
+  @override
+  String get mergeOrderHint =>
+      'PDF को उसी क्रम में लगाएँ जिसमें वे दिखने चाहिए।';
+
+  @override
+  String get splitModeExtract => 'चुने गए पेज निकालें';
+
+  @override
+  String get splitModeEach => 'हर पेज अलग PDF के रूप में';
+
+  @override
+  String get splitSelectHint => 'निकालने के लिए पेज चुनें।';
+
+  @override
+  String splitPageTitle(String title, int number) {
+    return '$title (पेज $number)';
+  }
+
+  @override
+  String extractedTitle(String title) {
+    return '$title (अंश)';
+  }
+
+  @override
+  String get compressLevelHigh => 'उच्च गुणवत्ता';
+
+  @override
+  String get compressLevelBalanced => 'संतुलित';
+
+  @override
+  String get compressLevelSmallest => 'सबसे छोटा';
+
+  @override
+  String get compressNote =>
+      'पेज इमेज में बदल दिए जाते हैं: परिणाम में टेक्स्ट चुना या खोजा नहीं जा सकेगा। मूल दस्तावेज़ रखे जाते हैं।';
+
+  @override
+  String compressedTitle(String title) {
+    return '$title (छोटा)';
+  }
+
+  @override
+  String get compressNotSmaller => 'पहले से छोटा है — छोटी कॉपी नहीं बनी।';
+
+  @override
+  String get compressRun => 'छोटा करें';
+
+  @override
+  String get imagesOrderHint =>
+      'इमेज को पेज के क्रम में लगाएँ। तिरछी इमेज घुमाएँ।';
+
+  @override
+  String get imagesPdfDefaultTitle => 'इमेज PDF';
+
+  @override
+  String get toolWorking => 'इसी फ़ोन पर काम हो रहा है…';
+
+  @override
+  String toolDoneCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count नए एन्क्रिप्टेड दस्तावेज़ सेव हुए',
+      one: '1 नया एन्क्रिप्टेड दस्तावेज़ सेव हुआ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get errorPdfUnreadable =>
+      'इस PDF को प्रोसेस नहीं किया जा सकता। यह खराब हो सकता है या पासवर्ड से सुरक्षित हो सकता है।';
+
+  @override
+  String get errorTooLarge =>
+      'ये दस्तावेज़ एक साथ प्रोसेस करने के लिए बहुत बड़े हैं (सीमा 150 MB)।';
+
+  @override
+  String pageLabelOf(int number, int total) {
+    return 'पेज $number / $total';
+  }
 }

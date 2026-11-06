@@ -4,12 +4,15 @@ import 'package:docsafe/app/app.dart';
 import 'package:docsafe/core/database/app_database.dart';
 import 'package:docsafe/core/database/database_opener.dart';
 import 'package:docsafe/core/database/database_provider.dart';
+import 'package:docsafe/core/pdf/pdf_engine.dart';
 import 'package:docsafe/core/security/lock_controller.dart';
+import 'package:docsafe/features/pdf_tools/widgets/pdf_thumbnail.dart';
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'fake_pdf_engine.dart';
 import 'fake_security_service.dart';
 
 /// Pumps the whole app with the fake native layer and a REAL in-memory
@@ -48,6 +51,7 @@ Future<TestApp> pumpApp(
   WidgetTester tester,
   FakeSecurityService fake, {
   Size size = const Size(1080, 2400),
+  PdfEngine? pdfEngine,
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -59,6 +63,14 @@ Future<TestApp> pumpApp(
       securityServiceProvider.overrideWithValue(fake),
       // Only the opener is replaced: open-on-unlock, close-on-lock and the
       // erase close-wait run the production code paths.
+      pdfEngineProvider.overrideWithValue(pdfEngine ?? FakePdfEngine()),
+      // No PDFium on the host: plain placeholders instead of page renders.
+      pdfThumbnailBuilderProvider.overrideWithValue(
+        (path, index) => ColoredBox(
+          color: const Color(0xFFEEEEEE),
+          child: Center(child: Text('p${index + 1}')),
+        ),
+      ),
       databaseOpenerProvider.overrideWithValue((path, key) {
         final db = openEncryptedMemoryDatabase('c' * 64);
         databases.add(db);
