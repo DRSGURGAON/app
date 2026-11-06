@@ -99,7 +99,7 @@ class _BiometricSetupScreenState extends ConsumerState<BiometricSetupScreen> {
                   ),
                 const SizedBox(height: 12),
                 OutlinedButton(
-                  onPressed: _busy ? null : () => context.go(Routes.vault),
+                  onPressed: _busy ? null : () => context.go(Routes.home),
                   child: Text(enabled ? l.biometricContinue : l.biometricSkip),
                 ),
               ],
