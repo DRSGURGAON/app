@@ -20,10 +20,14 @@ class EraseService {
     // Dispose the database provider now (its onDispose closes the database)
     // and wait for the close before the native layer deletes the file.
     _ref.invalidate(databaseProvider);
+    // Drift finishes closing once its stream queries are released (data
+    // providers are autoDispose, so leaving the vault releases them). Never
+    // wait forever: the native wipe unlinks the file and destroys its key,
+    // so a lingering connection cannot expose anything.
     try {
-      await databaseClosed();
+      await databaseClosed().timeout(const Duration(seconds: 3));
     } catch (_) {
-      // A database that fails to close is deleted regardless.
+      AppLogger.event('erase_db_close_timeout');
     }
     AppLogger.event('erase_all');
     await ctl.eraseAll();

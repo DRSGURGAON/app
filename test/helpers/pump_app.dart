@@ -17,18 +17,26 @@ import 'fake_security_service.dart';
 /// widget test's fake-async zone (mixing zones deadlocks Drift).
 /// Call [TestApp.dispose] at the end of every test.
 class TestApp {
-  TestApp(this.tester, this.db, this.container);
+  TestApp(this.tester, this.databases, this.container);
   final WidgetTester tester;
-  final AppDatabase db;
+
+  /// Every database the app opened (a new one after each unlock).
+  final List<AppDatabase> databases;
   final ProviderContainer container;
 
   Future<void> dispose() async {
     await tester.pumpWidget(const SizedBox());
-    await tester.pump(const Duration(milliseconds: 50));
+    // Let in-flight provider futures finish before disposing the container.
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
     container.dispose();
     // Drift's close completes via timers: pump the fake clock until it does.
     var closed = false;
-    unawaited(db.close().whenComplete(() => closed = true));
+    unawaited(
+      Future.wait(databases.map((d) => d.close()))
+          .whenComplete(() => closed = true),
+    );
     for (var i = 0; i < 100 && !closed; i++) {
       await tester.pump(const Duration(milliseconds: 20));
     }
@@ -45,18 +53,24 @@ Future<TestApp> pumpApp(
   tester.view.physicalSize = size;
   tester.view.devicePixelRatio = 2.5;
   addTearDown(tester.view.reset);
-  final db = openEncryptedMemoryDatabase('c' * 64);
+  final databases = <AppDatabase>[];
   final container = ProviderContainer(
     overrides: [
       securityServiceProvider.overrideWithValue(fake),
-      databaseProvider.overrideWith((ref) async => db),
+      // Only the opener is replaced: open-on-unlock, close-on-lock and the
+      // erase close-wait run the production code paths.
+      databaseOpenerProvider.overrideWithValue((path, key) {
+        final db = openEncryptedMemoryDatabase('c' * 64);
+        databases.add(db);
+        return db;
+      }),
     ],
   );
   await tester.pumpWidget(
     UncontrolledProviderScope(container: container, child: const DocSafeApp()),
   );
   await settle(tester);
-  return TestApp(tester, db, container);
+  return TestApp(tester, databases, container);
 }
 
 /// pumpAndSettle with a bounded number of frames (lists may show spinners

@@ -71,11 +71,17 @@ class FolderRepository {
   }
 }
 
-final folderRepositoryProvider = FutureProvider<FolderRepository>((ref) async {
-  return FolderRepository(await ref.watch(databaseProvider.future));
-});
+final folderRepositoryProvider = FutureProvider<FolderRepository>(
+  retry: noRetry,
+  (ref) async {
+    return FolderRepository(await ref.watch(databaseProvider.future));
+  },
+);
 
-final foldersProvider = StreamProvider<List<FolderSummary>>((ref) async* {
-  final repo = await ref.watch(folderRepositoryProvider.future);
-  yield* repo.watchAll();
-});
+final foldersProvider = StreamProvider.autoDispose<List<FolderSummary>>(
+  retry: noRetry,
+  (ref) async* {
+    final repo = await ref.watch(folderRepositoryProvider.future);
+    yield* repo.watchAll();
+  },
+);

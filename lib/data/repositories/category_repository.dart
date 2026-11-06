@@ -83,13 +83,17 @@ class CategoryRepository {
   }
 }
 
-final categoryRepositoryProvider = FutureProvider<CategoryRepository>((
-  ref,
-) async {
-  return CategoryRepository(await ref.watch(databaseProvider.future));
-});
+final categoryRepositoryProvider = FutureProvider<CategoryRepository>(
+  retry: noRetry,
+  (ref) async {
+    return CategoryRepository(await ref.watch(databaseProvider.future));
+  },
+);
 
-final categoriesProvider = StreamProvider<List<CategorySummary>>((ref) async* {
-  final repo = await ref.watch(categoryRepositoryProvider.future);
-  yield* repo.watchAll();
-});
+final categoriesProvider = StreamProvider.autoDispose<List<CategorySummary>>(
+  retry: noRetry,
+  (ref) async* {
+    final repo = await ref.watch(categoryRepositoryProvider.future);
+    yield* repo.watchAll();
+  },
+);

@@ -468,52 +468,58 @@ class DocumentRepository {
   }
 }
 
-final documentRepositoryProvider = FutureProvider<DocumentRepository>((
-  ref,
-) async {
-  final db = await ref.watch(databaseProvider.future);
-  final repo = DocumentRepository(db, ref.read(securityServiceProvider));
-  await repo.removeOrphanedFiles();
-  await repo.purgeExpiredTrash();
-  return repo;
-});
+final documentRepositoryProvider = FutureProvider<DocumentRepository>(
+  retry: noRetry,
+  (ref) async {
+    final db = await ref.watch(databaseProvider.future);
+    final repo = DocumentRepository(db, ref.read(securityServiceProvider));
+    await repo.removeOrphanedFiles();
+    await repo.purgeExpiredTrash();
+    return repo;
+  },
+);
 
 /// Document list for a query. Family key is the (value-equal) query.
-final documentsProvider =
-    StreamProvider.family<List<VaultDocument>, DocumentQuery>((
-      ref,
-      query,
-    ) async* {
+final documentsProvider = StreamProvider.autoDispose
+    .family<List<VaultDocument>, DocumentQuery>((ref, query) async* {
       final repo = await ref.watch(documentRepositoryProvider.future);
       yield* repo.watch(query);
     });
 
-final documentDetailsProvider = StreamProvider.family<DocumentDetails?, int>((
-  ref,
-  id,
-) async* {
-  final repo = await ref.watch(documentRepositoryProvider.future);
-  yield* repo.watchDetails(id);
-});
+final documentDetailsProvider = StreamProvider.autoDispose
+    .family<DocumentDetails?, int>((ref, id) async* {
+      final repo = await ref.watch(documentRepositoryProvider.future);
+      yield* repo.watchDetails(id);
+    });
 
-final trashProvider = StreamProvider<List<VaultDocument>>((ref) async* {
-  final repo = await ref.watch(documentRepositoryProvider.future);
-  yield* repo.watchTrash();
-});
+final trashProvider = StreamProvider.autoDispose<List<VaultDocument>>(
+  retry: noRetry,
+  (ref) async* {
+    final repo = await ref.watch(documentRepositoryProvider.future);
+    yield* repo.watchTrash();
+  },
+);
 
-final expiringDocumentsProvider = StreamProvider<List<VaultDocument>>((
-  ref,
-) async* {
-  final repo = await ref.watch(documentRepositoryProvider.future);
-  yield* repo.watchExpiring();
-});
+final expiringDocumentsProvider =
+    StreamProvider.autoDispose<List<VaultDocument>>(retry: noRetry, (
+      ref,
+    ) async* {
+      final repo = await ref.watch(documentRepositoryProvider.future);
+      yield* repo.watchExpiring();
+    });
 
-final vaultStatsProvider = StreamProvider<VaultStats>((ref) async* {
-  final repo = await ref.watch(documentRepositoryProvider.future);
-  yield* repo.watchStats();
-});
+final vaultStatsProvider = StreamProvider.autoDispose<VaultStats>(
+  retry: noRetry,
+  (ref) async* {
+    final repo = await ref.watch(documentRepositoryProvider.future);
+    yield* repo.watchStats();
+  },
+);
 
-final allTagsProvider = StreamProvider<List<String>>((ref) async* {
-  final repo = await ref.watch(documentRepositoryProvider.future);
-  yield* repo.watchAllTags();
-});
+final allTagsProvider = StreamProvider.autoDispose<List<String>>(
+  retry: noRetry,
+  (ref) async* {
+    final repo = await ref.watch(documentRepositoryProvider.future);
+    yield* repo.watchAllTags();
+  },
+);

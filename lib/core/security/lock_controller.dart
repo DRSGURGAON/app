@@ -99,6 +99,7 @@ class LockController extends Notifier<LockState> {
   Future<void> refresh() async {
     try {
       final s = await _service.getStatus();
+      if (!ref.mounted) return;
       state = LockState(_phaseFor(s), status: s);
     } on SecurityFailure catch (e) {
       AppLogger.event('status_failed', e.code.name);
@@ -190,8 +191,9 @@ class LockController extends Notifier<LockState> {
   /// Permanently erases all DocSafe data and returns to first-run state.
   /// Call through [EraseService], which closes the database first.
   Future<void> eraseAll() async {
-    await _service.eraseAllData();
-    await refresh();
+    final service = _service; // read before any async gap
+    await service.eraseAllData();
+    if (ref.mounted) await refresh();
   }
 
   Future<void> lock() async {
