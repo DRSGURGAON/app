@@ -159,7 +159,12 @@ class PdfOps(private val vault: VaultStore) {
                 }
                 val out = ByteArrayOutputStream()
                 bmp.compress(Bitmap.CompressFormat.JPEG, FLATTEN_QUALITY, out)
-                JpegPdfWriter.Opened(JpegInfo(w, h, 3), ByteArrayInputStream(out.toByteArray()))
+                JpegPdfWriter.Opened(
+                    JpegInfo(w, h, 3),
+                    ByteArrayInputStream(out.toByteArray()),
+                    // Same physical size as the original page.
+                    page.width.toDouble() to page.height.toDouble(),
+                )
             } finally {
                 bmp.recycle()
             }
@@ -194,7 +199,11 @@ class PdfOps(private val vault: VaultStore) {
                 val out = ByteArrayOutputStream()
                 bmp.compress(Bitmap.CompressFormat.JPEG, preset.quality, out)
                 val bytes = out.toByteArray()
-                JpegPdfWriter.Opened(JpegInfo(bmp.width, bmp.height, 3), ByteArrayInputStream(bytes))
+                JpegPdfWriter.Opened(
+                    JpegInfo(bmp.width, bmp.height, 3),
+                    ByteArrayInputStream(bytes),
+                    page.width.toDouble() to page.height.toDouble(),
+                )
             } finally {
                 bmp.recycle()
             }

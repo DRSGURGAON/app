@@ -219,6 +219,28 @@ class ScanPipelineTest {
     }
 
     @Test
+    fun reRenderedPageKeepsItsOriginalSizeInPoints() {
+        val bytes = jpeg(1700, 2200)
+        val pages = listOf(
+            // Letter-size page re-rendered at 200 dpi keeps 612x792 pt.
+            JpegPdfWriter.Page(0) {
+                JpegPdfWriter.Opened(JpegInfo.read(ByteArrayInputStream(bytes)), ByteArrayInputStream(bytes), 612.0 to 792.0)
+            },
+            // Absurd size is ignored (falls back to the A4 long side).
+            JpegPdfWriter.Page(0) {
+                JpegPdfWriter.Opened(JpegInfo.read(ByteArrayInputStream(bytes)), ByteArrayInputStream(bytes), 1e9 to 10.0)
+            },
+        )
+        val out = ByteArrayOutputStream()
+        JpegPdfWriter.write(out, pages)
+        Loader.loadPDF(out.toByteArray()).use { doc ->
+            assertEquals(612f, doc.getPage(0).mediaBox.width, 0.01f)
+            assertEquals(792f, doc.getPage(0).mediaBox.height, 0.01f)
+            assertEquals(842f, doc.getPage(1).mediaBox.height, 0.01f)
+        }
+    }
+
+    @Test
     fun rejectsInvalidRotationAndEmptyDocuments() {
         val bytes = jpeg(10, 10)
         assertFailsWith<IllegalArgumentException> { page(bytes, 45) }

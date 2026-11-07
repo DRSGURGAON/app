@@ -181,6 +181,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 5 | Decoded images in memory | Flutter image cache | Viewer / thumbnails | Viewer close (cache cleared) | — |
 | 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |
 | 7 | PDF tool inputs / output | inputs as #1; output PDF in memory only | Tool runs | When the tool finishes | No |
+| 7a | Annotate & Sign: source + flattened intermediate | as #1 (the intermediate is an encrypted vault container, decrypted to a temp file only while reassembling); overlay PNGs in memory | Save copy | When the save finishes (intermediate container deleted; orphan sweep on next start) | No |
 | 8 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
 
 Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
@@ -214,6 +215,42 @@ can read the cache while it exists.
   write fails, the new container is deleted).
 - In memory while a tool runs: decoded page bitmaps, PDFium document structures, the output PDF.
   Released when the operation ends.
+
+## 12a. Annotate & Sign (Premium)
+
+Write text, place a signature, draw, highlight or **cover** (white-out) parts of a PDF.
+
+- **Flattening.** The editor draws marks into one transparent PNG per page (`dart:ui`, 200 dpi —
+  the same resolution the native side renders at). Native `flattenPages` renders each marked page
+  with `PdfRenderer` on white, draws the overlay on top and writes those pages as JPEG pages
+  (keeping the original page size in points) into a new encrypted intermediate container. Dart then
+  reassembles the whole document with PDFium — unmarked pages are copied unchanged — and the
+  result is encrypted via `importPdfBytes`. The intermediate container and both temp files are
+  deleted in `finally`; if the app dies first, the orphan sweep removes the container on next start.
+- **Cover really removes content** on marked pages: the page becomes an image of what was visible,
+  so text, images or hidden layers under a cover are not in the copy (verified on the emulator by
+  rendering the result). Text on marked pages is no longer selectable (stated before saving).
+  Unmarked pages keep their text.
+- **Never in place.** The result is always a new document titled "… (annotated)" with a note
+  "Annotated copy of “…”, made in DocSafe. This is not the original document." The original is
+  not modified.
+- **Misuse mitigations (forgery of official documents):**
+  1. Documents in the **Identity Documents** category (Aadhaar, PAN, passport, voter ID…) are
+     refused in both the UI and `PdfToolsService.annotate` (`AnnotationNotAllowed`).
+  2. Before every save a warning must be acknowledged with a checkbox: use only on your own
+     forms/documents; altering official documents, certificates or someone else's signature can be
+     illegal.
+  3. Provenance label + note on the copy (above).
+  These reduce casual misuse; they cannot technically prevent someone from editing a document
+  stored in another category. DocSafe does not create digital (cryptographic) signatures — a drawn
+  signature is an image, not a legally verifiable e-signature.
+- **Saved signature** (optional, opt-in checkbox): stored as normalised stroke coordinates in the
+  encrypted database (`app_settings` key `signature.v1`), removable from the signature pad, wiped by
+  Erase all data. Never exported or logged.
+- **Premium gate.** There is no billing yet (Phase 6), so release and profile builds keep the
+  tool locked and show a Premium screen with the planned prices and "subscriptions open in an
+  upcoming update" — no buy button. Debug builds have a developer switch in Settings
+  (`kDebugMode`, in memory only) for testing. The gate is a product gate, not a security boundary.
 
 ## 13. Known limitations
 

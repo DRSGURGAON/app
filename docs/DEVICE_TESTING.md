@@ -132,6 +132,26 @@ Expected: renders or shows "This document failed its integrity check…" — nev
 | T10 | Merge PDFs totalling > 150 MB | "too large to process together" |
 | T11 | After each tool: `adb shell run-as $APP ls cache/vault_tmp` | Empty |
 
+## 9. Annotate & Sign
+
+Debug build: Settings → Developer → "Unlock Premium features for testing". Release build: the
+tool must stay locked and show the Premium screen (no purchase button).
+
+| # | Step | Expected |
+|---|---|---|
+| A1 | Release build: PDF Tools → Annotate & Sign | Premium screen, ₹49 / ₹299, "upcoming update", only a Close button |
+| A2 | Debug, unlocked: open a real multi-page PDF (bank form, letter-size and A4) | Pages display with correct orientation; page arrows work |
+| A3 | Text in Hindi and English at three sizes, three colours | Text lands where tapped; same position in the saved copy |
+| A4 | Draw a signature, tick "Save on this device", place it twice; reopen editor → Sign | Saved signature offered; "Delete saved signature" removes it |
+| A5 | Cover over printed text, Highlight over another line | Saved copy: covered text gone (try selecting/searching it in another viewer after export); highlight tinted |
+| A6 | Draw freehand; Undo; long-press a mark → Delete | Marks removed as expected |
+| A7 | Save copy without ticking the warning | Save disabled until ticked |
+| A8 | After saving | New "(annotated)" document with the note; original unchanged; unmarked pages still have selectable text |
+| A9 | Document in "Identity Documents" category → Annotate | Refused with explanation |
+| A10 | Back with unsaved marks | "Discard your changes?" |
+| A11 | Rotated pages (/Rotate 90) and a landscape page | Marks appear in the same place in the copy |
+| A12 | After saving: `adb shell run-as $APP ls cache/vault_tmp` | Empty |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -143,3 +163,4 @@ Expected: renders or shows "This document failed its integrity check…" — nev
 | Backups (§6) | | | |
 | Preview (§7) | | | |
 | PDF tools (§8) | | | |
+| Annotate & Sign (§9) | | | |

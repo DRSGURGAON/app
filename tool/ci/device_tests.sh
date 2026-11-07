@@ -24,6 +24,9 @@ flutter test integration_test/preview_test.dart -d "$DEVICE"
 echo "== 3b. PDF tools (real PDFium + native image/compress)"
 flutter test integration_test/pdf_tools_test.dart -d "$DEVICE"
 
+echo "== 3c. Annotate & Sign (real overlay render + native flatten + PDFium)"
+flutter test integration_test/annotate_test.dart -d "$DEVICE"
+
 echo "== 4. True process restart"
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
 flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall

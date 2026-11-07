@@ -4,7 +4,9 @@
 //
 // Design rules:
 // - Plaintext document bytes NEVER cross this bridge; only opaque file ids and
-//   paths of short-lived temp files inside app-private cache.
+//   paths of short-lived temp files inside app-private cache. Documented
+//   exceptions (in-process memory only, never written to disk): the PDF built
+//   by a page operation (importPdfBytes) and annotation overlays (flattenPages).
 // - PINs cross as Uint8List so Dart can zero its copy after the call.
 // - Every vault/database operation is refused natively unless the session is unlocked.
 // - Errors are raised as PlatformException with a code from SecurityErrorCode

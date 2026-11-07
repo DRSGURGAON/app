@@ -20,8 +20,19 @@ object JpegPdfWriter {
     /** Longer side of A4 in PDF points. */
     private const val LONG_SIDE_PT = 842.0
 
-    /** An opened page: its JPEG header info and a stream over the full JPEG. */
-    class Opened(val info: JpegInfo, val stream: InputStream)
+    /** PDF implementation limit for page dimensions (ISO 32000 annex C). */
+    private const val MAX_SIDE_PT = 14400.0
+
+    /**
+     * An opened page: its JPEG header info and a stream over the full JPEG.
+     * [pageSizePt] (width, height in points) keeps a re-rendered page at its
+     * original size; when null the long side is 842 pt (A4).
+     */
+    class Opened(
+        val info: JpegInfo,
+        val stream: InputStream,
+        val pageSizePt: Pair<Double, Double>? = null,
+    )
 
     class Page(
         /** Clockwise rotation: 0, 90, 180 or 270. */
@@ -71,9 +82,11 @@ object JpegPdfWriter {
             val opened = page.open()
             opened.stream.use { input ->
                 val info = opened.info
+                val size = opened.pageSizePt
+                    ?.takeIf { it.first > 0 && it.second > 0 && it.first <= MAX_SIDE_PT && it.second <= MAX_SIDE_PT }
                 val scale = LONG_SIDE_PT / maxOf(info.width, info.height)
-                val pw = fmt(info.width * scale)
-                val ph = fmt(info.height * scale)
+                val pw = fmt(size?.first ?: (info.width * scale))
+                val ph = fmt(size?.second ?: (info.height * scale))
                 val colorSpace = when (info.components) {
                     1 -> "/DeviceGray"
                     3 -> "/DeviceRGB"

@@ -47,7 +47,14 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 | Split: extract pages / every page separately | Premium | PDFium | Implemented, tested |
 | Compress (three presets, one or many PDFs = batch) | Premium | Android PdfRenderer -> JPEG pages | Implemented, tested; result discarded if not smaller |
 
-Premium tools are labelled but **not yet gated**: billing arrives in Phase 6. Every tool saves a
+| **Annotate & Sign** — text, signature (optional saved signature), draw, highlight, cover; undo; long-press delete | Premium (**locked**) | dart:ui overlay → native PdfRenderer flatten → PDFium reassembly | Implemented, tested (host + emulator); physical device pending |
+
+Annotate & Sign has its own icon (pen) and colour in PDF Tools and on the document page. It is
+**locked** in release builds until billing exists (Phase 6): the Premium screen shows ₹49/month and
+₹299/year with "subscriptions open in an upcoming update" and no purchase button; debug builds have
+a developer switch in Settings. Identity-category documents cannot be annotated, a legal warning
+must be acknowledged before saving, and the result is a separate "(annotated)" copy — see
+docs/SECURITY.md §12a. Merge, split and compress are labelled Premium but **not yet gated**. Every tool saves a
 NEW encrypted document; originals are kept (edit pages can optionally move the original to
 Recently deleted). Not supported: editing text inside PDFs, opening password-protected PDFs.
 
