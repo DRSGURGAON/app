@@ -13,7 +13,9 @@ import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import `in`.docsafe.app.bridge.SecurityBridgeError
 import `in`.docsafe.app.bridge.SecurityHostApi
+import `in`.docsafe.app.bridge.LaunchTarget
 import `in`.docsafe.app.bridge.SecurityHostApiImpl
+import `in`.docsafe.app.reminders.ReminderScheduler
 import `in`.docsafe.app.bridge.SystemDocumentUi
 import `in`.docsafe.app.security.VaultSession
 import kotlin.coroutines.resume
@@ -44,7 +46,26 @@ class MainActivity : FlutterFragmentActivity() {
         if (cont?.isActive == true) cont.resume(result)
     }
 
+    private var pendingPermission: CancellableContinuation<Boolean>? = null
+
+    private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        val cont = pendingPermission
+        pendingPermission = null
+        if (cont?.isActive == true) cont.resume(granted)
+    }
+
     private val documentUi = object : SystemDocumentUi {
+        override suspend fun requestNotificationPermission(): Boolean =
+            suspendCancellableCoroutine { cont ->
+                if (pendingPermission != null) {
+                    cont.resumeWith(Result.failure(SecurityBridgeError(SecurityHostApiImpl.ERR_BUSY, SecurityHostApiImpl.ERR_BUSY)))
+                    return@suspendCancellableCoroutine
+                }
+                pendingPermission = cont
+                cont.invokeOnCancellation { pendingPermission = null }
+                permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+
         override suspend fun launchIntentSender(sender: IntentSender): ActivityResult? =
             suspendCancellableCoroutine { cont ->
                 if (pendingSender != null || pending != null) {
@@ -93,6 +114,12 @@ class MainActivity : FlutterFragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         window.setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE)
         super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) LaunchTarget.set(intent?.getStringExtra(ReminderScheduler.EXTRA_OPEN))
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        LaunchTarget.set(intent.getStringExtra(ReminderScheduler.EXTRA_OPEN))
     }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -116,6 +143,8 @@ class MainActivity : FlutterFragmentActivity() {
         pending = null
         pendingSender?.let { if (it.isActive) it.resume(null) }
         pendingSender = null
+        pendingPermission?.let { if (it.isActive) it.resume(false) }
+        pendingPermission = null
         super.onDestroy()
     }
 }

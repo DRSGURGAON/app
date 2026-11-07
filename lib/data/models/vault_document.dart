@@ -97,6 +97,7 @@ class DocumentQuery {
     this.favouritesOnly = false,
     this.text,
     this.matchingCategoryIds = const {},
+    this.includeRecognizedText = false,
     this.sort = DocumentSort.newest,
     this.limit,
   });
@@ -111,6 +112,9 @@ class DocumentQuery {
   /// Categories whose localised display name matches [text]; computed by the
   /// UI because default category names are localised.
   final Set<int> matchingCategoryIds;
+
+  /// Also match text recognised by OCR (Premium).
+  final bool includeRecognizedText;
   final DocumentSort sort;
   final int? limit;
 
@@ -121,6 +125,7 @@ class DocumentQuery {
       other.categoryId == categoryId &&
       other.favouritesOnly == favouritesOnly &&
       other.text == text &&
+      other.includeRecognizedText == includeRecognizedText &&
       other.sort == sort &&
       other.limit == limit &&
       other.matchingCategoryIds.length == matchingCategoryIds.length &&
@@ -132,6 +137,7 @@ class DocumentQuery {
     categoryId,
     favouritesOnly,
     text,
+    includeRecognizedText,
     sort,
     limit,
     Object.hashAllUnordered(matchingCategoryIds),

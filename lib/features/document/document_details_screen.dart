@@ -15,7 +15,10 @@ import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/repositories/folder_repository.dart';
 import '../../data/repositories/text_rules.dart';
+import '../../data/repositories/document_text_repository.dart';
+import '../ocr/ocr_screen.dart';
 import '../pdf_tools/pdf_tools_screen.dart';
+import '../reminders/reminder_widgets.dart';
 import '../vault/widgets/document_list.dart';
 import '../vault/widgets/document_tile.dart';
 
@@ -299,6 +302,14 @@ class _DetailsView extends ConsumerWidget {
               );
             },
           ),
+          if (!inTrash) ...[
+            const Divider(height: 24),
+            DocumentRemindersSection(
+              documentId: doc.id,
+              expiryDate: details.expiryDate,
+            ),
+            _OcrTile(details: details),
+          ],
           const Divider(height: 24),
           if (!inTrash)
             ListTile(
@@ -518,6 +529,40 @@ class _TagsTile extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// "Read text (OCR)" and, if text was saved for search, a way to delete it.
+class _OcrTile extends ConsumerWidget {
+  const _OcrTile({required this.details});
+  final DocumentDetails details;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final doc = details.document;
+    final saved = ref.watch(documentTextProvider(doc.id)).value != null;
+    return ListTile(
+      key: const Key('ocr-read'),
+      leading: const Icon(Icons.document_scanner_outlined),
+      title: Text(l.ocrRead),
+      subtitle: saved ? Text(l.ocrSavedTile) : null,
+      trailing: saved
+          ? IconButton(
+              tooltip: l.ocrDeleteSaved,
+              icon: const Icon(Icons.delete_sweep_outlined),
+              onPressed: () async {
+                final messenger = ScaffoldMessenger.of(context);
+                final repo = await ref.read(
+                  documentTextRepositoryProvider.future,
+                );
+                await repo.delete(doc.id);
+                messenger.showSnackBar(SnackBar(content: Text(l.ocrDeleted)));
+              },
+            )
+          : null,
+      onTap: () => OcrFlows.read(context, ref, details),
     );
   }
 }

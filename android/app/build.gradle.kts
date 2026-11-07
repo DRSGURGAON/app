@@ -52,6 +52,9 @@ dependencies {
     // no camera permission in DocSafe). Same artifact/version the Flutter plugin pins.
     implementation("com.google.android.gms:play-services-mlkit-document-scanner:16.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    // Phase 5 OCR: on-device text recognition, Devanagari model (also reads Latin) bundled
+    // in the APK, so nothing is downloaded and no image leaves the device.
+    implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
 
     // Versions aligned with what Flutter's integration_test plugin puts on the debug runtime
     // classpath; Gradle's consistent resolution rejects anything newer here.

@@ -854,6 +854,56 @@ data class PageOverlay (
     return "PageOverlay(pageIndex=$pageIndex, png=${png.contentToString()})"
   }
 }
+
+/**
+ * Text recognised on the device (Phase 5). Shown to the user for
+ * confirmation; never stored without it.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class OcrResult (
+  val text: String,
+  val pagesRead: Long,
+  val pageCount: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): OcrResult {
+      val text = pigeonVar_list[0] as String
+      val pagesRead = pigeonVar_list[1] as Long
+      val pageCount = pigeonVar_list[2] as Long
+      return OcrResult(text, pagesRead, pageCount)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      text,
+      pagesRead,
+      pageCount,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as OcrResult
+    return SecurityApiPigeonUtils.deepEquals(this.text, other.text) && SecurityApiPigeonUtils.deepEquals(this.pagesRead, other.pagesRead) && SecurityApiPigeonUtils.deepEquals(this.pageCount, other.pageCount)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.text)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.pagesRead)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.pageCount)
+    return result
+  }
+  override fun toString(): String {
+    return "OcrResult(text=$text, pagesRead=$pagesRead, pageCount=$pageCount)"
+  }
+}
 private open class SecurityApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -947,6 +997,11 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
           PageOverlay.fromList(it)
         }
       }
+      147.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          OcrResult.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1022,6 +1077,10 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       is PageOverlay -> {
         stream.write(146)
+        writeValue(stream, value.toList())
+      }
+      is OcrResult -> {
+        stream.write(147)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1123,6 +1182,24 @@ interface SecurityHostApi {
    * hidden under "cover" marks. Errors: PDF_UNREADABLE.
    */
   suspend fun flattenPages(fileId: String, overlays: List<PageOverlay>): ImportedFile
+  /**
+   * On-device OCR (ML Kit, bundled model) of a vault document: images, or the
+   * first [maxPages] pages of a PDF. Errors: PDF_UNREADABLE, OCR_FAILED.
+   */
+  suspend fun recognizeText(fileId: String, mimeType: String, maxPages: Long): OcrResult
+  /**
+   * Replaces the reminder schedule: epoch milliseconds only (the sole
+   * reminder data kept outside the encrypted database). Requires unlock.
+   */
+  suspend fun setReminderSchedule(epochMillis: List<Long>)
+  /** Whether DocSafe may post notifications (permission + system switch). */
+  fun notificationsEnabled(): Boolean
+  /** Android 13+: shows the system permission dialog. Returns the result. */
+  suspend fun requestNotificationPermission(): Boolean
+  /** Opens the system notification settings for DocSafe. */
+  fun openNotificationSettings()
+  /** "reminders" if the app was opened from a reminder notification; consumed. */
+  fun takeLaunchTarget(): String?
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -1677,6 +1754,110 @@ interface SecurityHostApi {
               }
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.recognizeText$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileIdArg = args[0] as String
+            val mimeTypeArg = args[1] as String
+            val maxPagesArg = args[2] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.recognizeText(fileIdArg, mimeTypeArg, maxPagesArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.setReminderSchedule$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val epochMillisArg = args[0] as List<Long>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.setReminderSchedule(epochMillisArg)
+                listOf(null)
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.notificationsEnabled$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.notificationsEnabled())
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.requestNotificationPermission$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.requestNotificationPermission())
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.openNotificationSettings$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              api.openNotificationSettings()
+              listOf(null)
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.takeLaunchTarget$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.takeLaunchTarget())
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

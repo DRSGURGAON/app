@@ -593,5 +593,98 @@
         "type": "String"
       }
     }
+  },
+  "navReminders": "रिमाइंडर",
+  "errorOcrFailed": "इस दस्तावेज़ से टेक्स्ट नहीं पढ़ा जा सका। दोबारा कोशिश करें या साफ़ स्कैन का उपयोग करें।",
+  "remindersTitle": "रिमाइंडर",
+  "remindersUpcoming": "आने वाले रिमाइंडर",
+  "remindersExpiringDocs": "आगे की समाप्ति तिथियां",
+  "remindersExpiredDocs": "समाप्त हो चुके दस्तावेज़",
+  "remindersEmpty": "अभी कोई रिमाइंडर नहीं। कोई दस्तावेज़ खोलें और “रिमाइंडर जोड़ें” पर टैप करें।",
+  "remindersNoExpired": "कोई समाप्त दस्तावेज़ नहीं।",
+  "remindersNoUpcomingExpiry": "भविष्य की समाप्ति तिथि वाला कोई दस्तावेज़ नहीं।",
+  "remindersPrivacyNote": "रिमाइंडर सूचनाओं में कभी दस्तावेज़ का नाम या सामग्री नहीं दिखती।",
+  "remindersInactive": "समाप्ति तिथि नहीं — निष्क्रिय",
+  "reminderCustom": "चुनी हुई तारीख़ पर",
+  "reminderOnExpiryDay": "समाप्ति के दिन",
+  "reminderPast": "बीत गया",
+  "reminderDelete": "रिमाइंडर हटाएं",
+  "reminderAdd": "रिमाइंडर जोड़ें",
+  "reminderAddTitle": "मुझे याद दिलाएं",
+  "reminderPickDate": "किसी तारीख़ पर…",
+  "reminderNeedsExpiry": "समाप्ति रिमाइंडर के लिए समाप्ति तिथि जोड़ें।",
+  "reminderAdded": "रिमाइंडर जोड़ा गया",
+  "reminderLimitFeature": "3 से ज़्यादा सक्रिय रिमाइंडर",
+  "notificationsOff": "सूचनाएं बंद हैं, इसलिए रिमाइंडर आपको सूचित नहीं कर सकते।",
+  "notificationsTurnOn": "चालू करें",
+  "notificationsOpenSettings": "सेटिंग्स",
+  "detailsReminders": "रिमाइंडर",
+  "ocrRead": "टेक्स्ट पढ़ें (OCR)",
+  "ocrTitle": "मिला हुआ टेक्स्ट",
+  "ocrOnDevice": "इसी डिवाइस पर पढ़ा गया। कुछ भी अपलोड नहीं होता। आधार और पैन नंबर छिपाए गए हैं।",
+  "ocrNothingFound": "इस दस्तावेज़ में कोई टेक्स्ट नहीं मिला।",
+  "ocrSuggestions": "सुझाव — लागू करने से पहले जांचें",
+  "ocrApply": "लागू करें",
+  "ocrApplied": "लागू किया गया",
+  "ocrSaveForSearch": "खोज के लिए टेक्स्ट सहेजें",
+  "ocrSavedForSearch": "खोज के लिए टेक्स्ट सहेजा गया",
+  "ocrSearchFeature": "दस्तावेज़ों के अंदर खोज (OCR)",
+  "ocrSavedTile": "खोज के लिए पहचाना गया टेक्स्ट सहेजा है",
+  "ocrDeleteSaved": "सहेजा टेक्स्ट हटाएं",
+  "ocrDeleted": "सहेजा टेक्स्ट हटाया गया",
+  "searchInsideText": "दस्तावेज़ों के अंदर",
+  "reminderDaysBefore": "{days, plural, =1{समाप्ति से 1 दिन पहले} other{समाप्ति से {days} दिन पहले}}",
+  "@reminderDaysBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersFreeUsage": "फ़्री प्लान: {limit} में से {used} सक्रिय रिमाइंडर",
+  "@remindersFreeUsage": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "ocrPagesRead": "{total} में से पहले {read} पेज पढ़े गए।",
+  "@ocrPagesRead": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ocrSuggestedCategory": "श्रेणी: {name}",
+  "@ocrSuggestedCategory": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ocrSuggestedExpiry": "समाप्ति तिथि: {date}",
+  "@ocrSuggestedExpiry": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderOnDate": "{date} को",
+  "@reminderOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

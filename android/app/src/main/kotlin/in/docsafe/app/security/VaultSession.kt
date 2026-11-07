@@ -102,6 +102,8 @@ class VaultSession private constructor(context: Context) {
         biometric.clear()
         pinManager.clear()
         KeystoreKeys.deleteAll()
+        // Reminder times (the only reminder data outside the encrypted database).
+        `in`.docsafe.app.reminders.ReminderScheduler(appContext).clear()
     }
 
     class SessionLockedException : Exception("Session locked")

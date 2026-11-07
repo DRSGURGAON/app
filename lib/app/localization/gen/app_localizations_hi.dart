@@ -1216,4 +1216,164 @@ class AppLocalizationsHi extends AppLocalizations {
   String annotatedNote(String title) {
     return '“$title” की एनोटेटेड कॉपी, DocSafe में बनाई गई। यह मूल दस्तावेज़ नहीं है।';
   }
+
+  @override
+  String get navReminders => 'रिमाइंडर';
+
+  @override
+  String get errorOcrFailed =>
+      'इस दस्तावेज़ से टेक्स्ट नहीं पढ़ा जा सका। दोबारा कोशिश करें या साफ़ स्कैन का उपयोग करें।';
+
+  @override
+  String get remindersTitle => 'रिमाइंडर';
+
+  @override
+  String get remindersUpcoming => 'आने वाले रिमाइंडर';
+
+  @override
+  String get remindersExpiringDocs => 'आगे की समाप्ति तिथियां';
+
+  @override
+  String get remindersExpiredDocs => 'समाप्त हो चुके दस्तावेज़';
+
+  @override
+  String get remindersEmpty =>
+      'अभी कोई रिमाइंडर नहीं। कोई दस्तावेज़ खोलें और “रिमाइंडर जोड़ें” पर टैप करें।';
+
+  @override
+  String get remindersNoExpired => 'कोई समाप्त दस्तावेज़ नहीं।';
+
+  @override
+  String get remindersNoUpcomingExpiry =>
+      'भविष्य की समाप्ति तिथि वाला कोई दस्तावेज़ नहीं।';
+
+  @override
+  String get remindersPrivacyNote =>
+      'रिमाइंडर सूचनाओं में कभी दस्तावेज़ का नाम या सामग्री नहीं दिखती।';
+
+  @override
+  String get remindersInactive => 'समाप्ति तिथि नहीं — निष्क्रिय';
+
+  @override
+  String get reminderCustom => 'चुनी हुई तारीख़ पर';
+
+  @override
+  String get reminderOnExpiryDay => 'समाप्ति के दिन';
+
+  @override
+  String get reminderPast => 'बीत गया';
+
+  @override
+  String get reminderDelete => 'रिमाइंडर हटाएं';
+
+  @override
+  String get reminderAdd => 'रिमाइंडर जोड़ें';
+
+  @override
+  String get reminderAddTitle => 'मुझे याद दिलाएं';
+
+  @override
+  String get reminderPickDate => 'किसी तारीख़ पर…';
+
+  @override
+  String get reminderNeedsExpiry =>
+      'समाप्ति रिमाइंडर के लिए समाप्ति तिथि जोड़ें।';
+
+  @override
+  String get reminderAdded => 'रिमाइंडर जोड़ा गया';
+
+  @override
+  String get reminderLimitFeature => '3 से ज़्यादा सक्रिय रिमाइंडर';
+
+  @override
+  String get notificationsOff =>
+      'सूचनाएं बंद हैं, इसलिए रिमाइंडर आपको सूचित नहीं कर सकते।';
+
+  @override
+  String get notificationsTurnOn => 'चालू करें';
+
+  @override
+  String get notificationsOpenSettings => 'सेटिंग्स';
+
+  @override
+  String get detailsReminders => 'रिमाइंडर';
+
+  @override
+  String get ocrRead => 'टेक्स्ट पढ़ें (OCR)';
+
+  @override
+  String get ocrTitle => 'मिला हुआ टेक्स्ट';
+
+  @override
+  String get ocrOnDevice =>
+      'इसी डिवाइस पर पढ़ा गया। कुछ भी अपलोड नहीं होता। आधार और पैन नंबर छिपाए गए हैं।';
+
+  @override
+  String get ocrNothingFound => 'इस दस्तावेज़ में कोई टेक्स्ट नहीं मिला।';
+
+  @override
+  String get ocrSuggestions => 'सुझाव — लागू करने से पहले जांचें';
+
+  @override
+  String get ocrApply => 'लागू करें';
+
+  @override
+  String get ocrApplied => 'लागू किया गया';
+
+  @override
+  String get ocrSaveForSearch => 'खोज के लिए टेक्स्ट सहेजें';
+
+  @override
+  String get ocrSavedForSearch => 'खोज के लिए टेक्स्ट सहेजा गया';
+
+  @override
+  String get ocrSearchFeature => 'दस्तावेज़ों के अंदर खोज (OCR)';
+
+  @override
+  String get ocrSavedTile => 'खोज के लिए पहचाना गया टेक्स्ट सहेजा है';
+
+  @override
+  String get ocrDeleteSaved => 'सहेजा टेक्स्ट हटाएं';
+
+  @override
+  String get ocrDeleted => 'सहेजा टेक्स्ट हटाया गया';
+
+  @override
+  String get searchInsideText => 'दस्तावेज़ों के अंदर';
+
+  @override
+  String reminderDaysBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: 'समाप्ति से $days दिन पहले',
+      one: 'समाप्ति से 1 दिन पहले',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersFreeUsage(int used, int limit) {
+    return 'फ़्री प्लान: $limit में से $used सक्रिय रिमाइंडर';
+  }
+
+  @override
+  String ocrPagesRead(int read, int total) {
+    return '$total में से पहले $read पेज पढ़े गए।';
+  }
+
+  @override
+  String ocrSuggestedCategory(String name) {
+    return 'श्रेणी: $name';
+  }
+
+  @override
+  String ocrSuggestedExpiry(String date) {
+    return 'समाप्ति तिथि: $date';
+  }
+
+  @override
+  String reminderOnDate(String date) {
+    return '$date को';
+  }
 }

@@ -2191,6 +2191,276 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Annotated copy of “{title}”, made in DocSafe. This is not the original document.'**
   String annotatedNote(String title);
+
+  /// No description provided for @navReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get navReminders;
+
+  /// No description provided for @errorOcrFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Text could not be read from this document. Try again or use a clearer scan.'**
+  String get errorOcrFailed;
+
+  /// No description provided for @remindersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get remindersTitle;
+
+  /// No description provided for @remindersUpcoming.
+  ///
+  /// In en, this message translates to:
+  /// **'Upcoming reminders'**
+  String get remindersUpcoming;
+
+  /// No description provided for @remindersExpiringDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry dates ahead'**
+  String get remindersExpiringDocs;
+
+  /// No description provided for @remindersExpiredDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired documents'**
+  String get remindersExpiredDocs;
+
+  /// No description provided for @remindersEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet. Open a document and tap “Add reminder”.'**
+  String get remindersEmpty;
+
+  /// No description provided for @remindersNoExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'No expired documents.'**
+  String get remindersNoExpired;
+
+  /// No description provided for @remindersNoUpcomingExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents with a future expiry date.'**
+  String get remindersNoUpcomingExpiry;
+
+  /// No description provided for @remindersPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder notifications never show the document name or contents.'**
+  String get remindersPrivacyNote;
+
+  /// No description provided for @remindersInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiry date — inactive'**
+  String get remindersInactive;
+
+  /// No description provided for @reminderCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'On a chosen date'**
+  String get reminderCustom;
+
+  /// No description provided for @reminderOnExpiryDay.
+  ///
+  /// In en, this message translates to:
+  /// **'On the expiry day'**
+  String get reminderOnExpiryDay;
+
+  /// No description provided for @reminderPast.
+  ///
+  /// In en, this message translates to:
+  /// **'Passed'**
+  String get reminderPast;
+
+  /// No description provided for @reminderDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete reminder'**
+  String get reminderDelete;
+
+  /// No description provided for @reminderAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add reminder'**
+  String get reminderAdd;
+
+  /// No description provided for @reminderAddTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind me'**
+  String get reminderAddTitle;
+
+  /// No description provided for @reminderPickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'On a date…'**
+  String get reminderPickDate;
+
+  /// No description provided for @reminderNeedsExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an expiry date to get expiry reminders.'**
+  String get reminderNeedsExpiry;
+
+  /// No description provided for @reminderAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminder added'**
+  String get reminderAdded;
+
+  /// No description provided for @reminderLimitFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'More than 3 active reminders'**
+  String get reminderLimitFeature;
+
+  /// No description provided for @notificationsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications are off, so reminders can\'t alert you.'**
+  String get notificationsOff;
+
+  /// No description provided for @notificationsTurnOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on'**
+  String get notificationsTurnOn;
+
+  /// No description provided for @notificationsOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get notificationsOpenSettings;
+
+  /// No description provided for @detailsReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Reminders'**
+  String get detailsReminders;
+
+  /// No description provided for @ocrRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read text (OCR)'**
+  String get ocrRead;
+
+  /// No description provided for @ocrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Text found'**
+  String get ocrTitle;
+
+  /// No description provided for @ocrOnDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Read on this device. Nothing is uploaded. Aadhaar and PAN numbers are masked.'**
+  String get ocrOnDevice;
+
+  /// No description provided for @ocrNothingFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No text was found in this document.'**
+  String get ocrNothingFound;
+
+  /// No description provided for @ocrSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions — check before applying'**
+  String get ocrSuggestions;
+
+  /// No description provided for @ocrApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get ocrApply;
+
+  /// No description provided for @ocrApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Applied'**
+  String get ocrApplied;
+
+  /// No description provided for @ocrSaveForSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Save text for search'**
+  String get ocrSaveForSearch;
+
+  /// No description provided for @ocrSavedForSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Text saved for search'**
+  String get ocrSavedForSearch;
+
+  /// No description provided for @ocrSearchFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Search inside documents (OCR)'**
+  String get ocrSearchFeature;
+
+  /// No description provided for @ocrSavedTile.
+  ///
+  /// In en, this message translates to:
+  /// **'Recognised text saved for search'**
+  String get ocrSavedTile;
+
+  /// No description provided for @ocrDeleteSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete saved text'**
+  String get ocrDeleteSaved;
+
+  /// No description provided for @ocrDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved text deleted'**
+  String get ocrDeleted;
+
+  /// No description provided for @searchInsideText.
+  ///
+  /// In en, this message translates to:
+  /// **'Inside documents'**
+  String get searchInsideText;
+
+  /// No description provided for @reminderDaysBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'{days, plural, =1{1 day before expiry} other{{days} days before expiry}}'**
+  String reminderDaysBefore(int days);
+
+  /// No description provided for @remindersFreeUsage.
+  ///
+  /// In en, this message translates to:
+  /// **'Free plan: {used} of {limit} active reminders'**
+  String remindersFreeUsage(int used, int limit);
+
+  /// No description provided for @ocrPagesRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the first {read} of {total} pages.'**
+  String ocrPagesRead(int read, int total);
+
+  /// No description provided for @ocrSuggestedCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category: {name}'**
+  String ocrSuggestedCategory(String name);
+
+  /// No description provided for @ocrSuggestedExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry date: {date}'**
+  String ocrSuggestedExpiry(String date);
+
+  /// No description provided for @reminderOnDate.
+  ///
+  /// In en, this message translates to:
+  /// **'On {date}'**
+  String reminderOnDate(String date);
 }
 
 class _AppLocalizationsDelegate

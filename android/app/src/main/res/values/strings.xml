@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">DocSafe</string>
+    <!-- Reminder notifications are deliberately generic: never a document title or content. -->
+    <string name="reminder_channel_name">Document reminders</string>
+    <string name="reminder_channel_description">Expiry and other reminders you set in DocSafe</string>
+    <string name="reminder_notification_title">DocSafe reminder</string>
+    <string name="reminder_notification_text">A document in your vault needs attention. Open DocSafe to see it.</string>
 </resources>

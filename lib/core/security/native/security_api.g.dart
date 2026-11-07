@@ -797,6 +797,62 @@ class PageOverlay {
   }
 }
 
+/// Text recognised on the device (Phase 5). Shown to the user for
+/// confirmation; never stored without it.
+class OcrResult {
+  OcrResult({
+    required this.text,
+    required this.pagesRead,
+    required this.pageCount,
+  });
+
+  String text;
+
+  int pagesRead;
+
+  int pageCount;
+
+  List<Object?> _toList() {
+    return <Object?>[text, pagesRead, pageCount];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static OcrResult decode(Object result) {
+    result as List<Object?>;
+    return OcrResult(
+      text: result[0]! as String,
+      pagesRead: result[1]! as int,
+      pageCount: result[2]! as int,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! OcrResult || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(text, other.text) &&
+        _deepEquals(pagesRead, other.pagesRead) &&
+        _deepEquals(pageCount, other.pageCount);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'OcrResult(text: $text, pagesRead: $pagesRead, pageCount: $pageCount)';
+  }
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -858,6 +914,9 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is PageOverlay) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
+    } else if (value is OcrResult) {
+      buffer.putUint8(147);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -908,6 +967,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return ImagePageSpec.decode(readValue(buffer)!);
       case 146:
         return PageOverlay.decode(readValue(buffer)!);
+      case 147:
+        return OcrResult.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1574,6 +1635,134 @@ class SecurityHostApi {
       isNullValid: false,
     );
     return pigeonVar_replyValue! as ImportedFile;
+  }
+
+  /// On-device OCR (ML Kit, bundled model) of a vault document: images, or the
+  /// first [maxPages] pages of a PDF. Errors: PDF_UNREADABLE, OCR_FAILED.
+  Future<OcrResult> recognizeText(
+    String fileId,
+    String mimeType,
+    int maxPages,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.recognizeText$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, mimeType, maxPages],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as OcrResult;
+  }
+
+  /// Replaces the reminder schedule: epoch milliseconds only (the sole
+  /// reminder data kept outside the encrypted database). Requires unlock.
+  Future<void> setReminderSchedule(List<int> epochMillis) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setReminderSchedule$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[epochMillis],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+  }
+
+  /// Whether DocSafe may post notifications (permission + system switch).
+  Future<bool> notificationsEnabled() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.notificationsEnabled$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Android 13+: shows the system permission dialog. Returns the result.
+  Future<bool> requestNotificationPermission() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.requestNotificationPermission$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Opens the system notification settings for DocSafe.
+  Future<void> openNotificationSettings() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.openNotificationSettings$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+  }
+
+  /// "reminders" if the app was opened from a reminder notification; consumed.
+  Future<String?> takeLaunchTarget() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.takeLaunchTarget$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as String?;
   }
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").

@@ -593,5 +593,98 @@
         "type": "String"
       }
     }
+  },
+  "navReminders": "Reminders",
+  "errorOcrFailed": "Text could not be read from this document. Try again or use a clearer scan.",
+  "remindersTitle": "Reminders",
+  "remindersUpcoming": "Upcoming reminders",
+  "remindersExpiringDocs": "Expiry dates ahead",
+  "remindersExpiredDocs": "Expired documents",
+  "remindersEmpty": "No reminders yet. Open a document and tap “Add reminder”.",
+  "remindersNoExpired": "No expired documents.",
+  "remindersNoUpcomingExpiry": "No documents with a future expiry date.",
+  "remindersPrivacyNote": "Reminder notifications never show the document name or contents.",
+  "remindersInactive": "No expiry date — inactive",
+  "reminderCustom": "On a chosen date",
+  "reminderOnExpiryDay": "On the expiry day",
+  "reminderPast": "Passed",
+  "reminderDelete": "Delete reminder",
+  "reminderAdd": "Add reminder",
+  "reminderAddTitle": "Remind me",
+  "reminderPickDate": "On a date…",
+  "reminderNeedsExpiry": "Add an expiry date to get expiry reminders.",
+  "reminderAdded": "Reminder added",
+  "reminderLimitFeature": "More than 3 active reminders",
+  "notificationsOff": "Notifications are off, so reminders can't alert you.",
+  "notificationsTurnOn": "Turn on",
+  "notificationsOpenSettings": "Settings",
+  "detailsReminders": "Reminders",
+  "ocrRead": "Read text (OCR)",
+  "ocrTitle": "Text found",
+  "ocrOnDevice": "Read on this device. Nothing is uploaded. Aadhaar and PAN numbers are masked.",
+  "ocrNothingFound": "No text was found in this document.",
+  "ocrSuggestions": "Suggestions — check before applying",
+  "ocrApply": "Apply",
+  "ocrApplied": "Applied",
+  "ocrSaveForSearch": "Save text for search",
+  "ocrSavedForSearch": "Text saved for search",
+  "ocrSearchFeature": "Search inside documents (OCR)",
+  "ocrSavedTile": "Recognised text saved for search",
+  "ocrDeleteSaved": "Delete saved text",
+  "ocrDeleted": "Saved text deleted",
+  "searchInsideText": "Inside documents",
+  "reminderDaysBefore": "{days, plural, =1{1 day before expiry} other{{days} days before expiry}}",
+  "@reminderDaysBefore": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "remindersFreeUsage": "Free plan: {used} of {limit} active reminders",
+  "@remindersFreeUsage": {
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      }
+    }
+  },
+  "ocrPagesRead": "Read the first {read} of {total} pages.",
+  "@ocrPagesRead": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "ocrSuggestedCategory": "Category: {name}",
+  "@ocrSuggestedCategory": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ocrSuggestedExpiry": "Expiry date: {date}",
+  "@ocrSuggestedExpiry": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderOnDate": "On {date}",
+  "@reminderOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
   }
 }

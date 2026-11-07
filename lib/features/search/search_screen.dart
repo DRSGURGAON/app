@@ -6,13 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/localization/display_names.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/widgets/states.dart';
+import '../../core/entitlement/entitlement.dart';
 import '../../data/models/vault_document.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/document_repository.dart';
+import '../premium/premium_screen.dart';
 import '../vault/widgets/document_list.dart';
 
 /// Free search over titles, tags and (localised) category names.
-/// OCR text search inside documents is a Premium feature (Phase 5/6).
+/// Search inside recognised (OCR) text is Premium.
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
 
@@ -24,6 +26,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   final _controller = TextEditingController();
   Timer? _debounce;
   String _query = '';
+  bool _insideText = true;
 
   @override
   void dispose() {
@@ -43,6 +46,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final categories = ref.watch(categoriesProvider).value ?? const [];
+    final premium = ref.watch(premiumUnlockedProvider);
     final lower = _query.toLowerCase();
     final matchingCategories = {
       for (final c in categories)
@@ -80,13 +84,41 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ? EmptyState(icon: Icons.search, title: l.searchEmptyQuery)
           : CustomScrollView(
               slivers: [
-                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: FilterChip(
+                        key: const Key('search-inside-text'),
+                        avatar: premium
+                            ? null
+                            : const Icon(Icons.lock_outline, size: 18),
+                        label: Text(l.searchInsideText),
+                        selected: premium && _insideText,
+                        onSelected: (v) {
+                          if (!premium) {
+                            Navigator.of(context).push(
+                              MaterialPageRoute<void>(
+                                builder: (_) =>
+                                    PremiumScreen(feature: l.ocrSearchFeature),
+                              ),
+                            );
+                            return;
+                          }
+                          setState(() => _insideText = v);
+                        },
+                      ),
+                    ),
+                  ),
+                ),
                 DocumentSliverList(
                   docs: ref.watch(
                     documentsProvider(
                       DocumentQuery(
                         text: _query,
                         matchingCategoryIds: matchingCategories,
+                        includeRecognizedText: premium && _insideText,
                       ),
                     ),
                   ),

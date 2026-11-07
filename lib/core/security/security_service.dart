@@ -15,6 +15,7 @@ export 'native/security_api.g.dart'
         ExportSummary,
         ImportedFile,
         KeyProtection,
+        OcrResult,
         PageOverlay,
         PinOutcome,
         PinVerifyResult,
@@ -67,6 +68,12 @@ abstract interface class SecurityService {
   Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images);
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level);
   Future<ImportedFile> flattenPages(String fileId, List<PageOverlay> overlays);
+  Future<OcrResult> recognizeText(String fileId, String mimeType, int maxPages);
+  Future<void> setReminderSchedule(List<int> epochMillis);
+  Future<bool> notificationsEnabled();
+  Future<bool> requestNotificationPermission();
+  Future<void> openNotificationSettings();
+  Future<String?> takeLaunchTarget();
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -216,6 +223,31 @@ class PigeonSecurityService implements SecurityService {
     String fileId,
     List<PageOverlay> overlays,
   ) => _guard(() => _api.flattenPages(fileId, overlays));
+
+  @override
+  Future<OcrResult> recognizeText(
+    String fileId,
+    String mimeType,
+    int maxPages,
+  ) => _guard(() => _api.recognizeText(fileId, mimeType, maxPages));
+
+  @override
+  Future<void> setReminderSchedule(List<int> epochMillis) =>
+      _guard(() => _api.setReminderSchedule(epochMillis));
+
+  @override
+  Future<bool> notificationsEnabled() => _guard(_api.notificationsEnabled);
+
+  @override
+  Future<bool> requestNotificationPermission() =>
+      _guard(_api.requestNotificationPermission);
+
+  @override
+  Future<void> openNotificationSettings() =>
+      _guard(_api.openNotificationSettings);
+
+  @override
+  Future<String?> takeLaunchTarget() => _guard(_api.takeLaunchTarget);
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

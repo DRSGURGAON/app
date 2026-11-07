@@ -9,6 +9,7 @@ import 'generated/schema.dart';
 
 import 'generated/schema_v1.dart' as v1;
 import 'generated/schema_v2.dart' as v2;
+import 'generated/schema_v3.dart' as v3;
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -143,6 +144,74 @@ void main() {
           expectedNewAppSettingsData,
           await newDb.select(newDb.appSettings).get(),
         );
+      },
+    );
+  });
+
+  test('migration from v2 to v3 keeps documents, metadata and tags', () async {
+    final created =
+        DateTime.utc(2026, 3, 4, 5, 6, 7).millisecondsSinceEpoch ~/ 1000;
+    final fileId = 'b' * 32;
+    final categories = [
+      v2.CategoriesData(
+        id: 1,
+        key: 'vehicle',
+        sortOrder: 0,
+        isDefault: 1,
+        createdAt: created,
+      ),
+    ];
+    final files = [
+      v2.EncryptedFilesData(
+        id: fileId,
+        formatVersion: 1,
+        plaintextBytes: 10,
+        ciphertextBytes: 99,
+        fingerprint: 'fp',
+        createdAt: created,
+      ),
+    ];
+    final docs = [
+      v2.DocumentsData(
+        id: 3,
+        title: 'Licence',
+        mimeType: 'application/pdf',
+        fileId: fileId,
+        categoryId: 1,
+        createdAt: created,
+        updatedAt: created,
+        folderId: null,
+        isFavourite: 1,
+      ),
+    ];
+    const metadata = [
+      v2.DocumentMetadataData(
+        documentId: 3,
+        issueDate: '2021-08-15',
+        expiryDate: '2031-08-14',
+        notes: 'n',
+      ),
+    ];
+    await verifier.testWithDataIntegrity(
+      oldVersion: 2,
+      newVersion: 3,
+      createOld: v2.DatabaseAtV2.new,
+      createNew: v3.DatabaseAtV3.new,
+      openTestedDatabase: AppDatabase.new,
+      createItems: (batch, oldDb) {
+        batch.insertAll(oldDb.categories, categories);
+        batch.insertAll(oldDb.encryptedFiles, files);
+        batch.insertAll(oldDb.documents, docs);
+        batch.insertAll(oldDb.documentMetadata, metadata);
+      },
+      validateItems: (newDb) async {
+        final d = await newDb.select(newDb.documents).getSingle();
+        expect(d.title, 'Licence');
+        expect(d.isFavourite, 1);
+        final m = await newDb.select(newDb.documentMetadata).getSingle();
+        expect(m.expiryDate, '2031-08-14');
+        expect(await newDb.select(newDb.reminders).get(), isEmpty);
+        expect(await newDb.select(newDb.documentTexts).get(), isEmpty);
       },
     );
   });

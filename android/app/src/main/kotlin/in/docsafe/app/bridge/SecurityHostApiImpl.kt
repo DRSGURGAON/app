@@ -8,7 +8,10 @@ import `in`.docsafe.app.security.BiometricAuthenticator
 import `in`.docsafe.app.security.BiometricAvailabilityState
 import `in`.docsafe.app.security.BiometricResult
 import `in`.docsafe.app.security.KeystoreKeys
+import `in`.docsafe.app.ocr.OcrEngine
+import `in`.docsafe.app.ocr.OcrFailedException
 import `in`.docsafe.app.pdf.PdfOps
+import `in`.docsafe.app.reminders.ReminderScheduler
 import `in`.docsafe.app.pdf.PdfUnreadableException
 import `in`.docsafe.app.scanner.ScanStore
 import `in`.docsafe.app.scanner.ScannerLauncher
@@ -35,6 +38,9 @@ interface SystemDocumentUi {
     suspend fun createDocument(fileName: String, mimeType: String): Uri?
 
     suspend fun openDocumentTree(): Uri?
+
+    /** Android 13+ POST_NOTIFICATIONS runtime request; true if granted. */
+    suspend fun requestNotificationPermission(): Boolean
 
     /** Launches an IntentSender (ML Kit scanner); null if it could not deliver a result. */
     suspend fun launchIntentSender(sender: android.content.IntentSender): androidx.activity.result.ActivityResult?
@@ -335,6 +341,45 @@ class SecurityHostApiImpl(
         }
     }
 
+    private val reminders by lazy { ReminderScheduler(appContext) }
+
+    override suspend fun recognizeText(fileId: String, mimeType: String, maxPages: Long): OcrResult = guard {
+        io {
+            session.requireUnlocked()
+            VaultStore.validateId(fileId)
+            val r = OcrEngine(session.vaultStore).recognize(fileId, mimeType, maxPages.toInt())
+            OcrResult(r.text, r.pagesRead.toLong(), r.pageCount.toLong())
+        }
+    }
+
+    override suspend fun setReminderSchedule(epochMillis: List<Long>) = guard {
+        io {
+            session.requireUnlocked()
+            if (epochMillis.size > ReminderScheduler.MAX_TIMES) throw InvalidInputException("Too many reminders")
+            reminders.setSchedule(epochMillis)
+        }
+    }
+
+    override fun notificationsEnabled(): Boolean = reminders.notificationsAllowed()
+
+    override suspend fun requestNotificationPermission(): Boolean = guard {
+        if (reminders.notificationsAllowed()) return@guard true
+        if (android.os.Build.VERSION.SDK_INT < 33) return@guard false
+        documentUi.requestNotificationPermission() && reminders.notificationsAllowed()
+    }
+
+    override fun openNotificationSettings() {
+        val activity = activityProvider() ?: return
+        runCatching {
+            activity.startActivity(
+                android.content.Intent(android.provider.Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    .putExtra(android.provider.Settings.EXTRA_APP_PACKAGE, appContext.packageName),
+            )
+        }
+    }
+
+    override fun takeLaunchTarget(): String? = LaunchTarget.take()
+
     private fun VaultStore.ImportResult.toPigeon(mime: String) = ImportedFile(
         fileId = fileId,
         displayName = "",
@@ -373,6 +418,7 @@ class SecurityHostApiImpl(
             is VaultSession.SessionLockedException -> ERR_LOCKED
             is ScannerUnavailableException -> ERR_SCANNER_UNAVAILABLE
             is PdfUnreadableException -> ERR_PDF_UNREADABLE
+            is OcrFailedException -> ERR_OCR_FAILED
             is IntegrityException -> ERR_INTEGRITY
             is FormatException -> ERR_INTEGRITY
             is InsufficientStorageException -> ERR_LOW_STORAGE
@@ -435,6 +481,19 @@ class SecurityHostApiImpl(
         const val ERR_BUSY = "BUSY"
         const val ERR_SCANNER_UNAVAILABLE = "SCANNER_UNAVAILABLE"
         const val ERR_PDF_UNREADABLE = "PDF_UNREADABLE"
+        const val ERR_OCR_FAILED = "OCR_FAILED"
         const val ERR_UNKNOWN = "UNKNOWN"
     }
+}
+
+/** Where a notification asked the app to open; read once by Dart after unlock. */
+object LaunchTarget {
+    @Volatile
+    private var target: String? = null
+
+    fun set(value: String?) {
+        if (value == ReminderScheduler.OPEN_REMINDERS) target = value
+    }
+
+    fun take(): String? = target.also { target = null }
 }

@@ -31,13 +31,15 @@ const defaultCategoryKeys = <String>[
     DocumentMetadata,
     RecentlyDeleted,
     AppSettings,
+    Reminders,
+    DocumentTexts,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.e);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -71,6 +73,11 @@ class AppDatabase extends _$AppDatabase {
         await m.createIndex(schema.idxDocumentMetadataExpiry);
         await m.createTable(schema.recentlyDeleted);
         await m.createIndex(schema.idxRecentlyDeletedAt);
+      },
+      from2To3: (m, schema) async {
+        await m.createTable(schema.reminders);
+        await m.createIndex(schema.idxRemindersDocument);
+        await m.createTable(schema.documentTexts);
       },
     ),
     beforeOpen: (details) async {

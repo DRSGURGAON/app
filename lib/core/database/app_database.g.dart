@@ -2941,6 +2941,784 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }
 }
 
+class $RemindersTable extends Reminders
+    with TableInfo<$RemindersTable, Reminder> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RemindersTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _documentIdMeta = const VerificationMeta(
+    'documentId',
+  );
+  @override
+  late final GeneratedColumn<int> documentId = GeneratedColumn<int>(
+    'document_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES documents (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _kindMeta = const VerificationMeta('kind');
+  @override
+  late final GeneratedColumn<String> kind = GeneratedColumn<String>(
+    'kind',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 10,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _offsetDaysMeta = const VerificationMeta(
+    'offsetDays',
+  );
+  @override
+  late final GeneratedColumn<int> offsetDays = GeneratedColumn<int>(
+    'offset_days',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _remindOnMeta = const VerificationMeta(
+    'remindOn',
+  );
+  @override
+  late final GeneratedColumn<String> remindOn = GeneratedColumn<String>(
+    'remind_on',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 10,
+      maxTextLength: 10,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    documentId,
+    kind,
+    offsetDays,
+    remindOn,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'reminders';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Reminder> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('document_id')) {
+      context.handle(
+        _documentIdMeta,
+        documentId.isAcceptableOrUnknown(data['document_id']!, _documentIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_documentIdMeta);
+    }
+    if (data.containsKey('kind')) {
+      context.handle(
+        _kindMeta,
+        kind.isAcceptableOrUnknown(data['kind']!, _kindMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_kindMeta);
+    }
+    if (data.containsKey('offset_days')) {
+      context.handle(
+        _offsetDaysMeta,
+        offsetDays.isAcceptableOrUnknown(data['offset_days']!, _offsetDaysMeta),
+      );
+    }
+    if (data.containsKey('remind_on')) {
+      context.handle(
+        _remindOnMeta,
+        remindOn.isAcceptableOrUnknown(data['remind_on']!, _remindOnMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Reminder map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Reminder(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      documentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}document_id'],
+      )!,
+      kind: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}kind'],
+      )!,
+      offsetDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}offset_days'],
+      ),
+      remindOn: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remind_on'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $RemindersTable createAlias(String alias) {
+    return $RemindersTable(attachedDatabase, alias);
+  }
+}
+
+class Reminder extends DataClass implements Insertable<Reminder> {
+  final int id;
+  final int documentId;
+  final String kind;
+  final int? offsetDays;
+  final String? remindOn;
+  final DateTime createdAt;
+  const Reminder({
+    required this.id,
+    required this.documentId,
+    required this.kind,
+    this.offsetDays,
+    this.remindOn,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['document_id'] = Variable<int>(documentId);
+    map['kind'] = Variable<String>(kind);
+    if (!nullToAbsent || offsetDays != null) {
+      map['offset_days'] = Variable<int>(offsetDays);
+    }
+    if (!nullToAbsent || remindOn != null) {
+      map['remind_on'] = Variable<String>(remindOn);
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  RemindersCompanion toCompanion(bool nullToAbsent) {
+    return RemindersCompanion(
+      id: Value(id),
+      documentId: Value(documentId),
+      kind: Value(kind),
+      offsetDays: offsetDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(offsetDays),
+      remindOn: remindOn == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remindOn),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory Reminder.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Reminder(
+      id: serializer.fromJson<int>(json['id']),
+      documentId: serializer.fromJson<int>(json['documentId']),
+      kind: serializer.fromJson<String>(json['kind']),
+      offsetDays: serializer.fromJson<int?>(json['offsetDays']),
+      remindOn: serializer.fromJson<String?>(json['remindOn']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'documentId': serializer.toJson<int>(documentId),
+      'kind': serializer.toJson<String>(kind),
+      'offsetDays': serializer.toJson<int?>(offsetDays),
+      'remindOn': serializer.toJson<String?>(remindOn),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  Reminder copyWith({
+    int? id,
+    int? documentId,
+    String? kind,
+    Value<int?> offsetDays = const Value.absent(),
+    Value<String?> remindOn = const Value.absent(),
+    DateTime? createdAt,
+  }) => Reminder(
+    id: id ?? this.id,
+    documentId: documentId ?? this.documentId,
+    kind: kind ?? this.kind,
+    offsetDays: offsetDays.present ? offsetDays.value : this.offsetDays,
+    remindOn: remindOn.present ? remindOn.value : this.remindOn,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  Reminder copyWithCompanion(RemindersCompanion data) {
+    return Reminder(
+      id: data.id.present ? data.id.value : this.id,
+      documentId: data.documentId.present
+          ? data.documentId.value
+          : this.documentId,
+      kind: data.kind.present ? data.kind.value : this.kind,
+      offsetDays: data.offsetDays.present
+          ? data.offsetDays.value
+          : this.offsetDays,
+      remindOn: data.remindOn.present ? data.remindOn.value : this.remindOn,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Reminder(')
+          ..write('id: $id, ')
+          ..write('documentId: $documentId, ')
+          ..write('kind: $kind, ')
+          ..write('offsetDays: $offsetDays, ')
+          ..write('remindOn: $remindOn, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, documentId, kind, offsetDays, remindOn, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Reminder &&
+          other.id == this.id &&
+          other.documentId == this.documentId &&
+          other.kind == this.kind &&
+          other.offsetDays == this.offsetDays &&
+          other.remindOn == this.remindOn &&
+          other.createdAt == this.createdAt);
+}
+
+class RemindersCompanion extends UpdateCompanion<Reminder> {
+  final Value<int> id;
+  final Value<int> documentId;
+  final Value<String> kind;
+  final Value<int?> offsetDays;
+  final Value<String?> remindOn;
+  final Value<DateTime> createdAt;
+  const RemindersCompanion({
+    this.id = const Value.absent(),
+    this.documentId = const Value.absent(),
+    this.kind = const Value.absent(),
+    this.offsetDays = const Value.absent(),
+    this.remindOn = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  RemindersCompanion.insert({
+    this.id = const Value.absent(),
+    required int documentId,
+    required String kind,
+    this.offsetDays = const Value.absent(),
+    this.remindOn = const Value.absent(),
+    required DateTime createdAt,
+  }) : documentId = Value(documentId),
+       kind = Value(kind),
+       createdAt = Value(createdAt);
+  static Insertable<Reminder> custom({
+    Expression<int>? id,
+    Expression<int>? documentId,
+    Expression<String>? kind,
+    Expression<int>? offsetDays,
+    Expression<String>? remindOn,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (documentId != null) 'document_id': documentId,
+      if (kind != null) 'kind': kind,
+      if (offsetDays != null) 'offset_days': offsetDays,
+      if (remindOn != null) 'remind_on': remindOn,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  RemindersCompanion copyWith({
+    Value<int>? id,
+    Value<int>? documentId,
+    Value<String>? kind,
+    Value<int?>? offsetDays,
+    Value<String?>? remindOn,
+    Value<DateTime>? createdAt,
+  }) {
+    return RemindersCompanion(
+      id: id ?? this.id,
+      documentId: documentId ?? this.documentId,
+      kind: kind ?? this.kind,
+      offsetDays: offsetDays ?? this.offsetDays,
+      remindOn: remindOn ?? this.remindOn,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (documentId.present) {
+      map['document_id'] = Variable<int>(documentId.value);
+    }
+    if (kind.present) {
+      map['kind'] = Variable<String>(kind.value);
+    }
+    if (offsetDays.present) {
+      map['offset_days'] = Variable<int>(offsetDays.value);
+    }
+    if (remindOn.present) {
+      map['remind_on'] = Variable<String>(remindOn.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RemindersCompanion(')
+          ..write('id: $id, ')
+          ..write('documentId: $documentId, ')
+          ..write('kind: $kind, ')
+          ..write('offsetDays: $offsetDays, ')
+          ..write('remindOn: $remindOn, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $DocumentTextsTable extends DocumentTexts
+    with TableInfo<$DocumentTextsTable, DocumentText> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $DocumentTextsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _documentIdMeta = const VerificationMeta(
+    'documentId',
+  );
+  @override
+  late final GeneratedColumn<int> documentId = GeneratedColumn<int>(
+    'document_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES documents (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 200000),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pagesReadMeta = const VerificationMeta(
+    'pagesRead',
+  );
+  @override
+  late final GeneratedColumn<int> pagesRead = GeneratedColumn<int>(
+    'pages_read',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pageCountMeta = const VerificationMeta(
+    'pageCount',
+  );
+  @override
+  late final GeneratedColumn<int> pageCount = GeneratedColumn<int>(
+    'page_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _recognizedAtMeta = const VerificationMeta(
+    'recognizedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> recognizedAt = GeneratedColumn<DateTime>(
+    'recognized_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    documentId,
+    body,
+    pagesRead,
+    pageCount,
+    recognizedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'document_texts';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<DocumentText> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('document_id')) {
+      context.handle(
+        _documentIdMeta,
+        documentId.isAcceptableOrUnknown(data['document_id']!, _documentIdMeta),
+      );
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('pages_read')) {
+      context.handle(
+        _pagesReadMeta,
+        pagesRead.isAcceptableOrUnknown(data['pages_read']!, _pagesReadMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pagesReadMeta);
+    }
+    if (data.containsKey('page_count')) {
+      context.handle(
+        _pageCountMeta,
+        pageCount.isAcceptableOrUnknown(data['page_count']!, _pageCountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pageCountMeta);
+    }
+    if (data.containsKey('recognized_at')) {
+      context.handle(
+        _recognizedAtMeta,
+        recognizedAt.isAcceptableOrUnknown(
+          data['recognized_at']!,
+          _recognizedAtMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_recognizedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {documentId};
+  @override
+  DocumentText map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return DocumentText(
+      documentId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}document_id'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      pagesRead: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pages_read'],
+      )!,
+      pageCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}page_count'],
+      )!,
+      recognizedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}recognized_at'],
+      )!,
+    );
+  }
+
+  @override
+  $DocumentTextsTable createAlias(String alias) {
+    return $DocumentTextsTable(attachedDatabase, alias);
+  }
+}
+
+class DocumentText extends DataClass implements Insertable<DocumentText> {
+  final int documentId;
+  final String body;
+  final int pagesRead;
+  final int pageCount;
+  final DateTime recognizedAt;
+  const DocumentText({
+    required this.documentId,
+    required this.body,
+    required this.pagesRead,
+    required this.pageCount,
+    required this.recognizedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['document_id'] = Variable<int>(documentId);
+    map['body'] = Variable<String>(body);
+    map['pages_read'] = Variable<int>(pagesRead);
+    map['page_count'] = Variable<int>(pageCount);
+    map['recognized_at'] = Variable<DateTime>(recognizedAt);
+    return map;
+  }
+
+  DocumentTextsCompanion toCompanion(bool nullToAbsent) {
+    return DocumentTextsCompanion(
+      documentId: Value(documentId),
+      body: Value(body),
+      pagesRead: Value(pagesRead),
+      pageCount: Value(pageCount),
+      recognizedAt: Value(recognizedAt),
+    );
+  }
+
+  factory DocumentText.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return DocumentText(
+      documentId: serializer.fromJson<int>(json['documentId']),
+      body: serializer.fromJson<String>(json['body']),
+      pagesRead: serializer.fromJson<int>(json['pagesRead']),
+      pageCount: serializer.fromJson<int>(json['pageCount']),
+      recognizedAt: serializer.fromJson<DateTime>(json['recognizedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'documentId': serializer.toJson<int>(documentId),
+      'body': serializer.toJson<String>(body),
+      'pagesRead': serializer.toJson<int>(pagesRead),
+      'pageCount': serializer.toJson<int>(pageCount),
+      'recognizedAt': serializer.toJson<DateTime>(recognizedAt),
+    };
+  }
+
+  DocumentText copyWith({
+    int? documentId,
+    String? body,
+    int? pagesRead,
+    int? pageCount,
+    DateTime? recognizedAt,
+  }) => DocumentText(
+    documentId: documentId ?? this.documentId,
+    body: body ?? this.body,
+    pagesRead: pagesRead ?? this.pagesRead,
+    pageCount: pageCount ?? this.pageCount,
+    recognizedAt: recognizedAt ?? this.recognizedAt,
+  );
+  DocumentText copyWithCompanion(DocumentTextsCompanion data) {
+    return DocumentText(
+      documentId: data.documentId.present
+          ? data.documentId.value
+          : this.documentId,
+      body: data.body.present ? data.body.value : this.body,
+      pagesRead: data.pagesRead.present ? data.pagesRead.value : this.pagesRead,
+      pageCount: data.pageCount.present ? data.pageCount.value : this.pageCount,
+      recognizedAt: data.recognizedAt.present
+          ? data.recognizedAt.value
+          : this.recognizedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentText(')
+          ..write('documentId: $documentId, ')
+          ..write('body: $body, ')
+          ..write('pagesRead: $pagesRead, ')
+          ..write('pageCount: $pageCount, ')
+          ..write('recognizedAt: $recognizedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(documentId, body, pagesRead, pageCount, recognizedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is DocumentText &&
+          other.documentId == this.documentId &&
+          other.body == this.body &&
+          other.pagesRead == this.pagesRead &&
+          other.pageCount == this.pageCount &&
+          other.recognizedAt == this.recognizedAt);
+}
+
+class DocumentTextsCompanion extends UpdateCompanion<DocumentText> {
+  final Value<int> documentId;
+  final Value<String> body;
+  final Value<int> pagesRead;
+  final Value<int> pageCount;
+  final Value<DateTime> recognizedAt;
+  const DocumentTextsCompanion({
+    this.documentId = const Value.absent(),
+    this.body = const Value.absent(),
+    this.pagesRead = const Value.absent(),
+    this.pageCount = const Value.absent(),
+    this.recognizedAt = const Value.absent(),
+  });
+  DocumentTextsCompanion.insert({
+    this.documentId = const Value.absent(),
+    required String body,
+    required int pagesRead,
+    required int pageCount,
+    required DateTime recognizedAt,
+  }) : body = Value(body),
+       pagesRead = Value(pagesRead),
+       pageCount = Value(pageCount),
+       recognizedAt = Value(recognizedAt);
+  static Insertable<DocumentText> custom({
+    Expression<int>? documentId,
+    Expression<String>? body,
+    Expression<int>? pagesRead,
+    Expression<int>? pageCount,
+    Expression<DateTime>? recognizedAt,
+  }) {
+    return RawValuesInsertable({
+      if (documentId != null) 'document_id': documentId,
+      if (body != null) 'body': body,
+      if (pagesRead != null) 'pages_read': pagesRead,
+      if (pageCount != null) 'page_count': pageCount,
+      if (recognizedAt != null) 'recognized_at': recognizedAt,
+    });
+  }
+
+  DocumentTextsCompanion copyWith({
+    Value<int>? documentId,
+    Value<String>? body,
+    Value<int>? pagesRead,
+    Value<int>? pageCount,
+    Value<DateTime>? recognizedAt,
+  }) {
+    return DocumentTextsCompanion(
+      documentId: documentId ?? this.documentId,
+      body: body ?? this.body,
+      pagesRead: pagesRead ?? this.pagesRead,
+      pageCount: pageCount ?? this.pageCount,
+      recognizedAt: recognizedAt ?? this.recognizedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (documentId.present) {
+      map['document_id'] = Variable<int>(documentId.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (pagesRead.present) {
+      map['pages_read'] = Variable<int>(pagesRead.value);
+    }
+    if (pageCount.present) {
+      map['page_count'] = Variable<int>(pageCount.value);
+    }
+    if (recognizedAt.present) {
+      map['recognized_at'] = Variable<DateTime>(recognizedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('DocumentTextsCompanion(')
+          ..write('documentId: $documentId, ')
+          ..write('body: $body, ')
+          ..write('pagesRead: $pagesRead, ')
+          ..write('pageCount: $pageCount, ')
+          ..write('recognizedAt: $recognizedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2957,6 +3735,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $RemindersTable reminders = $RemindersTable(this);
+  late final $DocumentTextsTable documentTexts = $DocumentTextsTable(this);
   late final Index idxCategoriesSort = Index(
     'idx_categories_sort',
     'CREATE INDEX idx_categories_sort ON categories (sort_order)',
@@ -2993,6 +3773,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_recently_deleted_at',
     'CREATE INDEX idx_recently_deleted_at ON recently_deleted (deleted_at)',
   );
+  late final Index idxRemindersDocument = Index(
+    'idx_reminders_document',
+    'CREATE INDEX idx_reminders_document ON reminders (document_id)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3007,6 +3791,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     documentMetadata,
     recentlyDeleted,
     appSettings,
+    reminders,
+    documentTexts,
     idxCategoriesSort,
     idxEncryptedFilesFingerprint,
     idxDocumentsCreated,
@@ -3016,6 +3802,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxDocumentTagsTag,
     idxDocumentMetadataExpiry,
     idxRecentlyDeletedAt,
+    idxRemindersDocument,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3060,6 +3847,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('recently_deleted', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'documents',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('reminders', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'documents',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('document_texts', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -4120,6 +4921,42 @@ final class $$DocumentsTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$RemindersTable, List<Reminder>>
+  _remindersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.reminders,
+    aliasName: 'documents__id__reminders__document_id',
+  );
+
+  $$RemindersTableProcessedTableManager get remindersRefs {
+    final manager = $$RemindersTableTableManager(
+      $_db,
+      $_db.reminders,
+    ).filter((f) => f.documentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_remindersRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$DocumentTextsTable, List<DocumentText>>
+  _documentTextsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.documentTexts,
+    aliasName: 'documents__id__document_texts__document_id',
+  );
+
+  $$DocumentTextsTableProcessedTableManager get documentTextsRefs {
+    final manager = $$DocumentTextsTableTableManager(
+      $_db,
+      $_db.documentTexts,
+    ).filter((f) => f.documentId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_documentTextsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$DocumentsTableFilterComposer
@@ -4296,6 +5133,56 @@ class $$DocumentsTableFilterComposer
           }) => $$RecentlyDeletedTableFilterComposer(
             $db: $db,
             $table: $db.recentlyDeleted,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> remindersRefs(
+    Expression<bool> Function($$RemindersTableFilterComposer f) f,
+  ) {
+    final $$RemindersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.reminders,
+      getReferencedColumn: (t) => t.documentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RemindersTableFilterComposer(
+            $db: $db,
+            $table: $db.reminders,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> documentTextsRefs(
+    Expression<bool> Function($$DocumentTextsTableFilterComposer f) f,
+  ) {
+    final $$DocumentTextsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.documentTexts,
+      getReferencedColumn: (t) => t.documentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentTextsTableFilterComposer(
+            $db: $db,
+            $table: $db.documentTexts,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4587,6 +5474,56 @@ class $$DocumentsTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> remindersRefs<T extends Object>(
+    Expression<T> Function($$RemindersTableAnnotationComposer a) f,
+  ) {
+    final $$RemindersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.reminders,
+      getReferencedColumn: (t) => t.documentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RemindersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.reminders,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> documentTextsRefs<T extends Object>(
+    Expression<T> Function($$DocumentTextsTableAnnotationComposer a) f,
+  ) {
+    final $$DocumentTextsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.documentTexts,
+      getReferencedColumn: (t) => t.documentId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentTextsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.documentTexts,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$DocumentsTableTableManager
@@ -4609,6 +5546,8 @@ class $$DocumentsTableTableManager
             bool documentTagsRefs,
             bool documentMetadataRefs,
             bool recentlyDeletedRefs,
+            bool remindersRefs,
+            bool documentTextsRefs,
           })
         > {
   $$DocumentsTableTableManager(_$AppDatabase db, $DocumentsTable table)
@@ -4682,6 +5621,8 @@ class $$DocumentsTableTableManager
                 documentTagsRefs = false,
                 documentMetadataRefs = false,
                 recentlyDeletedRefs = false,
+                remindersRefs = false,
+                documentTextsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -4689,6 +5630,8 @@ class $$DocumentsTableTableManager
                     if (documentTagsRefs) db.documentTags,
                     if (documentMetadataRefs) db.documentMetadata,
                     if (recentlyDeletedRefs) db.recentlyDeleted,
+                    if (remindersRefs) db.reminders,
+                    if (documentTextsRefs) db.documentTexts,
                   ],
                   addJoins:
                       <
@@ -4804,6 +5747,46 @@ class $$DocumentsTableTableManager
                           referencedColumn: 'document_id',
                           typedResults: items,
                         ),
+                      if (remindersRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Document,
+                          $DocumentsTable,
+                          Reminder,
+                          $RemindersTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$DocumentsTableReferences
+                              ._remindersRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$DocumentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).remindersRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'document_id',
+                          typedResults: items,
+                        ),
+                      if (documentTextsRefs)
+                        await $_getPrefetchedDataByColumns<
+                          Document,
+                          $DocumentsTable,
+                          DocumentText,
+                          $DocumentTextsTable
+                        >(
+                          currentTable: table,
+                          referencedTable: $$DocumentsTableReferences
+                              ._documentTextsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$DocumentsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).documentTextsRefs,
+                          currentColumn: 'id',
+                          referencedColumn: 'document_id',
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -4831,6 +5814,8 @@ typedef $$DocumentsTableProcessedTableManager =
         bool documentTagsRefs,
         bool documentMetadataRefs,
         bool recentlyDeletedRefs,
+        bool remindersRefs,
+        bool documentTextsRefs,
       })
     >;
 typedef $$TagsTableCreateCompanionBuilder = TagsCompanion Function({
@@ -6139,6 +7124,649 @@ typedef $$AppSettingsTableProcessedTableManager =
       AppSetting,
       PrefetchHooks Function()
     >;
+typedef $$RemindersTableCreateCompanionBuilder = RemindersCompanion Function({
+  Value<int> id,
+  required int documentId,
+  required String kind,
+  Value<int?> offsetDays,
+  Value<String?> remindOn,
+  required DateTime createdAt,
+});
+typedef $$RemindersTableUpdateCompanionBuilder = RemindersCompanion Function({
+  Value<int> id,
+  Value<int> documentId,
+  Value<String> kind,
+  Value<int?> offsetDays,
+  Value<String?> remindOn,
+  Value<DateTime> createdAt,
+});
+
+final class $$RemindersTableReferences
+    extends BaseReferences<_$AppDatabase, $RemindersTable, Reminder> {
+  $$RemindersTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $DocumentsTable _documentIdTable(_$AppDatabase db) =>
+      db.documents.createAlias('reminders__document_id__documents__id');
+
+  $$DocumentsTableProcessedTableManager get documentId {
+    final $_column = $_itemColumn<int>('document_id')!;
+
+    final manager = $$DocumentsTableTableManager(
+      $_db,
+      $_db.documents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_documentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RemindersTableFilterComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get offsetDays => $composableBuilder(
+    column: $table.offsetDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remindOn => $composableBuilder(
+    column: $table.remindOn,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$DocumentsTableFilterComposer get documentId {
+    final $$DocumentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableFilterComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RemindersTableOrderingComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get kind => $composableBuilder(
+    column: $table.kind,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get offsetDays => $composableBuilder(
+    column: $table.offsetDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remindOn => $composableBuilder(
+    column: $table.remindOn,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$DocumentsTableOrderingComposer get documentId {
+    final $$DocumentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RemindersTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RemindersTable> {
+  $$RemindersTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get kind =>
+      $composableBuilder(column: $table.kind, builder: (column) => column);
+
+  GeneratedColumn<int> get offsetDays => $composableBuilder(
+    column: $table.offsetDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get remindOn =>
+      $composableBuilder(column: $table.remindOn, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  $$DocumentsTableAnnotationComposer get documentId {
+    final $$DocumentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RemindersTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RemindersTable,
+          Reminder,
+          $$RemindersTableFilterComposer,
+          $$RemindersTableOrderingComposer,
+          $$RemindersTableAnnotationComposer,
+          $$RemindersTableCreateCompanionBuilder,
+          $$RemindersTableUpdateCompanionBuilder,
+          (Reminder, $$RemindersTableReferences),
+          Reminder,
+          PrefetchHooks Function({bool documentId})
+        > {
+  $$RemindersTableTableManager(_$AppDatabase db, $RemindersTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RemindersTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RemindersTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RemindersTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> documentId = const Value.absent(),
+                Value<String> kind = const Value.absent(),
+                Value<int?> offsetDays = const Value.absent(),
+                Value<String?> remindOn = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => RemindersCompanion(
+                id: id,
+                documentId: documentId,
+                kind: kind,
+                offsetDays: offsetDays,
+                remindOn: remindOn,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int documentId,
+                required String kind,
+                Value<int?> offsetDays = const Value.absent(),
+                Value<String?> remindOn = const Value.absent(),
+                required DateTime createdAt,
+              }) => RemindersCompanion.insert(
+                id: id,
+                documentId: documentId,
+                kind: kind,
+                offsetDays: offsetDays,
+                remindOn: remindOn,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RemindersTable, Reminder>(table),
+                  $$RemindersTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({documentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (documentId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.documentId,
+                        referencedTable: $$RemindersTableReferences
+                            ._documentIdTable(db),
+                        referencedColumn: $$RemindersTableReferences
+                            ._documentIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$RemindersTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RemindersTable,
+      Reminder,
+      $$RemindersTableFilterComposer,
+      $$RemindersTableOrderingComposer,
+      $$RemindersTableAnnotationComposer,
+      $$RemindersTableCreateCompanionBuilder,
+      $$RemindersTableUpdateCompanionBuilder,
+      (Reminder, $$RemindersTableReferences),
+      Reminder,
+      PrefetchHooks Function({bool documentId})
+    >;
+typedef $$DocumentTextsTableCreateCompanionBuilder =
+    DocumentTextsCompanion Function({
+      Value<int> documentId,
+      required String body,
+      required int pagesRead,
+      required int pageCount,
+      required DateTime recognizedAt,
+    });
+typedef $$DocumentTextsTableUpdateCompanionBuilder =
+    DocumentTextsCompanion Function({
+      Value<int> documentId,
+      Value<String> body,
+      Value<int> pagesRead,
+      Value<int> pageCount,
+      Value<DateTime> recognizedAt,
+    });
+
+final class $$DocumentTextsTableReferences
+    extends BaseReferences<_$AppDatabase, $DocumentTextsTable, DocumentText> {
+  $$DocumentTextsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $DocumentsTable _documentIdTable(_$AppDatabase db) =>
+      db.documents.createAlias('document_texts__document_id__documents__id');
+
+  $$DocumentsTableProcessedTableManager get documentId {
+    final $_column = $_itemColumn<int>('document_id')!;
+
+    final manager = $$DocumentsTableTableManager(
+      $_db,
+      $_db.documents,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_documentIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$DocumentTextsTableFilterComposer
+    extends Composer<_$AppDatabase, $DocumentTextsTable> {
+  $$DocumentTextsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pagesRead => $composableBuilder(
+    column: $table.pagesRead,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get pageCount => $composableBuilder(
+    column: $table.pageCount,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get recognizedAt => $composableBuilder(
+    column: $table.recognizedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$DocumentsTableFilterComposer get documentId {
+    final $$DocumentsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableFilterComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DocumentTextsTableOrderingComposer
+    extends Composer<_$AppDatabase, $DocumentTextsTable> {
+  $$DocumentTextsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pagesRead => $composableBuilder(
+    column: $table.pagesRead,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get pageCount => $composableBuilder(
+    column: $table.pageCount,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get recognizedAt => $composableBuilder(
+    column: $table.recognizedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$DocumentsTableOrderingComposer get documentId {
+    final $$DocumentsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableOrderingComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DocumentTextsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $DocumentTextsTable> {
+  $$DocumentTextsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<int> get pagesRead =>
+      $composableBuilder(column: $table.pagesRead, builder: (column) => column);
+
+  GeneratedColumn<int> get pageCount =>
+      $composableBuilder(column: $table.pageCount, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recognizedAt => $composableBuilder(
+    column: $table.recognizedAt,
+    builder: (column) => column,
+  );
+
+  $$DocumentsTableAnnotationComposer get documentId {
+    final $$DocumentsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.documentId,
+      referencedTable: $db.documents,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$DocumentsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.documents,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$DocumentTextsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $DocumentTextsTable,
+          DocumentText,
+          $$DocumentTextsTableFilterComposer,
+          $$DocumentTextsTableOrderingComposer,
+          $$DocumentTextsTableAnnotationComposer,
+          $$DocumentTextsTableCreateCompanionBuilder,
+          $$DocumentTextsTableUpdateCompanionBuilder,
+          (DocumentText, $$DocumentTextsTableReferences),
+          DocumentText,
+          PrefetchHooks Function({bool documentId})
+        > {
+  $$DocumentTextsTableTableManager(_$AppDatabase db, $DocumentTextsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$DocumentTextsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$DocumentTextsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$DocumentTextsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> documentId = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<int> pagesRead = const Value.absent(),
+                Value<int> pageCount = const Value.absent(),
+                Value<DateTime> recognizedAt = const Value.absent(),
+              }) => DocumentTextsCompanion(
+                documentId: documentId,
+                body: body,
+                pagesRead: pagesRead,
+                pageCount: pageCount,
+                recognizedAt: recognizedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> documentId = const Value.absent(),
+                required String body,
+                required int pagesRead,
+                required int pageCount,
+                required DateTime recognizedAt,
+              }) => DocumentTextsCompanion.insert(
+                documentId: documentId,
+                body: body,
+                pagesRead: pagesRead,
+                pageCount: pageCount,
+                recognizedAt: recognizedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$DocumentTextsTable, DocumentText>(table),
+                  $$DocumentTextsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({documentId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (documentId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.documentId,
+                        referencedTable: $$DocumentTextsTableReferences
+                            ._documentIdTable(db),
+                        referencedColumn: $$DocumentTextsTableReferences
+                            ._documentIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$DocumentTextsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $DocumentTextsTable,
+      DocumentText,
+      $$DocumentTextsTableFilterComposer,
+      $$DocumentTextsTableOrderingComposer,
+      $$DocumentTextsTableAnnotationComposer,
+      $$DocumentTextsTableCreateCompanionBuilder,
+      $$DocumentTextsTableUpdateCompanionBuilder,
+      (DocumentText, $$DocumentTextsTableReferences),
+      DocumentText,
+      PrefetchHooks Function({bool documentId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -6160,4 +7788,8 @@ class $AppDatabaseManager {
       $$RecentlyDeletedTableTableManager(_db, _db.recentlyDeleted);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$RemindersTableTableManager get reminders =>
+      $$RemindersTableTableManager(_db, _db.reminders);
+  $$DocumentTextsTableTableManager get documentTexts =>
+      $$DocumentTextsTableTableManager(_db, _db.documentTexts);
 }

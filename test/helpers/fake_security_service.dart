@@ -48,6 +48,19 @@ class FakeSecurityService implements SecurityService {
   /// Annotate simulation: every flattenPages call (source id, overlays).
   final List<(String, List<PageOverlay>)> flattenCalls = [];
   final Set<String> flattenFailures = {};
+
+  /// Phase 5 simulation.
+  final Map<String, String> ocrText = {};
+  final Map<String, int> ocrPageCount = {};
+  final List<(String, int)> ocrCalls = [];
+  final Set<String> ocrFailures = {};
+  List<int>? reminderSchedule;
+  int scheduleCalls = 0;
+  bool notificationsOn = true;
+  bool grantOnRequest = true;
+  int permissionRequests = 0;
+  int openedNotificationSettings = 0;
+  String? launchTarget;
   int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
@@ -262,6 +275,7 @@ class FakeSecurityService implements SecurityService {
     lockoutMillis = 0;
     filesOnDisk.clear();
     tempFiles.clear();
+    reminderSchedule = null;
   }
 
   @override
@@ -379,6 +393,53 @@ class FakeSecurityService implements SecurityService {
       throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
     }
     return _generated(1000 * overlays.length);
+  }
+
+  @override
+  Future<OcrResult> recognizeText(
+    String fileId,
+    String mimeType,
+    int maxPages,
+  ) async {
+    _requireUnlocked();
+    ocrCalls.add((fileId, maxPages));
+    if (ocrFailures.contains(fileId)) {
+      throw const SecurityFailure(SecurityErrorCode.ocrFailed);
+    }
+    final total = ocrPageCount[fileId] ?? 1;
+    return OcrResult(
+      text: ocrText[fileId] ?? '',
+      pagesRead: total < maxPages ? total : maxPages,
+      pageCount: total,
+    );
+  }
+
+  @override
+  Future<void> setReminderSchedule(List<int> epochMillis) async {
+    _requireUnlocked();
+    scheduleCalls++;
+    reminderSchedule = List.of(epochMillis);
+  }
+
+  @override
+  Future<bool> notificationsEnabled() async => notificationsOn;
+
+  @override
+  Future<bool> requestNotificationPermission() async {
+    permissionRequests++;
+    if (grantOnRequest) notificationsOn = true;
+    return notificationsOn;
+  }
+
+  @override
+  Future<void> openNotificationSettings() async =>
+      openedNotificationSettings++;
+
+  @override
+  Future<String?> takeLaunchTarget() async {
+    final t = launchTarget;
+    launchTarget = null;
+    return t;
   }
 
   @override

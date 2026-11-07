@@ -63,7 +63,11 @@ class DocumentRepository {
     );
   }
 
-  Expression<bool> _matchesText(String text, Set<int> categoryIds) {
+  Expression<bool> _matchesText(
+    String text,
+    Set<int> categoryIds, {
+    bool recognized = false,
+  }) {
     final pattern = '%${escapeLike(text)}%';
     final tagMatch = existsQuery(
       _db.select(_db.documentTags).join([
@@ -80,6 +84,17 @@ class DocumentRepository {
     if (categoryIds.isNotEmpty) {
       e = e | _db.documents.categoryId.isIn(categoryIds);
     }
+    if (recognized) {
+      e =
+          e |
+          existsQuery(
+            _db.select(_db.documentTexts)..where(
+              (t) =>
+                  t.documentId.equalsExp(_db.documents.id) &
+                  t.body.like(pattern, escapeChar: r'\'),
+            ),
+          );
+    }
     return e;
   }
 
@@ -92,7 +107,13 @@ class DocumentRepository {
     if (q.favouritesOnly) s.where(_db.documents.isFavourite.equals(true));
     final text = q.text?.trim();
     if (text != null && text.isNotEmpty) {
-      s.where(_matchesText(text, q.matchingCategoryIds));
+      s.where(
+        _matchesText(
+          text,
+          q.matchingCategoryIds,
+          recognized: q.includeRecognizedText,
+        ),
+      );
     }
     s.orderBy([
       switch (q.sort) {

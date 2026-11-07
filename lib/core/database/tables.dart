@@ -123,3 +123,31 @@ class AppSettings extends Table {
   @override
   Set<Column> get primaryKey => {key};
 }
+
+/// Reminders (v3). `kind` is 'expiry' ([offsetDays] before the document's
+/// expiry date, recomputed if that date changes) or 'custom' ([remindOn]).
+/// Only the resulting times are handed to the native scheduler.
+@TableIndex(name: 'idx_reminders_document', columns: {#documentId})
+class Reminders extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  IntColumn get documentId =>
+      integer().references(Documents, #id, onDelete: KeyAction.cascade)();
+  TextColumn get kind => text().withLength(min: 1, max: 10)();
+  IntColumn get offsetDays => integer().nullable()();
+  TextColumn get remindOn => text().nullable().withLength(min: 10, max: 10)();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+/// Recognised text the user confirmed for search (v3). Aadhaar/PAN-like
+/// numbers are masked before it is stored. Encrypted with the database.
+class DocumentTexts extends Table {
+  IntColumn get documentId =>
+      integer().references(Documents, #id, onDelete: KeyAction.cascade)();
+  TextColumn get body => text().withLength(max: 200000)();
+  IntColumn get pagesRead => integer()();
+  IntColumn get pageCount => integer()();
+  DateTimeColumn get recognizedAt => dateTime()();
+
+  @override
+  Set<Column> get primaryKey => {documentId};
+}

@@ -8,6 +8,7 @@ import '../../features/document/document_details_screen.dart';
 import '../../features/document/document_preview_screen.dart';
 import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/pdf_tools/pdf_tools_screen.dart';
+import '../../features/reminders/reminders_screen.dart';
 import '../../features/onboarding/splash_screen.dart';
 import '../../features/scanner/scan_review_screen.dart';
 import '../../features/search/search_screen.dart';
@@ -42,6 +43,7 @@ abstract final class Routes {
   static const home = '/home';
   static const vault = '/vault';
   static const tools = '/tools';
+  static const reminders = '/reminders';
   static const settings = '/settings';
 
   static String folder(int id) => '/vault/folder/$id';
@@ -156,6 +158,14 @@ final routerProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: Routes.tools,
                 builder: (_, _) => const PdfToolsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: Routes.reminders,
+                builder: (_, _) => const RemindersScreen(),
               ),
             ],
           ),

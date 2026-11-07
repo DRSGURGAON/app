@@ -1215,4 +1215,164 @@ class AppLocalizationsEn extends AppLocalizations {
   String annotatedNote(String title) {
     return 'Annotated copy of “$title”, made in DocSafe. This is not the original document.';
   }
+
+  @override
+  String get navReminders => 'Reminders';
+
+  @override
+  String get errorOcrFailed =>
+      'Text could not be read from this document. Try again or use a clearer scan.';
+
+  @override
+  String get remindersTitle => 'Reminders';
+
+  @override
+  String get remindersUpcoming => 'Upcoming reminders';
+
+  @override
+  String get remindersExpiringDocs => 'Expiry dates ahead';
+
+  @override
+  String get remindersExpiredDocs => 'Expired documents';
+
+  @override
+  String get remindersEmpty =>
+      'No reminders yet. Open a document and tap “Add reminder”.';
+
+  @override
+  String get remindersNoExpired => 'No expired documents.';
+
+  @override
+  String get remindersNoUpcomingExpiry =>
+      'No documents with a future expiry date.';
+
+  @override
+  String get remindersPrivacyNote =>
+      'Reminder notifications never show the document name or contents.';
+
+  @override
+  String get remindersInactive => 'No expiry date — inactive';
+
+  @override
+  String get reminderCustom => 'On a chosen date';
+
+  @override
+  String get reminderOnExpiryDay => 'On the expiry day';
+
+  @override
+  String get reminderPast => 'Passed';
+
+  @override
+  String get reminderDelete => 'Delete reminder';
+
+  @override
+  String get reminderAdd => 'Add reminder';
+
+  @override
+  String get reminderAddTitle => 'Remind me';
+
+  @override
+  String get reminderPickDate => 'On a date…';
+
+  @override
+  String get reminderNeedsExpiry =>
+      'Add an expiry date to get expiry reminders.';
+
+  @override
+  String get reminderAdded => 'Reminder added';
+
+  @override
+  String get reminderLimitFeature => 'More than 3 active reminders';
+
+  @override
+  String get notificationsOff =>
+      'Notifications are off, so reminders can\'t alert you.';
+
+  @override
+  String get notificationsTurnOn => 'Turn on';
+
+  @override
+  String get notificationsOpenSettings => 'Settings';
+
+  @override
+  String get detailsReminders => 'Reminders';
+
+  @override
+  String get ocrRead => 'Read text (OCR)';
+
+  @override
+  String get ocrTitle => 'Text found';
+
+  @override
+  String get ocrOnDevice =>
+      'Read on this device. Nothing is uploaded. Aadhaar and PAN numbers are masked.';
+
+  @override
+  String get ocrNothingFound => 'No text was found in this document.';
+
+  @override
+  String get ocrSuggestions => 'Suggestions — check before applying';
+
+  @override
+  String get ocrApply => 'Apply';
+
+  @override
+  String get ocrApplied => 'Applied';
+
+  @override
+  String get ocrSaveForSearch => 'Save text for search';
+
+  @override
+  String get ocrSavedForSearch => 'Text saved for search';
+
+  @override
+  String get ocrSearchFeature => 'Search inside documents (OCR)';
+
+  @override
+  String get ocrSavedTile => 'Recognised text saved for search';
+
+  @override
+  String get ocrDeleteSaved => 'Delete saved text';
+
+  @override
+  String get ocrDeleted => 'Saved text deleted';
+
+  @override
+  String get searchInsideText => 'Inside documents';
+
+  @override
+  String reminderDaysBefore(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days before expiry',
+      one: '1 day before expiry',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String remindersFreeUsage(int used, int limit) {
+    return 'Free plan: $used of $limit active reminders';
+  }
+
+  @override
+  String ocrPagesRead(int read, int total) {
+    return 'Read the first $read of $total pages.';
+  }
+
+  @override
+  String ocrSuggestedCategory(String name) {
+    return 'Category: $name';
+  }
+
+  @override
+  String ocrSuggestedExpiry(String date) {
+    return 'Expiry date: $date';
+  }
+
+  @override
+  String reminderOnDate(String date) {
+    return 'On $date';
+  }
 }

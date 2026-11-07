@@ -6,7 +6,8 @@
 // - Plaintext document bytes NEVER cross this bridge; only opaque file ids and
 //   paths of short-lived temp files inside app-private cache. Documented
 //   exceptions (in-process memory only, never written to disk): the PDF built
-//   by a page operation (importPdfBytes) and annotation overlays (flattenPages).
+//   by a page operation (importPdfBytes), annotation overlays (flattenPages)
+//   and recognised text (recognizeText).
 // - PINs cross as Uint8List so Dart can zero its copy after the call.
 // - Every vault/database operation is refused natively unless the session is unlocked.
 // - Errors are raised as PlatformException with a code from SecurityErrorCode
@@ -192,6 +193,20 @@ class PageOverlay {
   Uint8List png;
 }
 
+/// Text recognised on the device (Phase 5). Shown to the user for
+/// confirmation; never stored without it.
+class OcrResult {
+  OcrResult({
+    required this.text,
+    required this.pagesRead,
+    required this.pageCount,
+  });
+
+  String text;
+  int pagesRead;
+  int pageCount;
+}
+
 /// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
 enum CompressionLevel { high, balanced, smallest }
 
@@ -321,6 +336,29 @@ abstract class SecurityHostApi {
   /// hidden under "cover" marks. Errors: PDF_UNREADABLE.
   @async
   ImportedFile flattenPages(String fileId, List<PageOverlay> overlays);
+
+  /// On-device OCR (ML Kit, bundled model) of a vault document: images, or the
+  /// first [maxPages] pages of a PDF. Errors: PDF_UNREADABLE, OCR_FAILED.
+  @async
+  OcrResult recognizeText(String fileId, String mimeType, int maxPages);
+
+  /// Replaces the reminder schedule: epoch milliseconds only (the sole
+  /// reminder data kept outside the encrypted database). Requires unlock.
+  @async
+  void setReminderSchedule(List<int> epochMillis);
+
+  /// Whether DocSafe may post notifications (permission + system switch).
+  bool notificationsEnabled();
+
+  /// Android 13+: shows the system permission dialog. Returns the result.
+  @async
+  bool requestNotificationPermission();
+
+  /// Opens the system notification settings for DocSafe.
+  void openNotificationSettings();
+
+  /// "reminders" if the app was opened from a reminder notification; consumed.
+  String? takeLaunchTarget();
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();
