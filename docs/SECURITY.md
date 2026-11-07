@@ -288,6 +288,9 @@ documents beyond the time itself — the time can reveal that *some* reminder ex
 
 ## 13. Known limitations
 
+- The bundled OCR model adds about 13 MB to the per-device download (arm64 APK 34.6 → 47.9 MB,
+  CI run 25). Play-services-delivered models would be smaller but need Google Play services and a
+  one-time download; not chosen so OCR works offline and on devices without Play services.
 - OCR quality depends on the scan; handwriting and low-contrast photos are read poorly. Only the
   first 20 pages of a PDF are read. Suggestions are heuristics and must be checked.
 - Reminder delivery depends on the OEM's background restrictions (some phones kill alarms of
