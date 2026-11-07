@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:docsafe/app/app.dart';
 import 'package:docsafe/core/database/app_database.dart';
@@ -6,6 +7,8 @@ import 'package:docsafe/core/database/database_opener.dart';
 import 'package:docsafe/core/database/database_provider.dart';
 import 'package:docsafe/core/pdf/pdf_engine.dart';
 import 'package:docsafe/core/security/lock_controller.dart';
+import 'package:docsafe/features/annotate/annotate_screen.dart';
+import 'package:docsafe/features/annotate/annotation.dart';
 import 'package:docsafe/features/pdf_tools/widgets/pdf_thumbnail.dart';
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
@@ -52,6 +55,7 @@ Future<TestApp> pumpApp(
   FakeSecurityService fake, {
   Size size = const Size(1080, 2400),
   PdfEngine? pdfEngine,
+  OverlayRenderer? overlayRenderer,
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -70,6 +74,12 @@ Future<TestApp> pumpApp(
           color: const Color(0xFFEEEEEE),
           child: Center(child: Text('p${index + 1}')),
         ),
+      ),
+      // Image readback needs the real engine: return a tiny stand-in PNG.
+      overlayRendererProvider.overrideWithValue(
+        overlayRenderer ??
+            (marks, size) async =>
+                Uint8List.fromList([137, 80, 78, 71, marks.length]),
       ),
       databaseOpenerProvider.overrideWithValue((path, key) {
         final db = openEncryptedMemoryDatabase('c' * 64);

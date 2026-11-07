@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +7,7 @@ import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/localization/locale_controller.dart';
 import '../../app/router/app_router.dart';
+import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
 import '../../core/security/security_service.dart';
@@ -148,6 +150,18 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l.settingsErase, style: TextStyle(color: scheme.error)),
             onTap: () => context.go(Routes.erase),
           ),
+          if (kDebugMode) ...[
+            _Header(l.settingsDeveloperSection),
+            SwitchListTile(
+              key: const Key('dev-premium'),
+              secondary: const Icon(Icons.developer_mode_outlined),
+              title: Text(l.settingsDevUnlockPremium),
+              value: ref.watch(premiumUnlockedProvider),
+              onChanged: (v) => ref
+                  .read(premiumUnlockedProvider.notifier)
+                  .setDebugUnlocked(v),
+            ),
+          ],
           const SizedBox(height: 24),
         ],
       ),

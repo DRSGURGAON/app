@@ -912,7 +912,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'Premium tools are open to everyone in this test version. Subscriptions arrive in a later update.';
+      'Merge, split and compress are open to everyone in this test version. Annotate & Sign needs Premium, and subscriptions arrive in a later update.';
 
   @override
   String get toolsPrivacyNote =>
@@ -1051,5 +1051,168 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String pageLabelOf(int number, int total) {
     return 'Page $number of $total';
+  }
+
+  @override
+  String get toolAnnotate => 'Annotate & Sign';
+
+  @override
+  String get toolAnnotateDesc =>
+      'Write text, add your signature, draw, highlight or cover parts of a PDF. Always saved as a new copy.';
+
+  @override
+  String get annotateToolText => 'Text';
+
+  @override
+  String get annotateToolSign => 'Sign';
+
+  @override
+  String get annotateToolDraw => 'Draw';
+
+  @override
+  String get annotateToolHighlight => 'Highlight';
+
+  @override
+  String get annotateToolCover => 'Cover';
+
+  @override
+  String get annotateHintText => 'Tap where the text should go';
+
+  @override
+  String get annotateHintSign => 'Tap where your signature should go';
+
+  @override
+  String get annotateHintDraw => 'Draw with your finger';
+
+  @override
+  String get annotateHintRect => 'Drag across the area';
+
+  @override
+  String get annotateHintDelete => 'Long-press a mark to delete it';
+
+  @override
+  String get annotateUndo => 'Undo';
+
+  @override
+  String get annotateColor => 'Colour';
+
+  @override
+  String get annotatePrevPage => 'Previous page';
+
+  @override
+  String get annotateNextPage => 'Next page';
+
+  @override
+  String get annotateAddText => 'Add text';
+
+  @override
+  String get annotateTextSmall => 'Small';
+
+  @override
+  String get annotateTextMedium => 'Medium';
+
+  @override
+  String get annotateTextLarge => 'Large';
+
+  @override
+  String get annotateAdd => 'Add';
+
+  @override
+  String get annotateDeleteMark => 'Delete this mark?';
+
+  @override
+  String get annotateNothing => 'Add something to the page first';
+
+  @override
+  String get annotateDiscardTitle => 'Discard your changes?';
+
+  @override
+  String get annotateDiscard => 'Discard';
+
+  @override
+  String get annotateSaveCopy => 'Save copy';
+
+  @override
+  String get annotateAckTitle => 'Before you save';
+
+  @override
+  String get annotateAckBody =>
+      'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocSafe saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.';
+
+  @override
+  String get annotateAckCheck => 'I understand, and this is my own document';
+
+  @override
+  String get annotateIdentityBlockedTitle =>
+      'Not available for identity documents';
+
+  @override
+  String get annotateIdentityBlocked =>
+      'Documents in the Identity category (Aadhaar, PAN, passport, voter ID and similar) can\'t be annotated. Changing official documents is not supported.';
+
+  @override
+  String get signaturePadTitle => 'Draw your signature';
+
+  @override
+  String get signatureClear => 'Clear';
+
+  @override
+  String get signatureUse => 'Use';
+
+  @override
+  String get signatureRemember => 'Save on this device (encrypted)';
+
+  @override
+  String get signatureUseSaved => 'Use saved signature';
+
+  @override
+  String get signatureDeleteSaved => 'Delete saved signature';
+
+  @override
+  String get signatureChange => 'Change signature';
+
+  @override
+  String get premiumTitle => 'DocSafe Premium';
+
+  @override
+  String premiumLocked(String feature) {
+    return '$feature is a Premium feature.';
+  }
+
+  @override
+  String get premiumIncludes => 'Premium includes';
+
+  @override
+  String get premiumMonthly => '₹49 / month';
+
+  @override
+  String get premiumYearly => '₹299 / year';
+
+  @override
+  String get premiumComingSoon =>
+      'Subscriptions open in an upcoming update. No payment can be made in this version.';
+
+  @override
+  String get premiumLockedBadge => 'Locked';
+
+  @override
+  String get settingsDeveloperSection => 'Developer (debug build only)';
+
+  @override
+  String get settingsDevUnlockPremium => 'Unlock Premium features for testing';
+
+  @override
+  String annotatePageOf(int page, int total) {
+    return 'Page $page of $total';
+  }
+
+  @override
+  String annotatedTitle(String title) {
+    return '$title (annotated)';
+  }
+
+  @override
+  String annotatedNote(String title) {
+    return 'Annotated copy of “$title”, made in DocSafe. This is not the original document.';
   }
 }

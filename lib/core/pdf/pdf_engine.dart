@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'dart:ui' show Size;
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:pdfrx/pdfrx.dart';
@@ -23,6 +24,9 @@ abstract interface class PdfEngine {
   /// damaged or password-protected PDFs.
   Future<int> pageCount(String path);
 
+  /// Size of every page in points, as displayed (rotation applied).
+  Future<List<Size>> pageSizes(String path);
+
   Future<Uint8List> assemble(List<PageRef> pages);
 }
 
@@ -42,6 +46,16 @@ class PdfiumEngine implements PdfEngine {
     final doc = await _open(path);
     try {
       return doc.pages.length;
+    } finally {
+      await doc.dispose();
+    }
+  }
+
+  @override
+  Future<List<Size>> pageSizes(String path) async {
+    final doc = await _open(path);
+    try {
+      return [for (final p in doc.pages) Size(p.width, p.height)];
     } finally {
       await doc.dispose();
     }

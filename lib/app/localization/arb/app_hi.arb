@@ -414,7 +414,7 @@
   "toolCompress": "PDF छोटा करें",
   "toolCompressDesc": "फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ",
   "premiumBadge": "प्रीमियम",
-  "toolsPremiumNote": "इस परीक्षण संस्करण में प्रीमियम टूल सभी के लिए खुले हैं। सदस्यता बाद के अपडेट में आएगी।",
+  "toolsPremiumNote": "इस परीक्षण संस्करण में जोड़ना, अलग करना और छोटा करना सभी के लिए खुले हैं। 'लिखें और साइन करें' के लिए प्रीमियम चाहिए, और सदस्यता बाद के अपडेट में आएगी।",
   "toolsPrivacyNote": "सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।",
   "pickPdf": "एक PDF चुनें",
   "pickPdfs": "PDF चुनें",
@@ -510,6 +510,87 @@
       },
       "total": {
         "type": "int"
+      }
+    }
+  },
+  "toolAnnotate": "लिखें और साइन करें",
+  "toolAnnotateDesc": "PDF पर टेक्स्ट लिखें, अपना हस्ताक्षर जोड़ें, ड्रॉ करें, हाइलाइट करें या कोई हिस्सा ढकें। हमेशा नई कॉपी के रूप में सहेजा जाता है।",
+  "annotateToolText": "टेक्स्ट",
+  "annotateToolSign": "हस्ताक्षर",
+  "annotateToolDraw": "ड्रॉ",
+  "annotateToolHighlight": "हाइलाइट",
+  "annotateToolCover": "ढकें",
+  "annotateHintText": "जहाँ टेक्स्ट लिखना है वहाँ टैप करें",
+  "annotateHintSign": "जहाँ हस्ताक्षर करना है वहाँ टैप करें",
+  "annotateHintDraw": "उंगली से ड्रॉ करें",
+  "annotateHintRect": "उस हिस्से पर उंगली खींचें",
+  "annotateHintDelete": "किसी निशान को हटाने के लिए उसे दबाकर रखें",
+  "annotateUndo": "पूर्ववत करें",
+  "annotateColor": "रंग",
+  "annotatePrevPage": "पिछला पेज",
+  "annotateNextPage": "अगला पेज",
+  "annotateAddText": "टेक्स्ट जोड़ें",
+  "annotateTextSmall": "छोटा",
+  "annotateTextMedium": "मध्यम",
+  "annotateTextLarge": "बड़ा",
+  "annotateAdd": "जोड़ें",
+  "annotateDeleteMark": "यह निशान हटाएं?",
+  "annotateNothing": "पहले पेज पर कुछ जोड़ें",
+  "annotateDiscardTitle": "आपके बदलाव छोड़ दें?",
+  "annotateDiscard": "छोड़ दें",
+  "annotateSaveCopy": "कॉपी सहेजें",
+  "annotateAckTitle": "सहेजने से पहले",
+  "annotateAckBody": "इसका उपयोग सिर्फ़ अपने फ़ॉर्म और दस्तावेज़ों पर करें। आधिकारिक या सरकारी दस्तावेज़, प्रमाणपत्र या किसी और के हस्ताक्षर बदलना गैर-कानूनी हो सकता है।\n\nDocSafe एक नई कॉपी सहेजता है जिस पर 'एनोटेटेड' लिखा होता है; मूल दस्तावेज़ नहीं बदलता। जिन पेजों पर आपने निशान लगाए हैं, उनका टेक्स्ट अब सेलेक्ट नहीं होगा, और 'ढकें' के नीचे की सामग्री कॉपी से हमेशा के लिए हट जाती है।",
+  "annotateAckCheck": "मैं समझता/समझती हूँ, और यह मेरा अपना दस्तावेज़ है",
+  "annotateIdentityBlockedTitle": "पहचान दस्तावेज़ों के लिए उपलब्ध नहीं",
+  "annotateIdentityBlocked": "पहचान श्रेणी के दस्तावेज़ों (आधार, पैन, पासपोर्ट, वोटर आईडी आदि) पर लिखा नहीं जा सकता। आधिकारिक दस्तावेज़ों में बदलाव समर्थित नहीं है।",
+  "signaturePadTitle": "अपना हस्ताक्षर बनाएं",
+  "signatureClear": "मिटाएं",
+  "signatureUse": "इस्तेमाल करें",
+  "signatureRemember": "इस डिवाइस पर सहेजें (एन्क्रिप्टेड)",
+  "signatureUseSaved": "सहेजा हुआ हस्ताक्षर इस्तेमाल करें",
+  "signatureDeleteSaved": "सहेजा हुआ हस्ताक्षर हटाएं",
+  "signatureChange": "हस्ताक्षर बदलें",
+  "premiumTitle": "DocSafe प्रीमियम",
+  "premiumLocked": "{feature} एक प्रीमियम सुविधा है।",
+  "premiumIncludes": "प्रीमियम में शामिल है",
+  "premiumMonthly": "₹49 / महीना",
+  "premiumYearly": "₹299 / साल",
+  "premiumComingSoon": "सदस्यता आने वाले अपडेट में शुरू होगी। इस संस्करण में कोई भुगतान नहीं किया जा सकता।",
+  "premiumLockedBadge": "लॉक",
+  "settingsDeveloperSection": "डेवलपर (सिर्फ़ डीबग बिल्ड)",
+  "settingsDevUnlockPremium": "टेस्ट के लिए प्रीमियम सुविधाएं खोलें",
+  "@premiumLocked": {
+    "placeholders": {
+      "feature": {
+        "type": "String"
+      }
+    }
+  },
+  "annotatePageOf": "पेज {page} / {total}",
+  "@annotatePageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "annotatedTitle": "{title} (एनोटेटेड कॉपी)",
+  "@annotatedTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "annotatedNote": "“{title}” की एनोटेटेड कॉपी, DocSafe में बनाई गई। यह मूल दस्तावेज़ नहीं है।",
+  "@annotatedNote": {
+    "placeholders": {
+      "title": {
+        "type": "String"
       }
     }
   }

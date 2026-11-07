@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/localization/gen/app_localizations.dart';
+import '../../core/entitlement/entitlement.dart';
 import '../../data/models/vault_document.dart';
+import '../../data/services/pdf_tools_service.dart';
+import '../annotate/annotate_screen.dart';
+import '../premium/premium_screen.dart';
 import 'compress_screen.dart';
 import 'document_picker_screen.dart';
 import 'ordered_documents_screen.dart';
@@ -78,6 +82,42 @@ abstract final class PdfToolFlows {
     await _push(context, CompressScreen(documents: docs));
   }
 
+  /// Annotate & Sign: Premium only; identity documents are refused.
+  static Future<void> annotate(
+    BuildContext context, {
+    VaultDocument? doc,
+  }) async {
+    final l = AppLocalizations.of(context);
+    final container = ProviderScope.containerOf(context, listen: false);
+    if (!container.read(premiumUnlockedProvider)) {
+      await _push(context, PremiumScreen(feature: l.toolAnnotate));
+      return;
+    }
+    final d = doc ?? await _pickOne(context, l.pickPdf);
+    if (d == null || !context.mounted) return;
+    final service = await container.read(pdfToolsServiceProvider.future);
+    final allowed = await service.canAnnotate(d);
+    if (!context.mounted) return;
+    if (!allowed) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          icon: const Icon(Icons.badge_outlined),
+          title: Text(l.annotateIdentityBlockedTitle),
+          content: Text(l.annotateIdentityBlocked),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l.previewClose),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    await _push(context, AnnotateScreen(document: d));
+  }
+
   static Future<VaultDocument?> _pickOne(
     BuildContext context,
     String title,
@@ -98,6 +138,7 @@ class PdfToolsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final premium = ref.watch(premiumUnlockedProvider);
     return Scaffold(
       appBar: AppBar(title: Text(l.navTools)),
       body: ListView(
@@ -138,6 +179,16 @@ class PdfToolsScreen extends ConsumerWidget {
             premium: true,
             onTap: () => PdfToolFlows.compress(context),
           ),
+          _Tool(
+            key: const Key('tool-annotate'),
+            icon: Icons.draw_outlined,
+            title: l.toolAnnotate,
+            body: l.toolAnnotateDesc,
+            premium: true,
+            locked: !premium,
+            highlight: true,
+            onTap: () => PdfToolFlows.annotate(context),
+          ),
           const SizedBox(height: 12),
           Text(
             l.toolsPremiumNote,
@@ -153,11 +204,14 @@ class PdfToolsScreen extends ConsumerWidget {
 
 class _Tool extends StatelessWidget {
   const _Tool({
+    super.key,
     required this.icon,
     required this.title,
     required this.body,
     required this.onTap,
     this.premium = false,
+    this.locked = false,
+    this.highlight = false,
   });
 
   final IconData icon;
@@ -165,6 +219,10 @@ class _Tool extends StatelessWidget {
   final String body;
   final VoidCallback onTap;
   final bool premium;
+  final bool locked;
+
+  /// Distinct colours so this tool is not mistaken for a page tool.
+  final bool highlight;
 
   @override
   Widget build(BuildContext context) {
@@ -175,8 +233,12 @@ class _Tool extends StatelessWidget {
       child: Card(
         child: ListTile(
           leading: CircleAvatar(
-            backgroundColor: scheme.primaryContainer,
-            foregroundColor: scheme.onPrimaryContainer,
+            backgroundColor: highlight
+                ? scheme.tertiary
+                : scheme.primaryContainer,
+            foregroundColor: highlight
+                ? scheme.onTertiary
+                : scheme.onPrimaryContainer,
             child: Icon(icon),
           ),
           title: Row(
@@ -203,7 +265,10 @@ class _Tool extends StatelessWidget {
             ],
           ),
           subtitle: Text(body),
-          trailing: const Icon(Icons.chevron_right),
+          trailing: Icon(
+            locked ? Icons.lock_outline : Icons.chevron_right,
+            semanticLabel: locked ? l.premiumLockedBadge : null,
+          ),
           onTap: onTap,
         ),
       ),

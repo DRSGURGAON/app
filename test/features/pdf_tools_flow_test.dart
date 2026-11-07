@@ -82,10 +82,12 @@ void main() {
       en.toolMerge,
       en.toolSplit,
       en.toolCompress,
+      en.toolAnnotate,
     ]) {
       expect(find.text(t), findsOneWidget);
     }
-    expect(find.text(en.premiumBadge), findsNWidgets(3));
+    expect(find.text(en.premiumBadge), findsNWidgets(4));
+    await tester.scrollUntilVisible(find.text(en.toolsPremiumNote), 200);
     expect(find.text(en.toolsPremiumNote), findsOneWidget);
     await app.dispose();
   });

@@ -912,7 +912,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'इस परीक्षण संस्करण में प्रीमियम टूल सभी के लिए खुले हैं। सदस्यता बाद के अपडेट में आएगी।';
+      'इस परीक्षण संस्करण में जोड़ना, अलग करना और छोटा करना सभी के लिए खुले हैं। \'लिखें और साइन करें\' के लिए प्रीमियम चाहिए, और सदस्यता बाद के अपडेट में आएगी।';
 
   @override
   String get toolsPrivacyNote =>
@@ -1051,5 +1051,169 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String pageLabelOf(int number, int total) {
     return 'पेज $number / $total';
+  }
+
+  @override
+  String get toolAnnotate => 'लिखें और साइन करें';
+
+  @override
+  String get toolAnnotateDesc =>
+      'PDF पर टेक्स्ट लिखें, अपना हस्ताक्षर जोड़ें, ड्रॉ करें, हाइलाइट करें या कोई हिस्सा ढकें। हमेशा नई कॉपी के रूप में सहेजा जाता है।';
+
+  @override
+  String get annotateToolText => 'टेक्स्ट';
+
+  @override
+  String get annotateToolSign => 'हस्ताक्षर';
+
+  @override
+  String get annotateToolDraw => 'ड्रॉ';
+
+  @override
+  String get annotateToolHighlight => 'हाइलाइट';
+
+  @override
+  String get annotateToolCover => 'ढकें';
+
+  @override
+  String get annotateHintText => 'जहाँ टेक्स्ट लिखना है वहाँ टैप करें';
+
+  @override
+  String get annotateHintSign => 'जहाँ हस्ताक्षर करना है वहाँ टैप करें';
+
+  @override
+  String get annotateHintDraw => 'उंगली से ड्रॉ करें';
+
+  @override
+  String get annotateHintRect => 'उस हिस्से पर उंगली खींचें';
+
+  @override
+  String get annotateHintDelete => 'किसी निशान को हटाने के लिए उसे दबाकर रखें';
+
+  @override
+  String get annotateUndo => 'पूर्ववत करें';
+
+  @override
+  String get annotateColor => 'रंग';
+
+  @override
+  String get annotatePrevPage => 'पिछला पेज';
+
+  @override
+  String get annotateNextPage => 'अगला पेज';
+
+  @override
+  String get annotateAddText => 'टेक्स्ट जोड़ें';
+
+  @override
+  String get annotateTextSmall => 'छोटा';
+
+  @override
+  String get annotateTextMedium => 'मध्यम';
+
+  @override
+  String get annotateTextLarge => 'बड़ा';
+
+  @override
+  String get annotateAdd => 'जोड़ें';
+
+  @override
+  String get annotateDeleteMark => 'यह निशान हटाएं?';
+
+  @override
+  String get annotateNothing => 'पहले पेज पर कुछ जोड़ें';
+
+  @override
+  String get annotateDiscardTitle => 'आपके बदलाव छोड़ दें?';
+
+  @override
+  String get annotateDiscard => 'छोड़ दें';
+
+  @override
+  String get annotateSaveCopy => 'कॉपी सहेजें';
+
+  @override
+  String get annotateAckTitle => 'सहेजने से पहले';
+
+  @override
+  String get annotateAckBody =>
+      'इसका उपयोग सिर्फ़ अपने फ़ॉर्म और दस्तावेज़ों पर करें। आधिकारिक या सरकारी दस्तावेज़, प्रमाणपत्र या किसी और के हस्ताक्षर बदलना गैर-कानूनी हो सकता है।\n\nDocSafe एक नई कॉपी सहेजता है जिस पर \'एनोटेटेड\' लिखा होता है; मूल दस्तावेज़ नहीं बदलता। जिन पेजों पर आपने निशान लगाए हैं, उनका टेक्स्ट अब सेलेक्ट नहीं होगा, और \'ढकें\' के नीचे की सामग्री कॉपी से हमेशा के लिए हट जाती है।';
+
+  @override
+  String get annotateAckCheck =>
+      'मैं समझता/समझती हूँ, और यह मेरा अपना दस्तावेज़ है';
+
+  @override
+  String get annotateIdentityBlockedTitle =>
+      'पहचान दस्तावेज़ों के लिए उपलब्ध नहीं';
+
+  @override
+  String get annotateIdentityBlocked =>
+      'पहचान श्रेणी के दस्तावेज़ों (आधार, पैन, पासपोर्ट, वोटर आईडी आदि) पर लिखा नहीं जा सकता। आधिकारिक दस्तावेज़ों में बदलाव समर्थित नहीं है।';
+
+  @override
+  String get signaturePadTitle => 'अपना हस्ताक्षर बनाएं';
+
+  @override
+  String get signatureClear => 'मिटाएं';
+
+  @override
+  String get signatureUse => 'इस्तेमाल करें';
+
+  @override
+  String get signatureRemember => 'इस डिवाइस पर सहेजें (एन्क्रिप्टेड)';
+
+  @override
+  String get signatureUseSaved => 'सहेजा हुआ हस्ताक्षर इस्तेमाल करें';
+
+  @override
+  String get signatureDeleteSaved => 'सहेजा हुआ हस्ताक्षर हटाएं';
+
+  @override
+  String get signatureChange => 'हस्ताक्षर बदलें';
+
+  @override
+  String get premiumTitle => 'DocSafe प्रीमियम';
+
+  @override
+  String premiumLocked(String feature) {
+    return '$feature एक प्रीमियम सुविधा है।';
+  }
+
+  @override
+  String get premiumIncludes => 'प्रीमियम में शामिल है';
+
+  @override
+  String get premiumMonthly => '₹49 / महीना';
+
+  @override
+  String get premiumYearly => '₹299 / साल';
+
+  @override
+  String get premiumComingSoon =>
+      'सदस्यता आने वाले अपडेट में शुरू होगी। इस संस्करण में कोई भुगतान नहीं किया जा सकता।';
+
+  @override
+  String get premiumLockedBadge => 'लॉक';
+
+  @override
+  String get settingsDeveloperSection => 'डेवलपर (सिर्फ़ डीबग बिल्ड)';
+
+  @override
+  String get settingsDevUnlockPremium => 'टेस्ट के लिए प्रीमियम सुविधाएं खोलें';
+
+  @override
+  String annotatePageOf(int page, int total) {
+    return 'पेज $page / $total';
+  }
+
+  @override
+  String annotatedTitle(String title) {
+    return '$title (एनोटेटेड कॉपी)';
+  }
+
+  @override
+  String annotatedNote(String title) {
+    return '“$title” की एनोटेटेड कॉपी, DocSafe में बनाई गई। यह मूल दस्तावेज़ नहीं है।';
   }
 }

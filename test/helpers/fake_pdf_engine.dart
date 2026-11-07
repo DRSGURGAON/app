@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:ui' show Size;
 
 import 'package:docsafe/core/pdf/pdf_engine.dart';
 import 'package:docsafe/core/security/security_failure.dart';
@@ -21,6 +22,16 @@ class FakePdfEngine implements PdfEngine {
       throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
     }
     return pagesByFileId[id] ?? 1;
+  }
+
+  /// A4 portrait unless configured.
+  final Map<String, Size> pageSizeByFileId = {};
+
+  @override
+  Future<List<Size>> pageSizes(String path) async {
+    final n = await pageCount(path);
+    final size = pageSizeByFileId[_fileId(path)] ?? const Size(595, 842);
+    return List.filled(n, size);
   }
 
   @override

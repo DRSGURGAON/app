@@ -1673,7 +1673,7 @@ abstract class AppLocalizations {
   /// No description provided for @toolsPremiumNote.
   ///
   /// In en, this message translates to:
-  /// **'Premium tools are open to everyone in this test version. Subscriptions arrive in a later update.'**
+  /// **'Merge, split and compress are open to everyone in this test version. Annotate & Sign needs Premium, and subscriptions arrive in a later update.'**
   String get toolsPremiumNote;
 
   /// No description provided for @toolsPrivacyNote.
@@ -1891,6 +1891,306 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Page {number} of {total}'**
   String pageLabelOf(int number, int total);
+
+  /// No description provided for @toolAnnotate.
+  ///
+  /// In en, this message translates to:
+  /// **'Annotate & Sign'**
+  String get toolAnnotate;
+
+  /// No description provided for @toolAnnotateDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Write text, add your signature, draw, highlight or cover parts of a PDF. Always saved as a new copy.'**
+  String get toolAnnotateDesc;
+
+  /// No description provided for @annotateToolText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get annotateToolText;
+
+  /// No description provided for @annotateToolSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign'**
+  String get annotateToolSign;
+
+  /// No description provided for @annotateToolDraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw'**
+  String get annotateToolDraw;
+
+  /// No description provided for @annotateToolHighlight.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlight'**
+  String get annotateToolHighlight;
+
+  /// No description provided for @annotateToolCover.
+  ///
+  /// In en, this message translates to:
+  /// **'Cover'**
+  String get annotateToolCover;
+
+  /// No description provided for @annotateHintText.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap where the text should go'**
+  String get annotateHintText;
+
+  /// No description provided for @annotateHintSign.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap where your signature should go'**
+  String get annotateHintSign;
+
+  /// No description provided for @annotateHintDraw.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw with your finger'**
+  String get annotateHintDraw;
+
+  /// No description provided for @annotateHintRect.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag across the area'**
+  String get annotateHintRect;
+
+  /// No description provided for @annotateHintDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Long-press a mark to delete it'**
+  String get annotateHintDelete;
+
+  /// No description provided for @annotateUndo.
+  ///
+  /// In en, this message translates to:
+  /// **'Undo'**
+  String get annotateUndo;
+
+  /// No description provided for @annotateColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Colour'**
+  String get annotateColor;
+
+  /// No description provided for @annotatePrevPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous page'**
+  String get annotatePrevPage;
+
+  /// No description provided for @annotateNextPage.
+  ///
+  /// In en, this message translates to:
+  /// **'Next page'**
+  String get annotateNextPage;
+
+  /// No description provided for @annotateAddText.
+  ///
+  /// In en, this message translates to:
+  /// **'Add text'**
+  String get annotateAddText;
+
+  /// No description provided for @annotateTextSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Small'**
+  String get annotateTextSmall;
+
+  /// No description provided for @annotateTextMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get annotateTextMedium;
+
+  /// No description provided for @annotateTextLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Large'**
+  String get annotateTextLarge;
+
+  /// No description provided for @annotateAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get annotateAdd;
+
+  /// No description provided for @annotateDeleteMark.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this mark?'**
+  String get annotateDeleteMark;
+
+  /// No description provided for @annotateNothing.
+  ///
+  /// In en, this message translates to:
+  /// **'Add something to the page first'**
+  String get annotateNothing;
+
+  /// No description provided for @annotateDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard your changes?'**
+  String get annotateDiscardTitle;
+
+  /// No description provided for @annotateDiscard.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get annotateDiscard;
+
+  /// No description provided for @annotateSaveCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Save copy'**
+  String get annotateSaveCopy;
+
+  /// No description provided for @annotateAckTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Before you save'**
+  String get annotateAckTitle;
+
+  /// No description provided for @annotateAckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocSafe saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.'**
+  String get annotateAckBody;
+
+  /// No description provided for @annotateAckCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand, and this is my own document'**
+  String get annotateAckCheck;
+
+  /// No description provided for @annotateIdentityBlockedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available for identity documents'**
+  String get annotateIdentityBlockedTitle;
+
+  /// No description provided for @annotateIdentityBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents in the Identity category (Aadhaar, PAN, passport, voter ID and similar) can\'t be annotated. Changing official documents is not supported.'**
+  String get annotateIdentityBlocked;
+
+  /// No description provided for @signaturePadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Draw your signature'**
+  String get signaturePadTitle;
+
+  /// No description provided for @signatureClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get signatureClear;
+
+  /// No description provided for @signatureUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Use'**
+  String get signatureUse;
+
+  /// No description provided for @signatureRemember.
+  ///
+  /// In en, this message translates to:
+  /// **'Save on this device (encrypted)'**
+  String get signatureRemember;
+
+  /// No description provided for @signatureUseSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Use saved signature'**
+  String get signatureUseSaved;
+
+  /// No description provided for @signatureDeleteSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete saved signature'**
+  String get signatureDeleteSaved;
+
+  /// No description provided for @signatureChange.
+  ///
+  /// In en, this message translates to:
+  /// **'Change signature'**
+  String get signatureChange;
+
+  /// No description provided for @premiumTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'DocSafe Premium'**
+  String get premiumTitle;
+
+  /// No description provided for @premiumLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'{feature} is a Premium feature.'**
+  String premiumLocked(String feature);
+
+  /// No description provided for @premiumIncludes.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium includes'**
+  String get premiumIncludes;
+
+  /// No description provided for @premiumMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'₹49 / month'**
+  String get premiumMonthly;
+
+  /// No description provided for @premiumYearly.
+  ///
+  /// In en, this message translates to:
+  /// **'₹299 / year'**
+  String get premiumYearly;
+
+  /// No description provided for @premiumComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions open in an upcoming update. No payment can be made in this version.'**
+  String get premiumComingSoon;
+
+  /// No description provided for @premiumLockedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Locked'**
+  String get premiumLockedBadge;
+
+  /// No description provided for @settingsDeveloperSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer (debug build only)'**
+  String get settingsDeveloperSection;
+
+  /// No description provided for @settingsDevUnlockPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock Premium features for testing'**
+  String get settingsDevUnlockPremium;
+
+  /// No description provided for @annotatePageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {page} of {total}'**
+  String annotatePageOf(int page, int total);
+
+  /// No description provided for @annotatedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (annotated)'**
+  String annotatedTitle(String title);
+
+  /// No description provided for @annotatedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Annotated copy of “{title}”, made in DocSafe. This is not the original document.'**
+  String annotatedNote(String title);
 }
 
 class _AppLocalizationsDelegate
