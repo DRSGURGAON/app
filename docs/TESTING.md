@@ -7,9 +7,9 @@
 | Crypto core (JVM) — 48 tests (incl. push encryptor, JPEG parser, PDF writer incl. lazy pages and original page size validated with PDFBox) | `cd native/docsafe-crypto && ./gradlew test` | Any JVM, CI | **Passed locally** |
 | Dart unit + widget + migration — 117 tests (real SQLCipher on host; PDF tools and Annotate & Sign with a fake engine; overlay rendering pixel-checked; 320x480 dp Hindi layout tests) | `flutter test` | Host, CI | **Passed locally** |
 | Static analysis | `flutter analyze` | Host, CI | **No issues** |
-| Debug + release APK build, release permission audit | `flutter build apk --debug/--release` | CI | **Passed** (CI run 12) |
-| Android instrumented tests — 20 tests (Keystore vault incl. 64 MB streaming; scan save path; PDF ops: images→PDF, compression, unreadable PDFs, flatten with cover, checked with `PdfRenderer`) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (5/5) |
-| On-device: security flow, preview robustness, PDF tools with real PDFium, Annotate & Sign (real overlay + native flatten, pixel-checked), **true process restart** (force-stop) and **device reboot** — `tool/ci/device_tests.sh` | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (1/1) |
+| Debug + release APK build, release permission audit | `flutter build apk --debug/--release` | CI | **Passed** (CI run 21) |
+| Android instrumented tests — 20 tests (Keystore vault incl. 64 MB streaming; scan save path; PDF ops: images→PDF, compression, unreadable PDFs, flatten with cover, checked with `PdfRenderer`) | `cd android && ./gradlew :app:connectedDebugAndroidTest` | Emulator API 34 (CI) | **Passed** (20/20, CI run 21) |
+| On-device: security flow, preview robustness, PDF tools with real PDFium, Annotate & Sign (real overlay + native flatten, pixel-checked), **true process restart** (force-stop) and **device reboot** — `tool/ci/device_tests.sh` | `flutter test integration_test` | Emulator API 34 (CI) | **Passed** (CI run 21) |
 
 All suites run in `.github/workflows/ci.yml` on every push (branch `docsafe-main` of DRSGURGAON/app).
 Emulator results cover the real Android Keystore, PinManager and SQLCipher on Android 14;
