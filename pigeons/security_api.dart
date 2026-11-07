@@ -182,6 +182,14 @@ class ImagePageSpec {
   int rotation;
 }
 
+/// A transparent PNG drawn over one page (same aspect ratio as the page as displayed).
+class PageOverlay {
+  PageOverlay({required this.pageIndex, required this.png});
+
+  int pageIndex;
+  Uint8List png;
+}
+
 /// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
 enum CompressionLevel { high, balanced, smallest }
 
@@ -303,6 +311,14 @@ abstract class SecurityHostApi {
   /// in the result is no longer selectable. Errors: PDF_UNREADABLE.
   @async
   ImportedFile compressPdf(String fileId, CompressionLevel level);
+
+  /// Annotate & Sign: renders each listed page of a vault PDF, draws its
+  /// overlay on top and returns a NEW encrypted PDF containing only those
+  /// flattened pages, in the given order (the caller reassembles the full
+  /// document and deletes this intermediate). Flattening removes anything
+  /// hidden under "cover" marks. Errors: PDF_UNREADABLE.
+  @async
+  ImportedFile flattenPages(String fileId, List<PageOverlay> overlays);
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();

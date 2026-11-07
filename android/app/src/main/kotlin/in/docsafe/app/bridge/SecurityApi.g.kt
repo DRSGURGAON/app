@@ -809,6 +809,51 @@ data class ImagePageSpec (
     return "ImagePageSpec(fileId=$fileId, mimeType=$mimeType, rotation=$rotation)"
   }
 }
+
+/**
+ * A transparent PNG drawn over one page (same aspect ratio as the page as displayed).
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class PageOverlay (
+  val pageIndex: Long,
+  val png: ByteArray
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): PageOverlay {
+      val pageIndex = pigeonVar_list[0] as Long
+      val png = pigeonVar_list[1] as ByteArray
+      return PageOverlay(pageIndex, png)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      pageIndex,
+      png,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as PageOverlay
+    return SecurityApiPigeonUtils.deepEquals(this.pageIndex, other.pageIndex) && SecurityApiPigeonUtils.deepEquals(this.png, other.png)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.pageIndex)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.png)
+    return result
+  }
+  override fun toString(): String {
+    return "PageOverlay(pageIndex=$pageIndex, png=${png.contentToString()})"
+  }
+}
 private open class SecurityApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -897,6 +942,11 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
           ImagePageSpec.fromList(it)
         }
       }
+      146.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          PageOverlay.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -968,6 +1018,10 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       is ImagePageSpec -> {
         stream.write(145)
+        writeValue(stream, value.toList())
+      }
+      is PageOverlay -> {
+        stream.write(146)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1061,6 +1115,14 @@ interface SecurityHostApi {
    * in the result is no longer selectable. Errors: PDF_UNREADABLE.
    */
   suspend fun compressPdf(fileId: String, level: CompressionLevel): ImportedFile
+  /**
+   * Annotate & Sign: renders each listed page of a vault PDF, draws its
+   * overlay on top and returns a NEW encrypted PDF containing only those
+   * flattened pages, in the given order (the caller reassembles the full
+   * document and deletes this intermediate). Flattening removes anything
+   * hidden under "cover" marks. Errors: PDF_UNREADABLE.
+   */
+  suspend fun flattenPages(fileId: String, overlays: List<PageOverlay>): ImportedFile
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -1590,6 +1652,26 @@ interface SecurityHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.compressPdf(fileIdArg, levelArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.flattenPages$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileIdArg = args[0] as String
+            val overlaysArg = args[1] as List<PageOverlay>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.flattenPages(fileIdArg, overlaysArg))
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)
               }

@@ -750,6 +750,53 @@ class ImagePageSpec {
   }
 }
 
+/// A transparent PNG drawn over one page (same aspect ratio as the page as displayed).
+class PageOverlay {
+  PageOverlay({required this.pageIndex, required this.png});
+
+  int pageIndex;
+
+  Uint8List png;
+
+  List<Object?> _toList() {
+    return <Object?>[pageIndex, png];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static PageOverlay decode(Object result) {
+    result as List<Object?>;
+    return PageOverlay(
+      pageIndex: result[0]! as int,
+      png: result[1]! as Uint8List,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! PageOverlay || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(pageIndex, other.pageIndex) &&
+        _deepEquals(png, other.png);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'PageOverlay(pageIndex: $pageIndex, png: $png)';
+  }
+}
+
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -808,6 +855,9 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is ImagePageSpec) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
+    } else if (value is PageOverlay) {
+      buffer.putUint8(146);
+      writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
     }
@@ -856,6 +906,8 @@ class _PigeonCodec extends StandardMessageCodec {
         return ScanPageSpec.decode(readValue(buffer)!);
       case 145:
         return ImagePageSpec.decode(readValue(buffer)!);
+      case 146:
+        return PageOverlay.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1484,6 +1536,35 @@ class SecurityHostApi {
     );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
       <Object?>[fileId, level],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as ImportedFile;
+  }
+
+  /// Annotate & Sign: renders each listed page of a vault PDF, draws its
+  /// overlay on top and returns a NEW encrypted PDF containing only those
+  /// flattened pages, in the given order (the caller reassembles the full
+  /// document and deletes this intermediate). Flattening removes anything
+  /// hidden under "cover" marks. Errors: PDF_UNREADABLE.
+  Future<ImportedFile> flattenPages(
+    String fileId,
+    List<PageOverlay> overlays,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.flattenPages$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, overlays],
     );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 

@@ -167,6 +167,17 @@ class DocumentRepository {
     return row == null ? null : _toModel(row);
   }
 
+  /// Stable key of the document's default category ('identity', ...), or
+  /// null for uncategorised / custom categories.
+  Future<String?> categoryKeyOf(VaultDocument doc) async {
+    final id = doc.categoryId;
+    if (id == null) return null;
+    final row = await (_db.select(
+      _db.categories,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
+    return row?.key;
+  }
+
   Future<DocumentDetails?> _loadDetails(int id) async {
     final row = await (_base()..where(_db.documents.id.equals(id)))
         .getSingleOrNull();

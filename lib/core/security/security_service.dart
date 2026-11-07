@@ -15,6 +15,7 @@ export 'native/security_api.g.dart'
         ExportSummary,
         ImportedFile,
         KeyProtection,
+        PageOverlay,
         PinOutcome,
         PinVerifyResult,
         ScanPageSpec,
@@ -65,6 +66,7 @@ abstract interface class SecurityService {
   Future<ImportedFile> importPdfBytes(Uint8List bytes);
   Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images);
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level);
+  Future<ImportedFile> flattenPages(String fileId, List<PageOverlay> overlays);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -208,6 +210,12 @@ class PigeonSecurityService implements SecurityService {
   @override
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level) =>
       _guard(() => _api.compressPdf(fileId, level));
+
+  @override
+  Future<ImportedFile> flattenPages(
+    String fileId,
+    List<PageOverlay> overlays,
+  ) => _guard(() => _api.flattenPages(fileId, overlays));
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

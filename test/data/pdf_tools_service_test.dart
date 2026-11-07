@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:docsafe/core/database/app_database.dart';
 import 'package:docsafe/core/database/database_opener.dart';
 import 'package:docsafe/core/security/security_failure.dart';
@@ -191,4 +193,108 @@ void main() {
       expect(fake.tempFiles, isEmpty);
     },
   );
+
+  group('annotate', () {
+    Uint8List png(int v) => Uint8List.fromList([137, 80, 78, 71, v]);
+
+    test(
+      'flattens only annotated pages, reassembles in order, saves a new copy '
+      'with a note, deletes the intermediate and wipes temps',
+      () async {
+        final folder = await FolderRepository(db).create('Bank');
+        final doc = await add('Form.pdf', pages: 4, folderId: folder);
+        final before = Set.of(fake.filesOnDisk);
+        final out = await tools.annotate(
+          doc,
+          {2: png(2), 0: png(0)},
+          title: 'Form (annotated)',
+          note: 'Annotated copy of Form',
+        );
+        final call = fake.flattenCalls.single;
+        expect(call.$1, doc.fileId);
+        expect([for (final o in call.$2) o.pageIndex], [0, 2]);
+        expect(call.$2.first.png, png(0));
+
+        // The flattened intermediate is the only file id that is neither the
+        // source nor the saved output.
+        final summary = engine.lastSummary();
+        expect(summary, hasLength(4));
+        final flatId = summary[0].split('#').first;
+        expect(flatId, isNot(doc.fileId));
+        expect(summary, [
+          '$flatId#0@0',
+          '${doc.fileId}#1@0',
+          '$flatId#1@0',
+          '${doc.fileId}#3@0',
+        ]);
+        expect(
+          fake.filesOnDisk.contains(flatId),
+          isFalse,
+          reason: 'intermediate deleted',
+        );
+        expect(fake.filesOnDisk, before..add(out.fileId));
+        expect(fake.tempFiles, isEmpty);
+
+        expect(out.title, 'Form (annotated)');
+        expect(out.folderId, folder);
+        expect(out.id, isNot(doc.id));
+        final orig = await repo.byId(doc.id);
+        expect(orig!.fileId, doc.fileId, reason: 'original untouched');
+        expect(orig.deletedAt, isNull);
+        final details = await repo.watchDetails(out.id).first;
+        expect(details!.notes, 'Annotated copy of Form');
+      },
+    );
+
+    test('identity-category documents are refused before any work', () async {
+      final doc = await add('Aadhaar.pdf', pages: 1);
+      final identity = await (db.select(
+        db.categories,
+      )..where((t) => t.key.equals('identity'))).getSingle();
+      await repo.setCategory(doc.id, identity.id);
+      final reloaded = (await repo.byId(doc.id))!;
+      expect(await tools.canAnnotate(reloaded), isFalse);
+      await expectLater(
+        tools.annotate(reloaded, {0: png(1)}, title: 'x'),
+        throwsA(isA<AnnotationNotAllowed>()),
+      );
+      expect(fake.flattenCalls, isEmpty);
+      expect(engine.assembled, isEmpty);
+    });
+
+    test('images and empty annotations are refused', () async {
+      final img = await add('Photo.jpg', mime: 'image/jpeg');
+      expect(await tools.canAnnotate(img), isFalse);
+      final doc = await add('Doc.pdf');
+      expect(await tools.canAnnotate(doc), isTrue);
+      await expectLater(
+        tools.annotate(doc, const {}, title: 'x'),
+        throwsArgumentError,
+      );
+    });
+
+    test('flatten failure: nothing saved, no temp left', () async {
+      final doc = await add('Broken.pdf', pages: 2);
+      fake.flattenFailures.add(doc.fileId);
+      final before = (await repo.watchAll().first).length;
+      await expectLater(
+        tools.annotate(doc, {0: png(1)}, title: 'x'),
+        throwsA(isA<SecurityFailure>()),
+      );
+      expect((await repo.watchAll().first).length, before);
+      expect(fake.tempFiles, isEmpty);
+    });
+
+    test('assemble failure deletes the intermediate container', () async {
+      final doc = await add('Damaged.pdf', pages: 2);
+      engine.unreadable.add(doc.fileId);
+      final filesBefore = Set.of(fake.filesOnDisk);
+      await expectLater(
+        tools.annotate(doc, {1: png(1)}, title: 'x'),
+        throwsA(isA<SecurityFailure>()),
+      );
+      expect(fake.filesOnDisk, filesBefore);
+      expect(fake.tempFiles, isEmpty);
+    });
+  });
 }

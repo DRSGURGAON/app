@@ -37,6 +37,15 @@ class CompressResult {
   final SecurityErrorCode? error;
 }
 
+/// Annotate & Sign is refused for documents in this category (Aadhaar, PAN,
+/// passport...): changing official identity documents is not supported.
+const annotationBlockedCategoryKey = 'identity';
+
+/// Thrown when a document may not be annotated (identity category).
+class AnnotationNotAllowed implements Exception {
+  const AnnotationNotAllowed();
+}
+
 /// PDF Assistant operations. Every result is a NEW encrypted document; inputs
 /// are decrypted to short-lived temp files that are deleted in `finally`.
 class PdfToolsService {
@@ -212,6 +221,65 @@ class PdfToolsService {
     }
     AppLogger.event('pdf_compress');
     return results;
+  }
+
+  /// Whether [doc] may be opened in Annotate & Sign.
+  Future<bool> canAnnotate(VaultDocument doc) async =>
+      doc.isPdf &&
+      await _repo.categoryKeyOf(doc) != annotationBlockedCategoryKey;
+
+  /// Annotate & Sign. [overlays] maps 0-based page index -> transparent PNG
+  /// (same aspect ratio as the page as displayed). Annotated pages are
+  /// flattened natively (rendered + overlay drawn, so anything under a
+  /// "cover" mark is really gone), then the full document is reassembled
+  /// with the untouched pages unchanged and saved as a NEW document. The
+  /// original is never modified. [note] is stored on the copy.
+  Future<VaultDocument> annotate(
+    VaultDocument doc,
+    Map<int, Uint8List> overlays, {
+    required String title,
+    String? note,
+  }) async {
+    if (overlays.isEmpty) throw ArgumentError('No annotations');
+    if (!await canAnnotate(doc)) throw const AnnotationNotAllowed();
+    _checkSize([doc]);
+    final indices = overlays.keys.toList()..sort();
+    final flat = await _security.flattenPages(doc.fileId, [
+      for (final i in indices) PageOverlay(pageIndex: i, png: overlays[i]!),
+    ]);
+    String? flatPath;
+    try {
+      final out = await _withSources([doc], (p) async {
+        flatPath = await _security.decryptToTemp(flat.fileId, 'pdf');
+        final src = p[doc.id]!;
+        final n = await _engine.pageCount(src);
+        final bytes = await _engine.assemble([
+          for (var i = 0; i < n; i++)
+            if (indices.contains(i))
+              PageRef(flatPath!, indices.indexOf(i))
+            else
+              PageRef(src, i),
+        ]);
+        return _save(bytes, title, doc);
+      });
+      if (note != null) await _repo.saveMetadata(out.id, notes: note);
+      AppLogger.event('pdf_annotate');
+      return out;
+    } finally {
+      final path = flatPath;
+      if (path != null) {
+        try {
+          await _security.deleteTemp(path);
+        } catch (_) {
+          // Wiped on lock / next start anyway.
+        }
+      }
+      try {
+        // Intermediate container, never recorded in the database. If this
+        // fails, the orphan sweep removes it on the next start.
+        await _security.deleteEncryptedFile(flat.fileId);
+      } catch (_) {}
+    }
   }
 
   Future<VaultDocument> _save(

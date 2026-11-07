@@ -118,6 +118,74 @@ class PdfOpsInstrumentedTest {
         assertTrue(temp.listFiles().isNullOrEmpty())
     }
 
+    /** Transparent overlay PNG with an opaque rectangle in the given normalized area. */
+    private fun overlayPng(color: Int, l: Float, t: Float, r: Float, b: Float): ByteArray {
+        val w = 400
+        val h = 566
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        bmp.eraseColor(Color.TRANSPARENT)
+        android.graphics.Canvas(bmp).drawRect(l * w, t * h, r * w, b * h, android.graphics.Paint().apply { this.color = color })
+        val out = ByteArrayOutputStream()
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+        bmp.recycle()
+        return out.toByteArray()
+    }
+
+    private fun pixelAt(fileId: String, page: Int, x: Float, y: Float): Int = render(fileId) { r ->
+        r.openPage(page).use { p ->
+            val bmp = Bitmap.createBitmap(p.width * 2, p.height * 2, Bitmap.Config.ARGB_8888)
+            bmp.eraseColor(Color.WHITE)
+            p.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+            val c = bmp.getPixel((x * bmp.width).toInt(), (y * bmp.height).toInt())
+            bmp.recycle()
+            c
+        }
+    }
+
+    private fun near(actual: Int, expected: Int) =
+        Math.abs(Color.red(actual) - Color.red(expected)) < 40 &&
+            Math.abs(Color.green(actual) - Color.green(expected)) < 40 &&
+            Math.abs(Color.blue(actual) - Color.blue(expected)) < 40
+
+    @Test
+    fun flattenDrawsOverlayAndCoverRemovesUnderlyingContent() {
+        // Source page: white with a blue bar at 25..33% height (see image()).
+        val src = ops.imagesToPdf(listOf(PdfOps.ImageSpec(store(image(600, 849, Bitmap.CompressFormat.JPEG)), "image/jpeg", 0)))
+        assertTrue("source has the blue bar", near(pixelAt(src.fileId, 0, 0.5f, 0.29f), Color.BLUE))
+
+        val annotated = ops.flatten(
+            src.fileId,
+            listOf(
+                PdfOps.Overlay(
+                    0,
+                    // White "cover" over the blue bar + a red "signature" box lower down.
+                    overlayPng(Color.WHITE, 0.2f, 0.2f, 0.8f, 0.4f).let { cover ->
+                        val a = android.graphics.BitmapFactory.decodeByteArray(cover, 0, cover.size).copy(Bitmap.Config.ARGB_8888, true)
+                        android.graphics.Canvas(a).drawRect(
+                            0.6f * a.width, 0.8f * a.height, 0.9f * a.width, 0.9f * a.height,
+                            android.graphics.Paint().apply { color = Color.RED },
+                        )
+                        ByteArrayOutputStream().also { a.compress(Bitmap.CompressFormat.PNG, 100, it); a.recycle() }.toByteArray()
+                    },
+                ),
+            ),
+        )
+        assertTrue("covered area is white", near(pixelAt(annotated.fileId, 0, 0.5f, 0.29f), Color.WHITE))
+        assertTrue("signature visible", near(pixelAt(annotated.fileId, 0, 0.75f, 0.85f), Color.RED))
+        assertTrue(temp.listFiles().isNullOrEmpty())
+    }
+
+    @Test
+    fun flattenRejectsBadPageIndex() {
+        val src = ops.imagesToPdf(listOf(PdfOps.ImageSpec(store(image(300, 400, Bitmap.CompressFormat.JPEG)), "image/jpeg", 0)))
+        try {
+            ops.flatten(src.fileId, listOf(PdfOps.Overlay(5, overlayPng(Color.RED, 0f, 0f, 0.1f, 0.1f))))
+            fail("expected InvalidInputException")
+        } catch (_: InvalidInputException) {
+        }
+        assertTrue(temp.listFiles().isNullOrEmpty())
+    }
+
     @Test
     fun importPdfBytesRejectsNonPdf() {
         try {

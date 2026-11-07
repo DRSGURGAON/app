@@ -44,6 +44,10 @@ class FakeSecurityService implements SecurityService {
   /// Size (bytes) the "compressed" output gets, per source fileId; default 100.
   final Map<String, int> compressedSize = {};
   final Set<String> compressFailures = {};
+
+  /// Annotate simulation: every flattenPages call (source id, overlays).
+  final List<(String, List<PageOverlay>)> flattenCalls = [];
+  final Set<String> flattenFailures = {};
   int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
@@ -362,6 +366,19 @@ class FakeSecurityService implements SecurityService {
       throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
     }
     return _generated(compressedSize[fileId] ?? 100);
+  }
+
+  @override
+  Future<ImportedFile> flattenPages(
+    String fileId,
+    List<PageOverlay> overlays,
+  ) async {
+    _requireUnlocked();
+    flattenCalls.add((fileId, overlays));
+    if (flattenFailures.contains(fileId)) {
+      throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
+    }
+    return _generated(1000 * overlays.length);
   }
 
   @override

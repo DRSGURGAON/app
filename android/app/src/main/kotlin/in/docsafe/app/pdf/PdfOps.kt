@@ -32,6 +32,8 @@ class PdfOps(private val vault: VaultStore) {
 
     data class ImageSpec(val fileId: String, val mimeType: String, val rotation: Int)
 
+    data class Overlay(val pageIndex: Int, val png: ByteArray)
+
     fun importPdfBytes(bytes: ByteArray): VaultStore.ImportResult {
         if (bytes.size > MAX_IN_MEMORY_PDF) throw InvalidInputException("PDF too large")
         if (bytes.size < 5 || String(bytes, 0, 5, Charsets.US_ASCII) != "%PDF-") {
@@ -90,6 +92,91 @@ class PdfOps(private val vault: VaultStore) {
         }
     }
 
+    /**
+     * Annotate & Sign: renders each overlay's page at [FLATTEN_DPI], draws the
+     * transparent overlay PNG over the whole page and writes those pages, in
+     * order, into a new encrypted PDF. Content under opaque "cover" marks is
+     * gone from the result (the page becomes an image).
+     */
+    fun flatten(fileId: String, overlays: List<Overlay>): VaultStore.ImportResult {
+        if (overlays.isEmpty()) throw InvalidInputException("No pages")
+        if (overlays.size > MAX_FLATTEN_PAGES) throw InvalidInputException("Too many pages")
+        if (overlays.any { it.png.size > MAX_OVERLAY_BYTES }) throw InvalidInputException("Overlay too large")
+        return withRenderer(fileId) { r ->
+            val pages = overlays.map { o ->
+                if (o.pageIndex !in 0 until r.pageCount) throw InvalidInputException("Page out of range")
+                JpegPdfWriter.Page(0) { renderWithOverlay(r, o) }
+            }
+            vault.importWriting(null) { out -> JpegPdfWriter.write(out, pages) }
+        }
+    }
+
+    private fun <T> withRenderer(fileId: String, block: (PdfRenderer) -> T): T {
+        val src = vault.decryptToTemp(fileId, "pdf")
+        try {
+            val fd = try {
+                ParcelFileDescriptor.open(src, ParcelFileDescriptor.MODE_READ_ONLY)
+            } catch (e: IOException) {
+                throw PdfUnreadableException(e)
+            }
+            fd.use {
+                val renderer = try {
+                    PdfRenderer(fd)
+                } catch (e: IOException) {
+                    throw PdfUnreadableException(e)
+                } catch (e: SecurityException) {
+                    throw PdfUnreadableException(e)
+                }
+                return renderer.use { r ->
+                    if (r.pageCount == 0) throw PdfUnreadableException(null)
+                    block(r)
+                }
+            }
+        } finally {
+            runCatching { vault.deleteTemp(src.path) }
+        }
+    }
+
+    private fun renderWithOverlay(r: PdfRenderer, o: Overlay): JpegPdfWriter.Opened =
+        r.openPage(o.pageIndex).use { page ->
+            val (w, h) = renderSize(page.width, page.height, FLATTEN_DPI)
+            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            try {
+                bmp.eraseColor(Color.WHITE)
+                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                val overlay = BitmapFactory.decodeByteArray(o.png, 0, o.png.size)
+                    ?: throw InvalidInputException("Unreadable overlay")
+                try {
+                    val paint = android.graphics.Paint(android.graphics.Paint.FILTER_BITMAP_FLAG)
+                    android.graphics.Canvas(bmp).drawBitmap(
+                        overlay,
+                        null,
+                        android.graphics.Rect(0, 0, w, h),
+                        paint,
+                    )
+                } finally {
+                    overlay.recycle()
+                }
+                val out = ByteArrayOutputStream()
+                bmp.compress(Bitmap.CompressFormat.JPEG, FLATTEN_QUALITY, out)
+                JpegPdfWriter.Opened(JpegInfo(w, h, 3), ByteArrayInputStream(out.toByteArray()))
+            } finally {
+                bmp.recycle()
+            }
+        }
+
+    private fun renderSize(widthPt: Int, heightPt: Int, dpi: Int): Pair<Int, Int> {
+        val scale = dpi / 72f
+        var w = (widthPt * scale).toInt().coerceAtLeast(1)
+        var h = (heightPt * scale).toInt().coerceAtLeast(1)
+        val longest = maxOf(w, h)
+        if (longest > MAX_RENDER_SIDE) {
+            w = (w.toLong() * MAX_RENDER_SIDE / longest).toInt().coerceAtLeast(1)
+            h = (h.toLong() * MAX_RENDER_SIDE / longest).toInt().coerceAtLeast(1)
+        }
+        return w to h
+    }
+
     private fun renderPage(r: PdfRenderer, index: Int, preset: Preset): JpegPdfWriter.Opened =
         r.openPage(index).use { page ->
             val scale = preset.dpi / 72f
@@ -144,5 +231,9 @@ class PdfOps(private val vault: VaultStore) {
         /** Upper bound for PDFs produced in memory by page operations. */
         const val MAX_IN_MEMORY_PDF = 150 * 1024 * 1024
         private const val MAX_RENDER_SIDE = 3500
+        const val FLATTEN_DPI = 200
+        private const val FLATTEN_QUALITY = 90
+        private const val MAX_FLATTEN_PAGES = 500
+        private const val MAX_OVERLAY_BYTES = 30 * 1024 * 1024
     }
 }

@@ -326,6 +326,15 @@ class SecurityHostApiImpl(
         }
     }
 
+    override suspend fun flattenPages(fileId: String, overlays: List<PageOverlay>): ImportedFile = guard {
+        io {
+            session.requireUnlocked()
+            VaultStore.validateId(fileId)
+            session.pdfOps.flatten(fileId, overlays.map { PdfOps.Overlay(it.pageIndex.toInt(), it.png) })
+                .toPigeon("application/pdf")
+        }
+    }
+
     private fun VaultStore.ImportResult.toPigeon(mime: String) = ImportedFile(
         fileId = fileId,
         displayName = "",
