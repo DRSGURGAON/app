@@ -125,7 +125,14 @@ class ReminderOcrInstrumentedTest {
         assertEquals(1, s.schedule().size)
         assertTrue(s.isArmed())
         val nm = context.getSystemService(NotificationManager::class.java)
-        val posted = nm.activeNotifications.firstOrNull { it.id == ReminderScheduler.NOTIFICATION_ID }
+        // Posting and cancelling go through the system server asynchronously.
+        fun active() = nm.activeNotifications.firstOrNull { it.id == ReminderScheduler.NOTIFICATION_ID }
+        var posted = active()
+        for (i in 0 until 30) {
+            if (posted != null) break
+            Thread.sleep(100)
+            posted = active()
+        }
         assertTrue("notification posted", posted != null)
         val extras = posted!!.notification.extras
         val text = "${extras.getCharSequence("android.title")} ${extras.getCharSequence("android.text")}"
@@ -138,6 +145,10 @@ class ReminderOcrInstrumentedTest {
         )
         s.clear()
         assertFalse(s.isArmed())
-        assertTrue(nm.activeNotifications.none { it.id == ReminderScheduler.NOTIFICATION_ID })
+        for (i in 0 until 30) {
+            if (active() == null) break
+            Thread.sleep(100)
+        }
+        assertTrue("notification removed by clear()", active() == null)
     }
 }
