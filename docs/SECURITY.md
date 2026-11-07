@@ -182,6 +182,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |
 | 7 | PDF tool inputs / output | inputs as #1; output PDF in memory only | Tool runs | When the tool finishes | No |
 | 7a | Annotate & Sign: source + flattened intermediate | as #1 (the intermediate is an encrypted vault container, decrypted to a temp file only while reassembling); overlay PNGs in memory | Save copy | When the save finishes (intermediate container deleted; orphan sweep on next start) | No |
+| 7b | OCR input / output | input decrypted as #1 (one page bitmap at a time in memory); recognised text in memory, shown to the user | "Read text" | When OCR finishes (temp deleted in `finally`); text discarded unless the user saves it — then stored masked in the encrypted DB | No |
 | 8 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
 
 Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
@@ -252,7 +253,45 @@ Write text, place a signature, draw, highlight or **cover** (white-out) parts of
   upcoming update" — no buy button. Debug builds have a developer switch in Settings
   (`kDebugMode`, in memory only) for testing. The gate is a product gate, not a security boundary.
 
+## 12b. OCR and reminders (Phase 5)
+
+**OCR.** Google ML Kit text recognition (Devanagari model, which also reads Latin script) is
+**bundled in the APK**: no model download, no network permission, nothing leaves the device. The
+document is decrypted to a short-lived temp file, PDF pages are rendered one at a time (first 20
+pages per run), and the recognised text is returned in memory. It is shown to the user first:
+- **Suggestions** (category from keywords, expiry date from labels such as "Valid till" / "वैधता")
+  are applied only when the user taps *Apply*.
+- **Saving the text for search** is an explicit action (Premium). Before display and again before
+  storage, 12-digit Aadhaar numbers, 16-digit VIDs and PAN numbers are **masked** (last 4 kept);
+  any other 12-digit number is masked too. The text is stored only in the SQLCipher database
+  (`document_texts`), deleted with the document, deletable on its own, and wiped by Erase all.
+- The recognised text crosses the Dart↔Kotlin bridge in memory (documented exception, like the
+  in-memory PDF of §12).
+
+**Reminders.** Reminder rows (expiry lead time or a custom date) live in the encrypted database.
+The database cannot be read while locked, so the app hands the native side **only the list of
+times** (epoch milliseconds, 09:00 local on each reminder date). That list is the only reminder
+data outside the encrypted database (`no_backup/reminders/schedule.v1`; no titles, ids or dates of
+documents beyond the time itself — the time can reveal that *some* reminder exists on that day).
+- One inexact alarm (`AlarmManager.setAndAllowWhileIdle`, no exact-alarm permission) for the next
+  time; re-armed after reboot, app update and clock/time-zone changes (`RECEIVE_BOOT_COMPLETED`).
+  Doze may delay a reminder; it is a date reminder, not a precise alarm.
+- Notifications are **generic** ("A document in your vault needs attention") in the app's language,
+  `VISIBILITY_PRIVATE` with a title-only public version: no document name, category, date or
+  content, on the lock screen or anywhere. Several reminders on one day produce one notification.
+- Tapping it opens DocSafe; the PIN/biometric lock still applies, then the Reminders tab opens.
+- Android 13+: `POST_NOTIFICATIONS` is requested when the first reminder is added; if refused,
+  the Reminders tab shows a banner with a shortcut to the system settings.
+- Changing reminders, expiry dates, trash/restore re-syncs the schedule while unlocked;
+  Erase all data deletes the schedule file and cancels the alarm.
+- Free plan: 3 active reminders (today or later); more needs Premium (locked until billing).
+
 ## 13. Known limitations
+
+- OCR quality depends on the scan; handwriting and low-contrast photos are read poorly. Only the
+  first 20 pages of a PDF are read. Suggestions are heuristics and must be checked.
+- Reminder delivery depends on the OEM's background restrictions (some phones kill alarms of
+  apps that were swiped away); verify on physical devices (DEVICE_TESTING.md §10).
 
 - Biometric prompt, SAF import, PDF rendering and Keystore behaviour on real OEM devices have not
   been verified on physical hardware yet (see TESTING.md).

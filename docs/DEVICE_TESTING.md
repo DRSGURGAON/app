@@ -152,6 +152,27 @@ tool must stay locked and show the Premium screen (no purchase button).
 | A11 | Rotated pages (/Rotate 90) and a landscape page | Marks appear in the same place in the copy |
 | A12 | After saving: `adb shell run-as $APP ls cache/vault_tmp` | Empty |
 
+## 10. OCR and reminders (Phase 5)
+
+| # | Step | Expected |
+|---|---|---|
+| O1 | Details → Read text on a real Driving Licence / RC photo (camera, EXIF-rotated) | Text found; category "Vehicle" and expiry suggested; nothing changes until Apply |
+| O2 | Same on an Aadhaar or PAN scan | Number shown masked (XXXX XXXX 1234 / XXXXXX234F) |
+| O3 | Hindi document (e.g. a Hindi letter) | Devanagari text recognised |
+| O4 | 30-page PDF | "Read the first 20 of 30 pages" |
+| O5 | Airplane mode during OCR | Works (no network needed) |
+| O6 | Save text for search (Premium via developer switch), then Search → a word from the text | Document found; turning off "Inside documents" hides it |
+| R1 | Add the first reminder on Android 13+ | System notification permission dialog |
+| R2 | Custom reminder for tomorrow; lock the app; wait until 09:00 | One notification "DocSafe reminder", no document name; lock screen hides the text |
+| R3 | Tap the notification | Lock screen, then the Reminders tab |
+| R4 | Reminder for tomorrow, then reboot the phone | Notification still arrives at 09:00 |
+| R5 | Change the expiry date of a document with an expiry reminder | Reminder date moves |
+| R6 | Move the document to Recently deleted | Its reminders disappear and do not fire; restore brings them back |
+| R7 | Deny notifications in system settings | Reminders tab banner; "Turn on" opens settings |
+| R8 | Free plan (switch off): add a 4th active reminder | Premium screen, reminder not added |
+| R9 | Battery-saver / OEM "deep sleep" on (Xiaomi, Samsung, Oppo, Vivo) | Note whether the reminder arrives and how late |
+| R10 | Erase all data | No reminder fires afterwards |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -164,3 +185,4 @@ tool must stay locked and show the Premium screen (no purchase button).
 | Preview (§7) | | | |
 | PDF tools (§8) | | | |
 | Annotate & Sign (§9) | | | |
+| OCR & reminders (§10) | | | |

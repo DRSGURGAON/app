@@ -58,8 +58,20 @@ docs/SECURITY.md §12a. Merge, split and compress are labelled Premium but **not
 NEW encrypted document; originals are kept (edit pages can optionally move the original to
 Recently deleted). Not supported: editing text inside PDFs, opening password-protected PDFs.
 
-Not started: Phase 5 (OCR, reminders/notifications), 6 (billing), 7–8.
-Bottom navigation shows Home, Vault and Settings; PDF Tools and Reminders tabs are added when those phases ship.
+**Phase 5 — OCR and reminders:** implemented (physical-device checks pending; DEVICE_TESTING.md §10).
+
+| Area | Tier | State |
+|---|---|---|
+| Read text (OCR) on the device — ML Kit, bundled Hindi/Devanagari + English model, images and first 20 PDF pages | Free | Implemented; host-tested with a fake, emulator-tested with the real model |
+| Category and expiry-date suggestions from the text, applied only after the user taps Apply | Free | Implemented, tested |
+| Save recognised text for search (Aadhaar/PAN masked) + "Inside documents" search | Premium (**locked**) | Implemented, tested |
+| Reminders tab: upcoming reminders, upcoming expiry dates, expired documents | Free | Implemented, tested |
+| Expiry reminders (30/7/1/0 days before) and custom-date reminders; generic local notifications at 09:00 | Free: 3 active; Premium: unlimited (**locked**) | Implemented; scheduler instrumented-tested on the emulator |
+
+Premium is locked in release builds until billing (Phase 6); debug builds have a developer switch.
+
+Not started: Phase 6 (billing), 7–8.
+Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings.
 
 ## Repository layout
 
