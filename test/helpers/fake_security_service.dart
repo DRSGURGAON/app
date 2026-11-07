@@ -432,8 +432,7 @@ class FakeSecurityService implements SecurityService {
   }
 
   @override
-  Future<void> openNotificationSettings() async =>
-      openedNotificationSettings++;
+  Future<void> openNotificationSettings() async => openedNotificationSettings++;
 
   @override
   Future<String?> takeLaunchTarget() async {

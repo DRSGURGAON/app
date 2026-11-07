@@ -80,8 +80,7 @@ class ReminderRepository {
   static String _minusDays(String iso, int days) =>
       isoDate(parseIsoDate(iso).subtract(Duration(days: days)));
 
-  /// All reminders of non-deleted documents, soonest first (inactive last).
-  Stream<List<ReminderItem>> watchAll({int? documentId}) {
+  JoinedSelectStatement<HasResultSet, dynamic> _query({int? documentId}) {
     final q = _db.select(_db.reminders).join([
       innerJoin(
         _db.documents,
@@ -99,24 +98,30 @@ class ReminderRepository {
     if (documentId != null) {
       q.where(_db.reminders.documentId.equals(documentId));
     }
-    return q.watch().map((rows) {
-      final items = [
-        for (final r in rows)
-          _toItem(
-            r.readTable(_db.reminders),
-            r.readTable(_db.documents).title,
-            r.readTableOrNull(_db.documentMetadata)?.expiryDate,
-          ),
-      ];
-      items.sort((a, b) {
-        if (a.date == null) return b.date == null ? a.id - b.id : 1;
-        if (b.date == null) return -1;
-        final c = a.date!.compareTo(b.date!);
-        return c != 0 ? c : a.id - b.id;
-      });
-      return items;
-    });
+    return q;
   }
+
+  List<ReminderItem> _items(List<TypedResult> rows) {
+    final items = [
+      for (final r in rows)
+        _toItem(
+          r.readTable(_db.reminders),
+          r.readTable(_db.documents).title,
+          r.readTableOrNull(_db.documentMetadata)?.expiryDate,
+        ),
+    ];
+    items.sort((a, b) {
+      if (a.date == null) return b.date == null ? a.id - b.id : 1;
+      if (b.date == null) return -1;
+      final c = a.date!.compareTo(b.date!);
+      return c != 0 ? c : a.id - b.id;
+    });
+    return items;
+  }
+
+  /// All reminders of non-deleted documents, soonest first (inactive last).
+  Stream<List<ReminderItem>> watchAll({int? documentId}) =>
+      _query(documentId: documentId).watch().map(_items);
 
   ReminderItem _toItem(Reminder r, String title, String? expiry) {
     final kind = r.kind == 'expiry' ? ReminderKind.expiry : ReminderKind.custom;
@@ -135,7 +140,7 @@ class ReminderRepository {
     );
   }
 
-  Future<List<ReminderItem>> _all() => watchAll().first;
+  Future<List<ReminderItem>> _all() async => _items(await _query().get());
 
   /// Reminders dated today or later.
   Future<int> activeCount() async {

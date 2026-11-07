@@ -130,11 +130,10 @@ class _OcrResultScreenState extends ConsumerState<OcrResultScreen> {
             const SizedBox(height: 16),
             Text(l.ocrSuggestions, style: theme.textTheme.titleSmall),
             if (showCategory)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.category_outlined),
-                title: Text(l.ocrSuggestedCategory(l.categoryName(suggested))),
-                trailing: _categoryApplied
+              _Suggestion(
+                icon: Icons.category_outlined,
+                label: l.ocrSuggestedCategory(l.categoryName(suggested)),
+                action: _categoryApplied
                     ? Text(l.ocrApplied)
                     : FilledButton.tonal(
                         key: const Key('ocr-apply-category'),
@@ -148,15 +147,12 @@ class _OcrResultScreenState extends ConsumerState<OcrResultScreen> {
                       ),
               ),
             if (showExpiry)
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.event_outlined),
-                title: Text(
-                  l.ocrSuggestedExpiry(
-                    formatIsoDate(r.suggestedExpiry!, locale),
-                  ),
+              _Suggestion(
+                icon: Icons.event_outlined,
+                label: l.ocrSuggestedExpiry(
+                  formatIsoDate(r.suggestedExpiry!, locale),
                 ),
-                trailing: _expiryApplied
+                action: _expiryApplied
                     ? Text(l.ocrApplied)
                     : FilledButton.tonal(
                         key: const Key('ocr-apply-expiry'),
@@ -197,4 +193,38 @@ class _OcrResultScreenState extends ConsumerState<OcrResultScreen> {
       ),
     );
   }
+}
+
+/// A suggestion with its Apply button; wraps on narrow screens.
+class _Suggestion extends StatelessWidget {
+  const _Suggestion({
+    required this.icon,
+    required this.label,
+    required this.action,
+  });
+
+  final IconData icon;
+  final String label;
+  final Widget action;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6),
+    child: Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 12,
+      runSpacing: 4,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon),
+            const SizedBox(width: 12),
+            Flexible(child: Text(label)),
+          ],
+        ),
+        action,
+      ],
+    ),
+  );
 }

@@ -35,6 +35,7 @@ Future<bool> ensureNotifications(BuildContext context, WidgetRef ref) async {
   } on SecurityFailure {
     // Fall through to the hint below.
   }
+  messenger.hideCurrentSnackBar();
   messenger.showSnackBar(
     SnackBar(
       content: Text(l.notificationsOff),
