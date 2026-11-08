@@ -44,3 +44,26 @@ hooks:
 flutter:
   uses-material-design: true
   generate: true
+  assets:
+    - assets/fonts/OFL.txt
+  # Brand typeface (Latin) with Noto Sans Devanagari for Hindi; both SIL OFL 1.1,
+  # bundled so the app never downloads fonts.
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans-400.ttf
+        - asset: assets/fonts/PlusJakartaSans-500.ttf
+          weight: 500
+        - asset: assets/fonts/PlusJakartaSans-600.ttf
+          weight: 600
+        - asset: assets/fonts/PlusJakartaSans-700.ttf
+          weight: 700
+        - asset: assets/fonts/PlusJakartaSans-800.ttf
+          weight: 800
+    - family: NotoSansDevanagari
+      fonts:
+        - asset: assets/fonts/NotoSansDevanagari-400.ttf
+        - asset: assets/fonts/NotoSansDevanagari-600.ttf
+          weight: 600
+        - asset: assets/fonts/NotoSansDevanagari-700.ttf
+          weight: 700

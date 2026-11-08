@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/localization/display_names.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/router/app_router.dart';
+import '../../app/theme/brand.dart';
 import '../../app/widgets/brand_mark.dart';
 import '../../app/widgets/dialogs.dart';
 import '../../app/widgets/states.dart';
@@ -35,127 +36,189 @@ class HomeScreen extends ConsumerWidget {
     final categories = ref.watch(categoriesProvider);
     final status = ref.watch(lockControllerProvider).status;
 
+    final stats = ref.watch(vaultStatsProvider).value;
+    final scheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Row(
-                  children: [
-                    const ExcludeSemantics(child: BrandMarkSmall()),
-                    const SizedBox(width: 12),
-                    Text(
-                      l.appName,
-                      style: Theme.of(context).textTheme.titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w700),
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      tooltip: l.vaultLock,
-                      icon: const Icon(Icons.lock_outline),
-                      onPressed: () =>
-                          ref.read(lockControllerProvider.notifier).lock(),
-                    ),
-                  ],
-                ),
-              ),
+      body: CustomScrollView(
+        slivers: [
+          SliverToBoxAdapter(
+            child: _Hero(
+              status: status,
+              documentCount: stats?.documentCount,
+              onLock: () => ref.read(lockControllerProvider.notifier).lock(),
             ),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: _SearchBar(onTap: () => context.push(Routes.search)),
-              ),
-            ),
-            if (status != null)
-              SliverToBoxAdapter(child: _SecurityCard(status: status)),
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _QuickAction(
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              child: Card(
+                color: scheme.surfaceContainerLowest,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 6,
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _QuickAction(
                         icon: Icons.document_scanner_outlined,
+                        color: const Color(0xFF3446D4),
                         label: l.scanDocument,
                         onTap: () => context.push(Routes.scan),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _QuickAction(
+                      _QuickAction(
                         icon: Icons.picture_as_pdf_outlined,
+                        color: const Color(0xFFD63B4A),
                         label: l.homeImportPdf,
                         onTap: () =>
                             runImport(context, ref, kind: ImportKind.pdf),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _QuickAction(
+                      _QuickAction(
                         icon: Icons.image_outlined,
+                        color: const Color(0xFF0E9F87),
                         label: l.homeImportImage,
                         onTap: () =>
                             runImport(context, ref, kind: ImportKind.image),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _QuickAction(
+                      _QuickAction(
                         icon: Icons.create_new_folder_outlined,
+                        color: const Color(0xFFC77700),
                         label: l.homeCreateFolder,
                         onTap: () => createFolder(context, ref),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            SliverToBoxAdapter(child: SectionHeader(title: l.homeExpiringSoon)),
-            _PreviewList(
-              docs: expiring.whenData((d) => d.take(5).toList()),
-              emptyText: l.homeNoExpiring,
-            ),
-            SliverToBoxAdapter(
-              child: SectionHeader(
-                title: l.homeRecent,
-                trailing: TextButton(
-                  onPressed: () => context.go(Routes.vault),
-                  child: Text(l.homeSeeAll),
-                ),
-              ),
-            ),
-            _PreviewList(docs: recent, emptyText: l.homeNoRecent),
-            SliverToBoxAdapter(child: SectionHeader(title: l.homeFavourites)),
-            _PreviewList(docs: favourites, emptyText: l.homeNoFavourites),
-            SliverToBoxAdapter(child: SectionHeader(title: l.homeCategories)),
-            SliverToBoxAdapter(
-              child: categories.when(
-                loading: () => const SizedBox(height: 48),
-                error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
-                data: (cats) => Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-                  child: Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
-                    children: [
-                      for (final c in cats)
-                        ActionChip(
-                          avatar: Icon(categoryIcon(c.key), size: 18),
-                          label: Text(
-                            c.documentCount == 0
-                                ? l.categoryName(c)
-                                : '${l.categoryName(c)} · ${c.documentCount}',
-                          ),
-                          onPressed: () => context.push(Routes.category(c.id)),
-                        ),
                     ],
                   ),
                 ),
               ),
             ),
-          ],
+          ),
+          SliverToBoxAdapter(child: SectionHeader(title: l.homeExpiringSoon)),
+          _PreviewList(
+            docs: expiring.whenData((d) => d.take(5).toList()),
+            emptyText: l.homeNoExpiring,
+          ),
+          SliverToBoxAdapter(
+            child: SectionHeader(
+              title: l.homeRecent,
+              trailing: TextButton(
+                onPressed: () => context.go(Routes.vault),
+                child: Text(l.homeSeeAll),
+              ),
+            ),
+          ),
+          _PreviewList(docs: recent, emptyText: l.homeNoRecent),
+          SliverToBoxAdapter(child: SectionHeader(title: l.homeFavourites)),
+          _PreviewList(docs: favourites, emptyText: l.homeNoFavourites),
+          SliverToBoxAdapter(child: SectionHeader(title: l.homeCategories)),
+          SliverToBoxAdapter(
+            child: categories.when(
+              loading: () => const SizedBox(height: 48),
+              error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+              data: (cats) => Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    for (final c in cats)
+                      ActionChip(
+                        avatar: Icon(
+                          categoryIcon(c.key),
+                          size: 18,
+                          color: CategoryStyle.of(c.key).color,
+                        ),
+                        label: Text(
+                          c.documentCount == 0
+                              ? l.categoryName(c)
+                              : '${l.categoryName(c)} · ${c.documentCount}',
+                        ),
+                        onPressed: () => context.push(Routes.category(c.id)),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Navy brand header: logo, lock, search and the security status.
+class _Hero extends StatelessWidget {
+  const _Hero({
+    required this.status,
+    required this.documentCount,
+    required this.onLock,
+  });
+
+  final SecurityStatus? status;
+  final int? documentCount;
+  final VoidCallback onLock;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final text = Theme.of(context).textTheme;
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        gradient: Brand.heroGradient,
+        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  const BrandMarkSmall(onDark: true),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.appName,
+                          style: text.titleLarge?.copyWith(color: Colors.white),
+                        ),
+                        if (documentCount != null)
+                          Text(
+                            l.documentCount(documentCount!),
+                            style: text.bodySmall?.copyWith(
+                              color: Colors.white70,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: l.vaultLock,
+                    color: Colors.white,
+                    icon: const Icon(Icons.lock_outline),
+                    onPressed: onLock,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: _SearchBar(onTap: () => context.push(Routes.search)),
+              ),
+              if (status != null) ...[
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: _SecurityPill(status: status!),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -176,20 +239,7 @@ Future<void> createFolder(BuildContext context, WidgetRef ref) async {
   if (context.mounted) await context.push(Routes.folder(id));
 }
 
-IconData categoryIcon(String? key) => switch (key) {
-  'identity' => Icons.badge_outlined,
-  'education' => Icons.school_outlined,
-  'vehicle' => Icons.directions_car_outlined,
-  'finance' => Icons.account_balance_outlined,
-  'insurance' => Icons.health_and_safety_outlined,
-  'medical' => Icons.medical_services_outlined,
-  'property' => Icons.home_work_outlined,
-  'work' => Icons.work_outline,
-  'bills' => Icons.receipt_long_outlined,
-  'personal' => Icons.person_outline,
-  'other' => Icons.category_outlined,
-  _ => Icons.label_outline,
-};
+IconData categoryIcon(String? key) => CategoryStyle.of(key).icon;
 
 class _PreviewList extends StatelessWidget {
   const _PreviewList({required this.docs, required this.emptyText});
@@ -240,7 +290,7 @@ class _SearchBar extends StatelessWidget {
       button: true,
       label: l.homeSearchHint,
       child: Material(
-        color: scheme.surfaceContainerHigh,
+        color: Colors.white,
         shape: const StadiumBorder(),
         child: InkWell(
           customBorder: const StadiumBorder(),
@@ -269,34 +319,62 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-class _SecurityCard extends StatelessWidget {
-  const _SecurityCard({required this.status});
+/// "Your vault is protected" status on the hero (taps to Privacy & security).
+class _SecurityPill extends StatelessWidget {
+  const _SecurityPill({required this.status});
   final SecurityStatus status;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
     final weak =
         status.keyProtection == KeyProtection.software ||
         status.keyProtection == KeyProtection.unknown;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-      child: Card(
-        color: weak ? null : scheme.primaryContainer.withValues(alpha: .45),
-        child: ListTile(
-          leading: Icon(
-            weak ? Icons.gpp_maybe_outlined : Icons.verified_user_outlined,
-            color: weak ? scheme.error : scheme.primary,
+    return Material(
+      color: Colors.white.withValues(alpha: .10),
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.go(Routes.privacy),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+          child: Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: weak ? Brand.amber : Brand.teal,
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  weak ? Icons.gpp_maybe_outlined : Icons.verified_user,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l.homeSecurityTitle,
+                      style: text.titleSmall?.copyWith(color: Colors.white),
+                    ),
+                    Text(
+                      status.biometricEnabled
+                          ? l.homeSecurityPinBiometric
+                          : l.homeSecurityPinOnly,
+                      style: text.bodySmall?.copyWith(color: Colors.white70),
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.white70),
+            ],
           ),
-          title: Text(l.homeSecurityTitle),
-          subtitle: Text(
-            status.biometricEnabled
-                ? l.homeSecurityPinBiometric
-                : l.homeSecurityPinOnly,
-          ),
-          trailing: const Icon(Icons.chevron_right),
-          onTap: () => context.go(Routes.privacy),
         ),
       ),
     );
@@ -306,37 +384,46 @@ class _SecurityCard extends StatelessWidget {
 class _QuickAction extends StatelessWidget {
   const _QuickAction({
     required this.icon,
+    required this.color,
     required this.label,
     required this.onTap,
   });
 
   final IconData icon;
+  final Color color;
   final String label;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-          child: Column(
-            children: [
-              Icon(icon, color: scheme.primary),
-              const SizedBox(height: 8),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                maxLines: 2,
-                style: Theme.of(context).textTheme.labelLarge,
+  Widget build(BuildContext context) => Expanded(
+    child: InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+        child: Column(
+          children: [
+            Container(
+              width: 50,
+              height: 50,
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: .12),
+                borderRadius: BorderRadius.circular(16),
               ),
-            ],
-          ),
+              child: Icon(icon, color: color),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelMedium
+                  ?.copyWith(fontWeight: FontWeight.w600),
+            ),
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
 }

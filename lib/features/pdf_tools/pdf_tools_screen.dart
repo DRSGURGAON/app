@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/widgets/brand_mark.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../data/models/vault_document.dart';
 import '../../data/services/pdf_tools_service.dart';
@@ -246,21 +247,7 @@ class _Tool extends StatelessWidget {
               Flexible(child: Text(title)),
               if (premium) ...[
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: scheme.tertiaryContainer,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    l.premiumBadge,
-                    style: Theme.of(context).textTheme.labelSmall
-                        ?.copyWith(color: scheme.onTertiaryContainer),
-                  ),
-                ),
+                PremiumPill(label: l.premiumBadge),
               ],
             ],
           ),

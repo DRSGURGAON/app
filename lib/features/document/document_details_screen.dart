@@ -6,6 +6,7 @@ import '../../app/localization/display_names.dart';
 import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/router/app_router.dart';
+import '../../app/theme/brand.dart';
 import '../../app/widgets/dialogs.dart';
 import '../../app/widgets/states.dart';
 import '../../core/security/lock_controller.dart';
@@ -110,14 +111,26 @@ class _DetailsView extends ConsumerWidget {
         padding: const EdgeInsets.only(bottom: 32),
         children: [
           ListTile(
-            leading: CircleAvatar(
-              backgroundColor: theme.colorScheme.primaryContainer,
-              child: Icon(
-                doc.isPdf
-                    ? Icons.picture_as_pdf_outlined
-                    : Icons.image_outlined,
-                color: theme.colorScheme.onPrimaryContainer,
-              ),
+            leading: Builder(
+              builder: (context) {
+                final style = category == null
+                    ? CategoryStyle(
+                        theme.colorScheme.primary,
+                        doc.isPdf
+                            ? Icons.picture_as_pdf_outlined
+                            : Icons.image_outlined,
+                      )
+                    : CategoryStyle.of(category.key);
+                return Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: style.color.withValues(alpha: .12),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Icon(style.icon, color: style.color, size: 28),
+                );
+              },
             ),
             title: Text(doc.title, style: theme.textTheme.titleLarge),
             subtitle: Text(

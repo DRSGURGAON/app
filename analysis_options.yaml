@@ -6,6 +6,8 @@ analyzer:
     - android/**
     - "**/*.g.dart"
     - lib/app/localization/gen/**
+    # Design-review screenshot harness (needs desktop fonts; not part of CI).
+    - tool/screenshots/**
   language:
     strict-casts: true
     strict-raw-types: true
