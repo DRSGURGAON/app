@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:docsafe/app/app.dart';
+import 'package:docsafe/app/localization/locale_controller.dart';
 import 'package:docsafe/core/database/app_database.dart';
 import 'package:docsafe/core/database/database_opener.dart';
 import 'package:docsafe/core/database/database_provider.dart';
@@ -56,6 +57,7 @@ Future<TestApp> pumpApp(
   Size size = const Size(1080, 2400),
   PdfEngine? pdfEngine,
   OverlayRenderer? overlayRenderer,
+  Locale deviceLocale = const Locale('en', 'US'),
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -65,6 +67,7 @@ Future<TestApp> pumpApp(
   final container = ProviderContainer(
     overrides: [
       securityServiceProvider.overrideWithValue(fake),
+      deviceLocaleProvider.overrideWithValue(deviceLocale),
       // Only the opener is replaced: open-on-unlock, close-on-lock and the
       // erase close-wait run the production code paths.
       pdfEngineProvider.overrideWithValue(pdfEngine ?? FakePdfEngine()),

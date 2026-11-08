@@ -13,10 +13,13 @@ final hi = AppLocalizationsHi();
 final en = AppLocalizationsEn();
 
 void main() {
-  testWidgets('first run is Hindi; continue requires acknowledging key loss', (
-    tester,
-  ) async {
-    final app = await pumpApp(tester, FakeSecurityService());
+  testWidgets('first run follows a Hindi phone; continue requires '
+      'acknowledging key loss', (tester) async {
+    final app = await pumpApp(
+      tester,
+      FakeSecurityService(),
+      deviceLocale: const Locale('hi', 'IN'),
+    );
     expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
 
     final button = find.widgetWithText(FilledButton, hi.onboardingContinue);
@@ -32,11 +35,34 @@ void main() {
     await app.dispose();
   });
 
+  testWidgets('first run follows an English (US/UK) phone', (tester) async {
+    for (final device in const [Locale('en', 'US'), Locale('en', 'GB')]) {
+      final app = await pumpApp(
+        tester,
+        FakeSecurityService(),
+        deviceLocale: device,
+      );
+      expect(find.text(en.onboardingBackupTitle), findsOneWidget);
+      await app.dispose();
+    }
+  });
+
+  testWidgets('a saved choice wins over the phone language', (tester) async {
+    final fake = FakeSecurityService()..language = 'hi';
+    final app = await pumpApp(tester, fake);
+    expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
+    await app.dispose();
+  });
+
   testWidgets('language can be switched to English before setup', (
     tester,
   ) async {
     final fake = FakeSecurityService();
-    final app = await pumpApp(tester, fake);
+    final app = await pumpApp(
+      tester,
+      fake,
+      deviceLocale: const Locale('hi', 'IN'),
+    );
     await tester.tap(find.text('English'));
     await tester.pumpAndSettle();
     expect(find.text(en.onboardingEncryptedTitle), findsOneWidget);

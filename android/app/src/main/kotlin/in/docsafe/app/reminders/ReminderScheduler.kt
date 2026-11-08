@@ -138,7 +138,9 @@ class ReminderScheduler(context: Context, private val clock: () -> Long = System
 
     /** Strings in the app's chosen language (stored outside the encrypted DB). */
     private fun localized(): android.content.res.Resources {
-        val lang = appContext.getSharedPreferences("docsafe_ui", Context.MODE_PRIVATE).getString("language", null) ?: "hi"
+        // Same rule as the Dart side: the user's choice, else Hindi on a Hindi phone, else English.
+        val lang = appContext.getSharedPreferences("docsafe_ui", Context.MODE_PRIVATE).getString("language", null)
+            ?: if (Locale.getDefault().language == "hi") "hi" else "en"
         val config = Configuration(appContext.resources.configuration).apply { setLocale(Locale.forLanguageTag(lang)) }
         return appContext.createConfigurationContext(config).resources
     }

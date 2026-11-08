@@ -1,6 +1,6 @@
 # DocSafe — notes for Claude Code
 
-Privacy-first Android document vault (Flutter + Kotlin). Hindi default, English option.
+Privacy-first Android document vault (Flutter + Kotlin). Follows the phone language (Hindi on Hindi phones, else English); first markets India, US, UK.
 Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what is verified.
 
 - Phases: 0–4 done (CI green); Annotate & Sign added (Premium, LOCKED in release builds until

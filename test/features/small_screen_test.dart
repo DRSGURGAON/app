@@ -17,7 +17,12 @@ final hi = AppLocalizationsHi();
 void main() {
   testWidgets('first-run screens fit 320x480 in Hindi', (tester) async {
     final fake = FakeSecurityService();
-    final app = await pumpApp(tester, fake, size: small);
+    final app = await pumpApp(
+      tester,
+      fake,
+      size: small,
+      deviceLocale: const Locale('hi', 'IN'),
+    );
     await scrollAndTap(tester, find.byType(Checkbox));
     await scrollAndTap(tester, find.text(hi.onboardingContinue));
     // The whole keypad must be on screen (no scrolling needed to type a PIN).
@@ -35,7 +40,12 @@ void main() {
     final fake = FakeSecurityService()
       ..availability = BiometricAvailability.available;
     await fake.setPin(Uint8List.fromList([2, 5, 8, 0, 3, 6]));
-    final app = await pumpApp(tester, fake, size: small);
+    final app = await pumpApp(
+      tester,
+      fake,
+      size: small,
+      deviceLocale: const Locale('hi', 'IN'),
+    );
     final router = app.container.read(routerProvider);
 
     fake.nextImport = fakeImport(
@@ -103,7 +113,12 @@ void main() {
       ..nextBiometricOutcome = BiometricOutcome.cancelled;
     await fake.setPin(Uint8List.fromList([2, 5, 8, 0, 3, 6]));
     await fake.lock();
-    final app = await pumpApp(tester, fake, size: small);
+    final app = await pumpApp(
+      tester,
+      fake,
+      size: small,
+      deviceLocale: const Locale('hi', 'IN'),
+    );
     expect(find.text(hi.lockTitle), findsOneWidget);
     await enterPin(tester, '111222');
     expect(find.text(hi.lockWrongPin(4)), findsOneWidget);

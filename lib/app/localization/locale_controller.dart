@@ -1,10 +1,23 @@
+import 'dart:ui' show PlatformDispatcher;
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/security/lock_controller.dart';
 
-/// UI language. Hindi is the default; the choice is stored natively as a
-/// non-sensitive preference so it is available before unlock.
+/// The phone's preferred locale (overridden in tests).
+final deviceLocaleProvider = Provider<Locale>(
+  (ref) => PlatformDispatcher.instance.locale,
+);
+
+/// Language used until the user picks one: Hindi on a Hindi phone, otherwise
+/// English (the only other UI language so far).
+Locale defaultLocaleFor(Locale device) =>
+    device.languageCode == 'hi' ? const Locale('hi') : const Locale('en');
+
+/// UI language. Follows the phone until the user chooses in Settings; the
+/// choice is stored natively as a non-sensitive preference so it is available
+/// before unlock.
 final localeControllerProvider = NotifierProvider<LocaleController, Locale>(
   LocaleController.new,
 );
@@ -15,7 +28,7 @@ class LocaleController extends Notifier<Locale> {
   @override
   Locale build() {
     Future.microtask(_load);
-    return const Locale('hi');
+    return defaultLocaleFor(ref.read(deviceLocaleProvider));
   }
 
   Future<void> _load() async {
@@ -23,7 +36,7 @@ class LocaleController extends Notifier<Locale> {
       final code = await ref.read(securityServiceProvider).getLanguage();
       if (code == 'en' || code == 'hi') state = Locale(code!);
     } catch (_) {
-      // Keep the default.
+      // Keep the phone-based default.
     }
   }
 

@@ -85,4 +85,65 @@ void main() {
       expect(OcrAnalysis.suggestExpiry('Valid till soon'), isNull);
     });
   });
+
+  group('US / UK', () {
+    test('SSN and UK National Insurance numbers are masked', () {
+      expect(
+        OcrAnalysis.maskSensitiveNumbers('SSN 123-45-6789'),
+        'SSN XXX-XX-6789',
+      );
+      expect(
+        OcrAnalysis.maskSensitiveNumbers('NI No: AB 12 34 56 C'),
+        'NI No: XX XX XX 56 C',
+      );
+      expect(
+        OcrAnalysis.maskSensitiveNumbers('NINO AB123456D'),
+        'NINO XX XX XX 56 D',
+      );
+      // Invalid NI prefix (D/F/I/Q/U/V not allowed first) and phone numbers stay.
+      const keep = 'Ref DA123456A, call 555-123-4567, zip 90210';
+      expect(OcrAnalysis.maskSensitiveNumbers(keep), keep);
+    });
+
+    test('US and UK categories, whole-word keywords only', () {
+      expect(
+        OcrAnalysis.suggestCategory("STATE OF CALIFORNIA DRIVER'S LICENSE DMV"),
+        'vehicle',
+      );
+      expect(
+        OcrAnalysis.suggestCategory(
+          'DVLA Vehicle registration certificate V5C',
+        ),
+        'vehicle',
+      );
+      expect(OcrAnalysis.suggestCategory('Council Tax bill 2026/27'), 'bills');
+      expect(OcrAnalysis.suggestCategory('HMRC P60 End of Year'), 'finance');
+      expect(
+        OcrAnalysis.suggestCategory('Indeed, the first thing is fine'),
+        isNull,
+        reason: '"deed" / "irs" must not match inside words',
+      );
+    });
+
+    test('US month-first dates, UK day-first, month names', () {
+      const us = 'EXP 08/09/2031';
+      expect(OcrAnalysis.suggestExpiry(us, monthFirst: true), '2031-08-09');
+      expect(OcrAnalysis.suggestExpiry(us), '2031-09-08');
+      // Impossible in the preferred order -> the other order.
+      expect(OcrAnalysis.suggestExpiry('Expires 08/14/2031'), '2031-08-14');
+      expect(
+        OcrAnalysis.suggestExpiry('Expiry date 14 AUG 2031'),
+        '2031-08-14',
+      );
+      expect(
+        OcrAnalysis.suggestExpiry('Expiration: August 14, 2031'),
+        '2031-08-14',
+      );
+      expect(
+        OcrAnalysis.suggestExpiry('Experience 10 years since 01/01/2020'),
+        isNull,
+        reason: '"Exp" must be a word',
+      );
+    });
+  });
 }

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/localization/locale_controller.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/security/lock_controller.dart';
@@ -36,8 +37,15 @@ class OcrReading {
 
 /// On-device OCR plus the confirmed, masked text kept for search.
 class DocumentTextRepository {
-  DocumentTextRepository(this._db, this._security, {DateTime Function()? clock})
-    : _clock = clock ?? DateTime.now;
+  DocumentTextRepository(
+    this._db,
+    this._security, {
+    DateTime Function()? clock,
+    this.monthFirstDates = false,
+  }) : _clock = clock ?? DateTime.now;
+
+  /// US phones: read 08/14/2031 as August 14.
+  final bool monthFirstDates;
 
   final AppDatabase _db;
   final SecurityService _security;
@@ -57,7 +65,10 @@ class DocumentTextRepository {
       pagesRead: r.pagesRead,
       pageCount: r.pageCount,
       suggestedCategoryKey: OcrAnalysis.suggestCategory(r.text),
-      suggestedExpiry: OcrAnalysis.suggestExpiry(r.text),
+      suggestedExpiry: OcrAnalysis.suggestExpiry(
+        r.text,
+        monthFirst: monthFirstDates,
+      ),
     );
   }
 
@@ -88,6 +99,7 @@ final documentTextRepositoryProvider = FutureProvider<DocumentTextRepository>(
   (ref) async => DocumentTextRepository(
     await ref.watch(databaseProvider.future),
     ref.read(securityServiceProvider),
+    monthFirstDates: ref.read(deviceLocaleProvider).countryCode == 'US',
   ),
 );
 
