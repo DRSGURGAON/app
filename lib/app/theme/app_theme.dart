@@ -241,6 +241,13 @@ abstract final class AppTheme {
         checkColor: const WidgetStatePropertyAll(Brand.navy900),
         side: const BorderSide(color: Color(0x99FFFFFF), width: 1.5),
       ),
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        backgroundColor: Colors.white,
+        foregroundColor: Brand.navy900,
+        elevation: 6,
+        extendedTextStyle: text.labelLarge,
+        shape: const StadiumBorder(),
+      ),
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: Colors.white,
       ),

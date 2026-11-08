@@ -24,3 +24,9 @@ Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what 
 - Schema changes: edit tables, bump schemaVersion, `dart run drift_dev make-migrations`, write the step.
 - SnackBars with actions must set `persist: false` (Flutter persists them by default).
 - In widget tests, Drift `stream.first` can hang in the fake-async zone: use `.get()` for one-shot reads.
+- Design system: lib/app/theme/{brand,app_theme}.dart (gradient background painted in MaterialApp.builder,
+  glass cards, white pill buttons, Sora headings / Plus Jakarta Sans / Noto Sans Devanagari, bundled,
+  OFL in assets/fonts). No letter-spacing on Devanagari text. Review screens with
+  `SHOTS_DIR=... [SHOTS_LANG=hi SHOTS_SMALL=1] flutter test tool/screenshots/screenshots_test.dart`;
+  icons via tool/screenshots/icons_test.dart (docs/brand/icon-512.png = store icon).
+

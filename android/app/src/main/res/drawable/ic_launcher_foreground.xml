@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- DocSafe mark: shield with a folded document corner and a keyhole (see LogoMark in brand_mark.dart). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp"
+    android:viewportWidth="108" android:viewportHeight="108">
+    <path android:fillColor="#FFFFFFFF" android:pathData="M33.20,31.60 L62.00,31.60 L74.80,44.40 L74.80,55.60 C74.80,69.20 65.20,77.20 54.00,81.20 C42.80,77.20 33.20,69.20 33.20,55.60 Z" />
+    <path android:fillColor="#FFB9C1FF" android:pathData="M62.00,31.60 L62.00,44.40 L74.80,44.40 Z" />
+    <path android:fillColor="#FF15215C" android:pathData="M48.72,54.00 a5.28,5.28 0 1,0 10.56,0 a5.28,5.28 0 1,0 -10.56,0 Z M51.44,57.20 L56.56,57.20 L57.84,67.60 L50.16,67.60 Z" />
+</vector>

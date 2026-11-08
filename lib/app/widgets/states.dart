@@ -100,6 +100,8 @@ class LoadingState extends StatelessWidget {
       const Center(child: CircularProgressIndicator());
 }
 
+final _devanagari = RegExp(r'[\u0900-\u097F]');
+
 class SectionHeader extends StatelessWidget {
   const SectionHeader({super.key, required this.title, this.trailing});
   final String title;
@@ -118,7 +120,8 @@ class SectionHeader extends StatelessWidget {
               title.toUpperCase(),
               semanticsLabel: title,
               style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                letterSpacing: 1.8,
+                // Tracking breaks Devanagari conjuncts: only for Latin script.
+                letterSpacing: _devanagari.hasMatch(title) ? 0 : 1.8,
                 fontWeight: FontWeight.w700,
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),

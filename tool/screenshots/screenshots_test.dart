@@ -13,7 +13,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../test/features/pdf_tools_flow_test.dart'
-    show en, goTab, importDoc, unlockedFake;
+    show en, hi, goTab, importDoc, unlockedFake;
 import '../../test/features/reminders_ocr_flow_test.dart'
     show pumpUntil, docIdByTitle;
 import '../../test/helpers/fake_pdf_engine.dart';
@@ -83,7 +83,12 @@ Future<void> shot(WidgetTester tester, String name) async {
   });
 }
 
-Future<void> seed(TestApp app, FakeSecurityService fake, FakePdfEngine engine) async {
+Future<void> seed(
+  TestApp app,
+  FakeSecurityService fake,
+  FakePdfEngine engine, {
+  String importLabel = '',
+}) async {
   final tester = app.tester;
   for (final (name, pages) in [
     ('Aadhaar Card.pdf', 1),
@@ -92,7 +97,14 @@ Future<void> seed(TestApp app, FakeSecurityService fake, FakePdfEngine engine) a
     ('Electricity Bill Oct.pdf', 1),
     ('Class 12 Marksheet.pdf', 1),
   ]) {
-    await importDoc(tester, fake, engine, name, pages: pages);
+    await importDoc(
+      tester,
+      fake,
+      engine,
+      name,
+      pages: pages,
+      importLabel: importLabel,
+    );
   }
   final repo = await pumpUntil(
     tester,
@@ -135,42 +147,58 @@ void main() {
   testWidgets('screens', (tester) async {
     await loadFonts();
     final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final small = Platform.environment['SHOTS_SMALL'] == '1';
+    final t = lang == 'hi' ? hi : en;
     final fake = await unlockedFake(lang: lang);
     final engine = FakePdfEngine();
-    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    final app = await pumpApp(
+      tester,
+      fake,
+      pdfEngine: engine,
+      size: small ? const Size(800, 1200) : const Size(1080, 2400),
+    );
     app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(false);
-    await seed(app, fake, engine);
+    await seed(
+      app,
+      fake,
+      engine,
+      importLabel: lang == 'hi' ? hi.homeImportPdf : '',
+    );
     await tester.pump(const Duration(seconds: 10));
     await settle(tester);
 
-    await goTab(tester, en.navHome);
+    await goTab(tester, t.navHome);
     await shot(tester, '01-home');
     await tester.drag(find.byType(Scrollable).first, const Offset(0, -700));
     await shot(tester, '02-home-scrolled');
-    await goTab(tester, en.navVault);
+    await goTab(tester, t.navVault);
     await shot(tester, '03-vault');
-    await goTab(tester, en.navHome);
-    await tester.drag(find.byType(Scrollable).first, const Offset(0, 2000));
-    await settle(tester);
+    await goTab(tester, t.navVault);
     await tester.tap(find.text('Driving Licence').first);
     await shot(tester, '04-details');
     await tester.drag(find.byType(Scrollable).first, const Offset(0, -700));
     await shot(tester, '05-details-scrolled');
     await tester.binding.handlePopRoute();
     await settle(tester);
-    await goTab(tester, en.navTools);
+    await goTab(tester, t.navTools);
     await shot(tester, '06-tools');
-    await goTab(tester, en.navReminders);
+    await goTab(tester, t.navReminders);
     await shot(tester, '07-reminders');
-    await goTab(tester, en.navSettings);
+    await goTab(tester, t.navSettings);
     await shot(tester, '08-settings');
     await app.dispose();
   });
 
   testWidgets('first run and lock', (tester) async {
     await loadFonts();
-    final fake = FakeSecurityService()..language = 'en';
-    final app = await pumpApp(tester, fake);
+    final small = Platform.environment['SHOTS_SMALL'] == '1';
+    final fake = FakeSecurityService()
+      ..language = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final app = await pumpApp(
+      tester,
+      fake,
+      size: small ? const Size(800, 1200) : const Size(1080, 2400),
+    );
     await shot(tester, '10-onboarding');
     await app.dispose();
 
