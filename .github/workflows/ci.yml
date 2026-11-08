@@ -25,6 +25,8 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          # Gradle distribution + dependency cache: fewer downloads that can time out.
+          cache: gradle
       - name: Unit tests
         working-directory: native/docsafe-crypto
         run: ./gradlew test --console=plain
@@ -43,6 +45,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          # Gradle distribution + dependency cache: fewer downloads that can time out.
+          cache: gradle
+      - name: Cache PDFium binary (downloaded by the pdfium_dart build hook)
+        uses: actions/cache@v4
+        with:
+          path: .dart_tool/hooks_runner/shared/pdfium_dart
+          key: pdfium-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
@@ -137,6 +146,13 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          # Gradle distribution + dependency cache: fewer downloads that can time out.
+          cache: gradle
+      - name: Cache PDFium binary (downloaded by the pdfium_dart build hook)
+        uses: actions/cache@v4
+        with:
+          path: .dart_tool/hooks_runner/shared/pdfium_dart
+          key: pdfium-${{ runner.os }}-${{ hashFiles('pubspec.lock') }}
       - uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
