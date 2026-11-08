@@ -79,7 +79,7 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               data: (list) => list.isEmpty
                   ? const SizedBox.shrink()
                   : SizedBox(
-                      height: 92,
+                      height: 108,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -135,7 +135,7 @@ class _FolderCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.folder_rounded, color: scheme.primary),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   folder.name,
                   maxLines: 1,
@@ -144,6 +144,8 @@ class _FolderCard extends StatelessWidget {
                 ),
                 Text(
                   l.documentCount(folder.documentCount),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ],
