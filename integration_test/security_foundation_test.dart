@@ -14,6 +14,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
+import 'support/fixtures.dart';
+
 final hi = AppLocalizationsHi();
 
 Future<void> enterPin(WidgetTester tester, String pin) async {
@@ -37,7 +39,7 @@ void main() {
   testWidgets('setup, lock, wrong PIN, unlock, encrypted DB opens', (
     tester,
   ) async {
-    var container = ProviderContainer();
+    var container = ProviderContainer(overrides: [hindiPhone]);
     addTearDown(container.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(
@@ -106,7 +108,7 @@ void main() {
     await container.read(lockControllerProvider.notifier).lock();
     await tester.pumpWidget(const SizedBox());
     await settle(tester, seconds: 2);
-    final restarted = ProviderContainer();
+    final restarted = ProviderContainer(overrides: [hindiPhone]);
     addTearDown(restarted.dispose);
     await tester.pumpWidget(
       UncontrolledProviderScope(

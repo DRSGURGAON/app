@@ -8,9 +8,12 @@ Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what 
   still pending. Merge/split/compress are labelled Premium but not gated until Phase 6.
   Annotate rules: identity category refused, acknowledgement before save, always a new copy.
   Phase 5 (OCR + reminders) implemented: OCR text only stored after user action, masked; notifications
-  generic; only reminder times leave the encrypted DB. Do not start Phase 6 until the user approves.
+  generic; only reminder times leave the encrypted DB. Encrypted backup file (.dsbackup, backup
+  password, PBKDF2 600k) via SAF; no network permission. Do not start Phase 6 until the user approves.
+- On-device tests drive the Hindi UI: their ProviderContainers override `hindiPhone`
+  (integration_test/support/fixtures.dart) because the app follows the phone language.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge (documented exceptions, in-process memory
-  only: `importPdfBytes` output, `flattenPages` overlay PNGs, `recognizeText` text);
+  only: `importPdfBytes` output, `flattenPages` overlay PNGs, `recognizeText` text, backup metadata JSON);
   hardcode user-facing strings (use ARB files); add network/analytics/ads SDKs; claim untested
   features work.
 - Regenerate after edits: `dart run pigeon --input pigeons/security_api.dart`,

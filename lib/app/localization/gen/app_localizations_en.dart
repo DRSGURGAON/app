@@ -1375,4 +1375,115 @@ class AppLocalizationsEn extends AppLocalizations {
   String reminderOnDate(String date) {
     return 'On $date';
   }
+
+  @override
+  String get settingsBackup => 'Backup & restore';
+
+  @override
+  String get backupIntro =>
+      'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install DocSafe and restore it with your backup password.';
+
+  @override
+  String get backupPasswordWarning =>
+      'The backup is locked with a separate backup password (not your PIN). DocSafe cannot recover it: if you forget it, the backup can never be opened.';
+
+  @override
+  String get backupNotIncluded =>
+      'Not included: documents in Recently deleted, your PIN and fingerprint setting, the saved signature and app settings.';
+
+  @override
+  String get backupNever => 'No backup made yet';
+
+  @override
+  String get backupCreate => 'Create backup';
+
+  @override
+  String get backupRestore => 'Restore from backup';
+
+  @override
+  String get backupPasswordTitle => 'Set a backup password';
+
+  @override
+  String get backupPasswordLabel => 'Backup password';
+
+  @override
+  String get backupPasswordRepeat => 'Repeat password';
+
+  @override
+  String get backupPasswordMismatch => 'Passwords do not match';
+
+  @override
+  String get backupPasswordAck =>
+      'I understand this password cannot be recovered';
+
+  @override
+  String get backupShowPassword => 'Show password';
+
+  @override
+  String get backupContinue => 'Continue';
+
+  @override
+  String get restoreEnterPassword => 'Enter the backup password';
+
+  @override
+  String get restoreButton => 'Restore';
+
+  @override
+  String get restoreDoneTitle => 'Restore complete';
+
+  @override
+  String get errorBackupPassword =>
+      'Wrong backup password, or the backup file is damaged.';
+
+  @override
+  String get errorBackupInvalid =>
+      'This is not a DocSafe backup, or it was made by a newer version of DocSafe.';
+
+  @override
+  String backupLast(String date) {
+    return 'Last backup: $date';
+  }
+
+  @override
+  String backupPasswordTooShort(int min) {
+    return 'At least $min characters';
+  }
+
+  @override
+  String backupCreated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Backup saved with $count documents',
+      one: 'Backup saved with 1 document',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count damaged documents were left out',
+      one: '1 damaged document was left out',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String restoreSummary(int restored, int duplicates) {
+    return '$restored documents restored. $duplicates were already in DocSafe.';
+  }
+
+  @override
+  String restoreMissing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents in the backup could not be restored.',
+      one: '1 document in the backup could not be restored.',
+    );
+    return '$_temp0';
+  }
 }

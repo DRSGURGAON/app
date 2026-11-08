@@ -15,6 +15,7 @@ import '../../features/search/search_screen.dart';
 import '../../features/security/biometric_setup_screen.dart';
 import '../../features/security/lock_screen.dart';
 import '../../features/security/pin_setup_screen.dart';
+import '../../features/settings/backup_screen.dart';
 import '../../features/settings/change_pin_screen.dart';
 import '../../features/settings/erase_screen.dart';
 import '../../features/settings/export_all_screen.dart';
@@ -54,6 +55,7 @@ abstract final class Routes {
   static const trash = '/settings/trash';
   static const categories = '/settings/categories';
   static const exportAll = '/settings/export';
+  static const backup = '/settings/backup';
   static const erase = '/settings/erase';
 
   // Full-screen routes.
@@ -198,6 +200,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                   GoRoute(
                     path: 'export',
                     builder: (_, _) => const ExportAllScreen(),
+                  ),
+                  GoRoute(
+                    path: 'backup',
+                    builder: (_, _) => const BackupScreen(),
                   ),
                   GoRoute(
                     path: 'erase',

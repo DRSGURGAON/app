@@ -2461,6 +2461,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'On {date}'**
   String reminderOnDate(String date);
+
+  /// No description provided for @settingsBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup & restore'**
+  String get settingsBackup;
+
+  /// No description provided for @backupIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install DocSafe and restore it with your backup password.'**
+  String get backupIntro;
+
+  /// No description provided for @backupPasswordWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The backup is locked with a separate backup password (not your PIN). DocSafe cannot recover it: if you forget it, the backup can never be opened.'**
+  String get backupPasswordWarning;
+
+  /// No description provided for @backupNotIncluded.
+  ///
+  /// In en, this message translates to:
+  /// **'Not included: documents in Recently deleted, your PIN and fingerprint setting, the saved signature and app settings.'**
+  String get backupNotIncluded;
+
+  /// No description provided for @backupNever.
+  ///
+  /// In en, this message translates to:
+  /// **'No backup made yet'**
+  String get backupNever;
+
+  /// No description provided for @backupCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create backup'**
+  String get backupCreate;
+
+  /// No description provided for @backupRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore from backup'**
+  String get backupRestore;
+
+  /// No description provided for @backupPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a backup password'**
+  String get backupPasswordTitle;
+
+  /// No description provided for @backupPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get backupPasswordLabel;
+
+  /// No description provided for @backupPasswordRepeat.
+  ///
+  /// In en, this message translates to:
+  /// **'Repeat password'**
+  String get backupPasswordRepeat;
+
+  /// No description provided for @backupPasswordMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get backupPasswordMismatch;
+
+  /// No description provided for @backupPasswordAck.
+  ///
+  /// In en, this message translates to:
+  /// **'I understand this password cannot be recovered'**
+  String get backupPasswordAck;
+
+  /// No description provided for @backupShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get backupShowPassword;
+
+  /// No description provided for @backupContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get backupContinue;
+
+  /// No description provided for @restoreEnterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the backup password'**
+  String get restoreEnterPassword;
+
+  /// No description provided for @restoreButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreButton;
+
+  /// No description provided for @restoreDoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore complete'**
+  String get restoreDoneTitle;
+
+  /// No description provided for @errorBackupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Wrong backup password, or the backup file is damaged.'**
+  String get errorBackupPassword;
+
+  /// No description provided for @errorBackupInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a DocSafe backup, or it was made by a newer version of DocSafe.'**
+  String get errorBackupInvalid;
+
+  /// No description provided for @backupLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup: {date}'**
+  String backupLast(String date);
+
+  /// No description provided for @backupPasswordTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'At least {min} characters'**
+  String backupPasswordTooShort(int min);
+
+  /// No description provided for @backupCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Backup saved with 1 document} other{Backup saved with {count} documents}}'**
+  String backupCreated(int count);
+
+  /// No description provided for @backupSkipped.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 damaged document was left out} other{{count} damaged documents were left out}}'**
+  String backupSkipped(int count);
+
+  /// No description provided for @restoreSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{restored} documents restored. {duplicates} were already in DocSafe.'**
+  String restoreSummary(int restored, int duplicates);
+
+  /// No description provided for @restoreMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 document in the backup could not be restored.} other{{count} documents in the backup could not be restored.}}'**
+  String restoreMissing(int count);
 }
 
 class _AppLocalizationsDelegate

@@ -15,6 +15,8 @@ extension SecurityErrorText on AppLocalizations {
     SecurityErrorCode.pdfUnreadable => errorPdfUnreadable,
     SecurityErrorCode.tooLarge => errorTooLarge,
     SecurityErrorCode.ocrFailed => errorOcrFailed,
+    SecurityErrorCode.backupPassword => errorBackupPassword,
+    SecurityErrorCode.backupInvalid => errorBackupInvalid,
     SecurityErrorCode.noActivity || SecurityErrorCode.unknown => errorGeneric,
   };
 

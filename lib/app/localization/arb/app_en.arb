@@ -686,5 +686,75 @@
         "type": "String"
       }
     }
+  },
+  "settingsBackup": "Backup & restore",
+  "backupIntro": "Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install DocSafe and restore it with your backup password.",
+  "backupPasswordWarning": "The backup is locked with a separate backup password (not your PIN). DocSafe cannot recover it: if you forget it, the backup can never be opened.",
+  "backupNotIncluded": "Not included: documents in Recently deleted, your PIN and fingerprint setting, the saved signature and app settings.",
+  "backupNever": "No backup made yet",
+  "backupCreate": "Create backup",
+  "backupRestore": "Restore from backup",
+  "backupPasswordTitle": "Set a backup password",
+  "backupPasswordLabel": "Backup password",
+  "backupPasswordRepeat": "Repeat password",
+  "backupPasswordMismatch": "Passwords do not match",
+  "backupPasswordAck": "I understand this password cannot be recovered",
+  "backupShowPassword": "Show password",
+  "backupContinue": "Continue",
+  "restoreEnterPassword": "Enter the backup password",
+  "restoreButton": "Restore",
+  "restoreDoneTitle": "Restore complete",
+  "errorBackupPassword": "Wrong backup password, or the backup file is damaged.",
+  "errorBackupInvalid": "This is not a DocSafe backup, or it was made by a newer version of DocSafe.",
+  "backupLast": "Last backup: {date}",
+  "@backupLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backupPasswordTooShort": "At least {min} characters",
+  "@backupPasswordTooShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
+  "backupCreated": "{count, plural, =1{Backup saved with 1 document} other{Backup saved with {count} documents}}",
+  "@backupCreated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "backupSkipped": "{count, plural, =1{1 damaged document was left out} other{{count} damaged documents were left out}}",
+  "@backupSkipped": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreSummary": "{restored} documents restored. {duplicates} were already in DocSafe.",
+  "@restoreSummary": {
+    "placeholders": {
+      "restored": {
+        "type": "int"
+      },
+      "duplicates": {
+        "type": "int"
+      }
+    }
+  },
+  "restoreMissing": "{count, plural, =1{1 document in the backup could not be restored.} other{{count} documents in the backup could not be restored.}}",
+  "@restoreMissing": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

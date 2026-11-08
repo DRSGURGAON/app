@@ -183,6 +183,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 7 | PDF tool inputs / output | inputs as #1; output PDF in memory only | Tool runs | When the tool finishes | No |
 | 7a | Annotate & Sign: source + flattened intermediate | as #1 (the intermediate is an encrypted vault container, decrypted to a temp file only while reassembling); overlay PNGs in memory | Save copy | When the save finishes (intermediate container deleted; orphan sweep on next start) | No |
 | 7b | OCR input / output | input decrypted as #1 (one page bitmap at a time in memory); recognised text in memory, shown to the user | "Read text" | When OCR finishes (temp deleted in `finally`); text discarded unless the user saves it — then stored masked in the encrypted DB | No |
+| 7c | Backup / restore | none on disk: vault plaintext streams through memory into the encrypted backup, and back into new vault containers | Backup or restore | When it finishes | No |
 | 8 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
 
 Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
@@ -285,6 +286,36 @@ documents beyond the time itself — the time can reveal that *some* reminder ex
 - Changing reminders, expiry dates, trash/restore re-syncs the schedule while unlocked;
   Erase all data deletes the schedule file and cancels the alarm.
 - Free plan: 3 active reminders (today or later); more needs Premium (locked until billing).
+
+## 12c. Encrypted backup file (Option A)
+
+Settings → Backup & restore writes one file `DocSafe-backup-<date>.dsbackup` to a place the user
+picks in the system "save" dialog (Google Drive app, USB drive, any folder). DocSafe itself still
+has **no network permission**; uploading, if any, is done by the app the user chose.
+
+- **Key:** a separate *backup password* (≥ 8 characters, entered twice, with an explicit "cannot be
+  recovered" acknowledgement). PBKDF2-HMAC-SHA256, 600,000 iterations, random 16-byte salt
+  (`BackupFormat`, verified against RFC 7914 and the JDK). The derived key wraps a random 256-bit
+  DEK; the content is one DSF1 stream (same chunked AES-256-GCM as the vault). Changing the salt or
+  iteration count makes the file unopenable (treated like a wrong password). Brute force is limited
+  only by the password's strength and the PBKDF2 cost: a short or common password is weak.
+- **Contents:** metadata JSON (titles, categories, folders, tags, dates, notes, saved OCR text,
+  reminders) and every non-deleted document, streamed natively from the vault into the encrypted
+  backup — no plaintext file is written. Not included: Recently deleted, PIN, biometrics, saved
+  signature, settings, keys.
+- **Damaged vault files** are marked aborted inside the backup and reported as skipped; the rest of
+  the backup stays valid.
+- **Restore** (same or new phone, after setting a PIN): the backup is decrypted as a stream; each
+  document is re-encrypted into the vault with this device's Keystore keys. Every chunk is
+  authenticated; the end of the backup is only accepted after the final chunk verifies (truncation,
+  reordering, tampering → failure). On a wrong password, damaged file, low storage or a metadata
+  error, every container imported so far is deleted again. Documents already in the vault (same
+  content, by keyed fingerprint) are skipped. Restoring adds to the vault; it never deletes.
+- **Bridge:** the password crosses as UTF-8 bytes and is zeroed on both sides after use; metadata
+  JSON crosses in memory (documented exception); document bytes never cross.
+- **Limitations:** no automatic/scheduled backup yet (needs the Drive API = network permission;
+  deliberately not done). A backup file is only as safe as its password; the file name and size
+  are visible to wherever it is stored.
 
 ## 13. Known limitations
 

@@ -8,6 +8,7 @@ export 'native/security_api.g.dart'
         BiometricAvailability,
         BiometricOutcome,
         BiometricPromptText,
+        BackupSummary,
         CompressionLevel,
         ImagePageSpec,
         DatabaseConfig,
@@ -19,6 +20,8 @@ export 'native/security_api.g.dart'
         PageOverlay,
         PinOutcome,
         PinVerifyResult,
+        RestoreResult,
+        RestoredFile,
         ScanPageSpec,
         ScanSaveFormat,
         ScannedPage,
@@ -74,6 +77,14 @@ abstract interface class SecurityService {
   Future<bool> requestNotificationPermission();
   Future<void> openNotificationSettings();
   Future<String?> takeLaunchTarget();
+  Future<BackupSummary?> createBackup(
+    String fileName,
+    Uint8List password,
+    Uint8List metadata,
+    List<String> fileIds,
+  );
+  Future<String?> pickBackupFile();
+  Future<RestoreResult> restoreBackup(String token, Uint8List password);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
 }
@@ -248,6 +259,21 @@ class PigeonSecurityService implements SecurityService {
 
   @override
   Future<String?> takeLaunchTarget() => _guard(_api.takeLaunchTarget);
+
+  @override
+  Future<BackupSummary?> createBackup(
+    String fileName,
+    Uint8List password,
+    Uint8List metadata,
+    List<String> fileIds,
+  ) => _guard(() => _api.createBackup(fileName, password, metadata, fileIds));
+
+  @override
+  Future<String?> pickBackupFile() => _guard(_api.pickBackupFile);
+
+  @override
+  Future<RestoreResult> restoreBackup(String token, Uint8List password) =>
+      _guard(() => _api.restoreBackup(token, password));
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

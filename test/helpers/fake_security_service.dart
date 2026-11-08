@@ -61,6 +61,18 @@ class FakeSecurityService implements SecurityService {
   int permissionRequests = 0;
   int openedNotificationSettings = 0;
   String? launchTarget;
+
+  /// Backup simulation: the last backup "file" (metadata, file ids, password).
+  ({Uint8List metadata, List<String> fileIds, String password})? backupFile;
+  bool cancelBackupDialog = false;
+  bool cancelBackupPick = false;
+  bool pickInvalidBackup = false;
+  final Set<String> damagedForBackup = {};
+  final List<Uint8List> backupPasswordBuffers = [];
+
+  /// Fingerprint the restored copy of a backed-up file gets (same content on
+  /// the same device = same fingerprint); default is unique.
+  final Map<String, String> restoredFingerprints = {};
   int eraseCalls = 0;
   final Set<String> tempFiles = {};
   final List<Uint8List> pinBuffersSeen = [];
@@ -439,6 +451,70 @@ class FakeSecurityService implements SecurityService {
     final t = launchTarget;
     launchTarget = null;
     return t;
+  }
+
+  @override
+  Future<BackupSummary?> createBackup(
+    String fileName,
+    Uint8List password,
+    Uint8List metadata,
+    List<String> fileIds,
+  ) async {
+    _requireUnlocked();
+    backupPasswordBuffers.add(password);
+    if (password.length < 8) {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    if (cancelBackupDialog) return null;
+    final ok = [
+      for (final id in fileIds)
+        if (!damagedForBackup.contains(id)) id,
+    ];
+    backupFile = (
+      metadata: Uint8List.fromList(metadata),
+      fileIds: ok,
+      password: String.fromCharCodes(password),
+    );
+    return BackupSummary(
+      files: ok.length,
+      skipped: fileIds.length - ok.length,
+      bytes: metadata.length + 1000 * ok.length,
+    );
+  }
+
+  @override
+  Future<String?> pickBackupFile() async {
+    _requireUnlocked();
+    if (cancelBackupPick) return null;
+    if (pickInvalidBackup || backupFile == null) {
+      throw const SecurityFailure(SecurityErrorCode.backupInvalid);
+    }
+    return 'token-1';
+  }
+
+  @override
+  Future<RestoreResult> restoreBackup(String token, Uint8List password) async {
+    _requireUnlocked();
+    backupPasswordBuffers.add(password);
+    final b = backupFile;
+    if (token != 'token-1' || b == null) {
+      throw const SecurityFailure(SecurityErrorCode.backupInvalid);
+    }
+    if (String.fromCharCodes(password) != b.password) {
+      throw const SecurityFailure(SecurityErrorCode.backupPassword);
+    }
+    return RestoreResult(
+      metadata: b.metadata,
+      files: [
+        for (final id in b.fileIds)
+          RestoredFile(
+            originalFileId: id,
+            file: _generated(2000)
+              ..fingerprint = restoredFingerprints[id] ?? 'restored-$id',
+          ),
+      ],
+      skipped: 0,
+    );
   }
 
   @override

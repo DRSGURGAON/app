@@ -1376,4 +1376,115 @@ class AppLocalizationsHi extends AppLocalizations {
   String reminderOnDate(String date) {
     return '$date को';
   }
+
+  @override
+  String get settingsBackup => 'बैकअप और रीस्टोर';
+
+  @override
+  String get backupIntro =>
+      'अपने सभी दस्तावेज़ों और उनकी जानकारी की एक एन्क्रिप्टेड बैकअप फ़ाइल बनाएं। अगले कदम में चुनें कि उसे कहाँ रखना है — Google Drive, USB ड्राइव या कोई भी फ़ोल्डर। नए फ़ोन पर DocSafe इंस्टॉल करें और बैकअप पासवर्ड से रीस्टोर करें।';
+
+  @override
+  String get backupPasswordWarning =>
+      'बैकअप एक अलग बैकअप पासवर्ड (आपका PIN नहीं) से लॉक होता है। DocSafe इसे वापस नहीं ला सकता: पासवर्ड भूल गए तो बैकअप कभी नहीं खुलेगा।';
+
+  @override
+  String get backupNotIncluded =>
+      'शामिल नहीं: हाल ही में हटाए गए दस्तावेज़, आपका PIN और फ़िंगरप्रिंट सेटिंग, सहेजा हुआ हस्ताक्षर और ऐप सेटिंग्स।';
+
+  @override
+  String get backupNever => 'अभी तक कोई बैकअप नहीं बना';
+
+  @override
+  String get backupCreate => 'बैकअप बनाएं';
+
+  @override
+  String get backupRestore => 'बैकअप से रीस्टोर करें';
+
+  @override
+  String get backupPasswordTitle => 'बैकअप पासवर्ड सेट करें';
+
+  @override
+  String get backupPasswordLabel => 'बैकअप पासवर्ड';
+
+  @override
+  String get backupPasswordRepeat => 'पासवर्ड दोबारा लिखें';
+
+  @override
+  String get backupPasswordMismatch => 'पासवर्ड मेल नहीं खाते';
+
+  @override
+  String get backupPasswordAck =>
+      'मैं समझता/समझती हूँ कि यह पासवर्ड वापस नहीं मिल सकता';
+
+  @override
+  String get backupShowPassword => 'पासवर्ड दिखाएं';
+
+  @override
+  String get backupContinue => 'आगे बढ़ें';
+
+  @override
+  String get restoreEnterPassword => 'बैकअप पासवर्ड डालें';
+
+  @override
+  String get restoreButton => 'रीस्टोर करें';
+
+  @override
+  String get restoreDoneTitle => 'रीस्टोर पूरा हुआ';
+
+  @override
+  String get errorBackupPassword =>
+      'बैकअप पासवर्ड गलत है, या बैकअप फ़ाइल खराब है।';
+
+  @override
+  String get errorBackupInvalid =>
+      'यह DocSafe बैकअप नहीं है, या DocSafe के नए वर्ज़न से बना है।';
+
+  @override
+  String backupLast(String date) {
+    return 'पिछला बैकअप: $date';
+  }
+
+  @override
+  String backupPasswordTooShort(int min) {
+    return 'कम से कम $min अक्षर';
+  }
+
+  @override
+  String backupCreated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count दस्तावेज़ों के साथ बैकअप सहेजा गया',
+      one: '1 दस्तावेज़ के साथ बैकअप सहेजा गया',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String backupSkipped(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count खराब दस्तावेज़ छोड़ दिए गए',
+      one: '1 खराब दस्तावेज़ छोड़ दिया गया',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String restoreSummary(int restored, int duplicates) {
+    return '$restored दस्तावेज़ रीस्टोर हुए। $duplicates पहले से DocSafe में थे।';
+  }
+
+  @override
+  String restoreMissing(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'बैकअप के $count दस्तावेज़ रीस्टोर नहीं हो सके।',
+      one: 'बैकअप का 1 दस्तावेज़ रीस्टोर नहीं हो सका।',
+    );
+    return '$_temp0';
+  }
 }

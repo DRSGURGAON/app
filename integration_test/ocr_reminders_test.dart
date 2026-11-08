@@ -46,7 +46,10 @@ void main() {
   testWidgets('OCR and reminders on device', (tester) async {
     final security = FixtureSecurityService();
     final container = ProviderContainer(
-      overrides: [securityServiceProvider.overrideWithValue(security)],
+      overrides: [
+        securityServiceProvider.overrideWithValue(security),
+        hindiPhone,
+      ],
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(

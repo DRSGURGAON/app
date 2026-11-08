@@ -48,7 +48,10 @@ void main() {
     await pdfrxFlutterInitialize();
     final security = FixtureSecurityService();
     final container = ProviderContainer(
-      overrides: [securityServiceProvider.overrideWithValue(security)],
+      overrides: [
+        securityServiceProvider.overrideWithValue(security),
+        hindiPhone,
+      ],
     );
     addTearDown(container.dispose);
     await tester.pumpWidget(

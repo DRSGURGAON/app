@@ -1,11 +1,19 @@
 // On-device test support. Talks to the DEBUG-ONLY fixture channel
 // (android/app/src/debug/.../TestFixtures.kt); release builds do not contain it.
 
+import 'package:docsafe/app/localization/locale_controller.dart';
 import 'package:docsafe/core/security/security_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_test/flutter_test.dart';
 
 const _channel = MethodChannel('docsafe.debug/fixtures');
+
+/// On-device tests drive the Hindi UI; the CI emulator's locale is English,
+/// and the app now follows the phone language until the user picks one.
+final hindiPhone = deviceLocaleProvider.overrideWithValue(
+  const Locale('hi', 'IN'),
+);
 
 class FixtureFile {
   FixtureFile(this.file, this.sha256);

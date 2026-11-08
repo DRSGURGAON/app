@@ -119,6 +119,13 @@ class SettingsScreen extends ConsumerWidget {
           ),
           _Header(l.settingsDataSection),
           ListTile(
+            key: const Key('settings-backup'),
+            leading: const Icon(Icons.backup_outlined),
+            title: Text(l.settingsBackup),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.go(Routes.backup),
+          ),
+          ListTile(
             leading: const Icon(Icons.category_outlined),
             title: Text(l.settingsCategories),
             trailing: const Icon(Icons.chevron_right),

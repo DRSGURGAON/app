@@ -173,6 +173,20 @@ tool must stay locked and show the Premium screen (no purchase button).
 | R9 | Battery-saver / OEM "deep sleep" on (Xiaomi, Samsung, Oppo, Vivo) | Note whether the reminder arrives and how late |
 | R10 | Erase all data | No reminder fires afterwards |
 
+## 11. Encrypted backup and phone language
+
+| # | Step | Expected |
+|---|---|---|
+| K1 | Fresh install on an English phone (US or UK region) | App starts in English; on a Hindi phone it starts in Hindi |
+| K2 | Settings → Backup & restore → Create backup, save to **Google Drive** (Drive app) | File `DocSafe-backup-<date>.dsbackup` appears in Drive; "Backup saved with N documents" |
+| K3 | Same, save to Downloads / a USB drive | File created; open it in a text viewer: unreadable bytes only |
+| K4 | Erase all data (or a second phone), set a PIN, Restore from backup → pick the file → wrong password | "Wrong backup password…", can retry |
+| K5 | Correct password | All documents, folders, categories, tags, expiry dates, notes, reminders back; documents open |
+| K6 | Restore the same backup again | "0 restored, N were already in DocSafe" |
+| K7 | Pick a random PDF as backup | "This is not a DocSafe backup…" |
+| K8 | Large vault (500 MB+) | Completes; note the time; no plaintext in `cache/` during the run |
+| K9 | US phone: OCR a document with "EXP 08/09/2031" | Suggested expiry 9 Aug 2031 (month first) |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -186,3 +200,4 @@ tool must stay locked and show the Premium screen (no purchase button).
 | PDF tools (§8) | | | |
 | Annotate & Sign (§9) | | | |
 | OCR & reminders (§10) | | | |
+| Backup & language (§11) | | | |

@@ -118,8 +118,7 @@ void main() {
       ); // back on home, hidden from recent
 
       await goTab(tester, en.navSettings);
-      await tester.tap(find.text(en.trashTitle));
-      await settle(tester);
+      await scrollAndTap(tester, find.text(en.trashTitle));
       expect(find.text('Passport'), findsOneWidget);
       expect(find.text(en.trashDaysLeft(29)), findsOneWidget);
       await tester.tap(find.byType(PopupMenuButton<String>));

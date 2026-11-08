@@ -16,6 +16,8 @@ enum SecurityErrorCode {
   pdfUnreadable,
   tooLarge,
   ocrFailed,
+  backupPassword,
+  backupInvalid,
   unknown;
 
   static SecurityErrorCode fromNative(String code) => switch (code) {
@@ -30,6 +32,8 @@ enum SecurityErrorCode {
     'SCANNER_UNAVAILABLE' => scannerUnavailable,
     'PDF_UNREADABLE' => pdfUnreadable,
     'OCR_FAILED' => ocrFailed,
+    'BACKUP_PASSWORD' => backupPassword,
+    'BACKUP_INVALID' => backupInvalid,
     _ => unknown,
   };
 }

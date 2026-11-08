@@ -70,6 +70,14 @@ Recently deleted). Not supported: editing text inside PDFs, opening password-pro
 
 Premium is locked in release builds until billing (Phase 6); debug builds have a developer switch.
 
+**Global readiness + encrypted backup** (first markets: India, US, UK):
+
+| Area | State |
+|---|---|
+| UI language follows the phone (Hindi on Hindi phones, else English) until the user picks one | Implemented, tested |
+| OCR masking also for US SSN and UK National Insurance numbers; US/UK category keywords; US month-first and month-name expiry dates | Implemented, tested |
+| Encrypted backup file (.dsbackup) with a separate backup password, saved via the system dialog (Drive, USB, any folder); restore on the same or a new phone | Implemented; format JVM-tested, vault round trip instrumented-tested; system dialogs **need a device run** |
+
 Not started: Phase 6 (billing), 7–8.
 Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings.
 

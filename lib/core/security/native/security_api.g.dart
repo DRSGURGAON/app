@@ -11,9 +11,9 @@ import 'package:flutter/services.dart';
 import 'package:meta/meta.dart' show immutable, protected, visibleForTesting;
 
 Object? _extractReplyValueOrThrow(
-    List<Object?>? replyList,
-    String channelName, {
-    required bool isNullValid,
+  List<Object?>? replyList,
+  String channelName, {
+  required bool isNullValid,
 }) {
   if (replyList == null) {
     throw PlatformException(
@@ -47,8 +47,9 @@ bool _deepEquals(Object? a, Object? b) {
   }
   if (a is List && b is List) {
     return a.length == b.length &&
-        a.indexed
-            .every(((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]));
+        a.indexed.every(
+          ((int, dynamic) item) => _deepEquals(item.$2, b[item.$1]),
+        );
   }
   if (a is Map && b is Map) {
     if (a.length != b.length) {
@@ -97,13 +98,12 @@ int _deepHash(Object? value) {
   return value.hashCode;
 }
 
-
 enum BiometricAvailability {
   available,
   noneEnrolled,
   noHardware,
   unavailable,
-  securityUpdateRequired;
+  securityUpdateRequired,
 }
 
 enum BiometricOutcome {
@@ -114,34 +114,17 @@ enum BiometricOutcome {
   notEnrolled,
   unavailable,
   keyInvalidated,
-  failed;
+  failed,
 }
 
-enum PinOutcome {
-  success,
-  wrong,
-  lockedOut,
-  notSet;
-}
+enum PinOutcome { success, wrong, lockedOut, notSet }
 
-enum KeyProtection {
-  strongBox,
-  trustedEnvironment,
-  software,
-  unknown;
-}
+enum KeyProtection { strongBox, trustedEnvironment, software, unknown }
 
-enum ScanSaveFormat {
-  pdf,
-  images;
-}
+enum ScanSaveFormat { pdf, images }
 
 /// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
-enum CompressionLevel {
-  high,
-  balanced,
-  smallest;
-}
+enum CompressionLevel { high, balanced, smallest }
 
 class SecurityStatus {
   SecurityStatus({
@@ -181,7 +164,8 @@ class SecurityStatus {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static SecurityStatus decode(Object result) {
     result as List<Object?>;
@@ -205,7 +189,13 @@ class SecurityStatus {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(pinSet, other.pinSet) && _deepEquals(unlocked, other.unlocked) && _deepEquals(biometricEnabled, other.biometricEnabled) && _deepEquals(biometricAvailability, other.biometricAvailability) && _deepEquals(failedAttempts, other.failedAttempts) && _deepEquals(lockoutRemainingMillis, other.lockoutRemainingMillis) && _deepEquals(keyProtection, other.keyProtection);
+    return _deepEquals(pinSet, other.pinSet) &&
+        _deepEquals(unlocked, other.unlocked) &&
+        _deepEquals(biometricEnabled, other.biometricEnabled) &&
+        _deepEquals(biometricAvailability, other.biometricAvailability) &&
+        _deepEquals(failedAttempts, other.failedAttempts) &&
+        _deepEquals(lockoutRemainingMillis, other.lockoutRemainingMillis) &&
+        _deepEquals(keyProtection, other.keyProtection);
   }
 
   @override
@@ -244,7 +234,8 @@ class PinVerifyResult {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PinVerifyResult decode(Object result) {
     result as List<Object?>;
@@ -265,7 +256,10 @@ class PinVerifyResult {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(outcome, other.outcome) && _deepEquals(failedAttempts, other.failedAttempts) && _deepEquals(lockoutMillis, other.lockoutMillis) && _deepEquals(attemptsBeforeLockout, other.attemptsBeforeLockout);
+    return _deepEquals(outcome, other.outcome) &&
+        _deepEquals(failedAttempts, other.failedAttempts) &&
+        _deepEquals(lockoutMillis, other.lockoutMillis) &&
+        _deepEquals(attemptsBeforeLockout, other.attemptsBeforeLockout);
   }
 
   @override
@@ -293,15 +287,12 @@ class BiometricPromptText {
   String negativeButton;
 
   List<Object?> _toList() {
-    return <Object?>[
-      title,
-      subtitle,
-      negativeButton,
-    ];
+    return <Object?>[title, subtitle, negativeButton];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BiometricPromptText decode(Object result) {
     result as List<Object?>;
@@ -321,7 +312,9 @@ class BiometricPromptText {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(title, other.title) && _deepEquals(subtitle, other.subtitle) && _deepEquals(negativeButton, other.negativeButton);
+    return _deepEquals(title, other.title) &&
+        _deepEquals(subtitle, other.subtitle) &&
+        _deepEquals(negativeButton, other.negativeButton);
   }
 
   @override
@@ -369,7 +362,8 @@ class ImportedFile {
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ImportedFile decode(Object result) {
     result as List<Object?>;
@@ -392,7 +386,12 @@ class ImportedFile {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(fileId, other.fileId) && _deepEquals(displayName, other.displayName) && _deepEquals(mimeType, other.mimeType) && _deepEquals(plaintextBytes, other.plaintextBytes) && _deepEquals(ciphertextBytes, other.ciphertextBytes) && _deepEquals(fingerprint, other.fingerprint);
+    return _deepEquals(fileId, other.fileId) &&
+        _deepEquals(displayName, other.displayName) &&
+        _deepEquals(mimeType, other.mimeType) &&
+        _deepEquals(plaintextBytes, other.plaintextBytes) &&
+        _deepEquals(ciphertextBytes, other.ciphertextBytes) &&
+        _deepEquals(fingerprint, other.fingerprint);
   }
 
   @override
@@ -406,10 +405,7 @@ class ImportedFile {
 }
 
 class DatabaseConfig {
-  DatabaseConfig({
-    required this.path,
-    required this.keyHex,
-  });
+  DatabaseConfig({required this.path, required this.keyHex});
 
   String path;
 
@@ -417,14 +413,12 @@ class DatabaseConfig {
   String keyHex;
 
   List<Object?> _toList() {
-    return <Object?>[
-      path,
-      keyHex,
-    ];
+    return <Object?>[path, keyHex];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static DatabaseConfig decode(Object result) {
     result as List<Object?>;
@@ -457,24 +451,19 @@ class DatabaseConfig {
 }
 
 class StorageInfo {
-  StorageInfo({
-    required this.vaultBytes,
-    required this.availableBytes,
-  });
+  StorageInfo({required this.vaultBytes, required this.availableBytes});
 
   int vaultBytes;
 
   int availableBytes;
 
   List<Object?> _toList() {
-    return <Object?>[
-      vaultBytes,
-      availableBytes,
-    ];
+    return <Object?>[vaultBytes, availableBytes];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static StorageInfo decode(Object result) {
     result as List<Object?>;
@@ -493,7 +482,8 @@ class StorageInfo {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(vaultBytes, other.vaultBytes) && _deepEquals(availableBytes, other.availableBytes);
+    return _deepEquals(vaultBytes, other.vaultBytes) &&
+        _deepEquals(availableBytes, other.availableBytes);
   }
 
   @override
@@ -521,15 +511,12 @@ class ExportItem {
   String mimeType;
 
   List<Object?> _toList() {
-    return <Object?>[
-      fileId,
-      fileName,
-      mimeType,
-    ];
+    return <Object?>[fileId, fileName, mimeType];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ExportItem decode(Object result) {
     result as List<Object?>;
@@ -549,7 +536,9 @@ class ExportItem {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(fileId, other.fileId) && _deepEquals(fileName, other.fileName) && _deepEquals(mimeType, other.mimeType);
+    return _deepEquals(fileId, other.fileId) &&
+        _deepEquals(fileName, other.fileName) &&
+        _deepEquals(mimeType, other.mimeType);
   }
 
   @override
@@ -563,24 +552,19 @@ class ExportItem {
 }
 
 class ExportSummary {
-  ExportSummary({
-    required this.exported,
-    required this.failed,
-  });
+  ExportSummary({required this.exported, required this.failed});
 
   int exported;
 
   int failed;
 
   List<Object?> _toList() {
-    return <Object?>[
-      exported,
-      failed,
-    ];
+    return <Object?>[exported, failed];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ExportSummary decode(Object result) {
     result as List<Object?>;
@@ -599,7 +583,8 @@ class ExportSummary {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(exported, other.exported) && _deepEquals(failed, other.failed);
+    return _deepEquals(exported, other.exported) &&
+        _deepEquals(failed, other.failed);
   }
 
   @override
@@ -614,11 +599,7 @@ class ExportSummary {
 
 /// A page produced by the document scanner (a JPEG in app-private cache).
 class ScannedPage {
-  ScannedPage({
-    required this.path,
-    required this.width,
-    required this.height,
-  });
+  ScannedPage({required this.path, required this.width, required this.height});
 
   String path;
 
@@ -627,15 +608,12 @@ class ScannedPage {
   int height;
 
   List<Object?> _toList() {
-    return <Object?>[
-      path,
-      width,
-      height,
-    ];
+    return <Object?>[path, width, height];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ScannedPage decode(Object result) {
     result as List<Object?>;
@@ -655,7 +633,9 @@ class ScannedPage {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(path, other.path) && _deepEquals(width, other.width) && _deepEquals(height, other.height);
+    return _deepEquals(path, other.path) &&
+        _deepEquals(width, other.width) &&
+        _deepEquals(height, other.height);
   }
 
   @override
@@ -670,24 +650,19 @@ class ScannedPage {
 
 /// A page to save, in final order, with its clockwise rotation (0/90/180/270).
 class ScanPageSpec {
-  ScanPageSpec({
-    required this.path,
-    required this.rotation,
-  });
+  ScanPageSpec({required this.path, required this.rotation});
 
   String path;
 
   int rotation;
 
   List<Object?> _toList() {
-    return <Object?>[
-      path,
-      rotation,
-    ];
+    return <Object?>[path, rotation];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ScanPageSpec decode(Object result) {
     result as List<Object?>;
@@ -706,7 +681,8 @@ class ScanPageSpec {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(path, other.path) && _deepEquals(rotation, other.rotation);
+    return _deepEquals(path, other.path) &&
+        _deepEquals(rotation, other.rotation);
   }
 
   @override
@@ -734,15 +710,12 @@ class ImagePageSpec {
   int rotation;
 
   List<Object?> _toList() {
-    return <Object?>[
-      fileId,
-      mimeType,
-      rotation,
-    ];
+    return <Object?>[fileId, mimeType, rotation];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static ImagePageSpec decode(Object result) {
     result as List<Object?>;
@@ -762,7 +735,9 @@ class ImagePageSpec {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(fileId, other.fileId) && _deepEquals(mimeType, other.mimeType) && _deepEquals(rotation, other.rotation);
+    return _deepEquals(fileId, other.fileId) &&
+        _deepEquals(mimeType, other.mimeType) &&
+        _deepEquals(rotation, other.rotation);
   }
 
   @override
@@ -777,24 +752,19 @@ class ImagePageSpec {
 
 /// A transparent PNG drawn over one page (same aspect ratio as the page as displayed).
 class PageOverlay {
-  PageOverlay({
-    required this.pageIndex,
-    required this.png,
-  });
+  PageOverlay({required this.pageIndex, required this.png});
 
   int pageIndex;
 
   Uint8List png;
 
   List<Object?> _toList() {
-    return <Object?>[
-      pageIndex,
-      png,
-    ];
+    return <Object?>[pageIndex, png];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static PageOverlay decode(Object result) {
     result as List<Object?>;
@@ -813,7 +783,8 @@ class PageOverlay {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(pageIndex, other.pageIndex) && _deepEquals(png, other.png);
+    return _deepEquals(pageIndex, other.pageIndex) &&
+        _deepEquals(png, other.png);
   }
 
   @override
@@ -842,15 +813,12 @@ class OcrResult {
   int pageCount;
 
   List<Object?> _toList() {
-    return <Object?>[
-      text,
-      pagesRead,
-      pageCount,
-    ];
+    return <Object?>[text, pagesRead, pageCount];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static OcrResult decode(Object result) {
     result as List<Object?>;
@@ -870,7 +838,9 @@ class OcrResult {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(text, other.text) && _deepEquals(pagesRead, other.pagesRead) && _deepEquals(pageCount, other.pageCount);
+    return _deepEquals(text, other.text) &&
+        _deepEquals(pagesRead, other.pagesRead) &&
+        _deepEquals(pageCount, other.pageCount);
   }
 
   @override
@@ -899,15 +869,12 @@ class BackupSummary {
   int bytes;
 
   List<Object?> _toList() {
-    return <Object?>[
-      files,
-      skipped,
-      bytes,
-    ];
+    return <Object?>[files, skipped, bytes];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static BackupSummary decode(Object result) {
     result as List<Object?>;
@@ -927,7 +894,9 @@ class BackupSummary {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(files, other.files) && _deepEquals(skipped, other.skipped) && _deepEquals(bytes, other.bytes);
+    return _deepEquals(files, other.files) &&
+        _deepEquals(skipped, other.skipped) &&
+        _deepEquals(bytes, other.bytes);
   }
 
   @override
@@ -943,24 +912,19 @@ class BackupSummary {
 /// A document file restored from a backup: its id inside the backup and the
 /// new vault container it was re-encrypted into.
 class RestoredFile {
-  RestoredFile({
-    required this.originalFileId,
-    required this.file,
-  });
+  RestoredFile({required this.originalFileId, required this.file});
 
   String originalFileId;
 
   ImportedFile file;
 
   List<Object?> _toList() {
-    return <Object?>[
-      originalFileId,
-      file,
-    ];
+    return <Object?>[originalFileId, file];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static RestoredFile decode(Object result) {
     result as List<Object?>;
@@ -979,7 +943,8 @@ class RestoredFile {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(originalFileId, other.originalFileId) && _deepEquals(file, other.file);
+    return _deepEquals(originalFileId, other.originalFileId) &&
+        _deepEquals(file, other.file);
   }
 
   @override
@@ -1007,15 +972,12 @@ class RestoreResult {
   int skipped;
 
   List<Object?> _toList() {
-    return <Object?>[
-      metadata,
-      files,
-      skipped,
-    ];
+    return <Object?>[metadata, files, skipped];
   }
 
   Object encode() {
-    return _toList();  }
+    return _toList();
+  }
 
   static RestoreResult decode(Object result) {
     result as List<Object?>;
@@ -1035,7 +997,9 @@ class RestoreResult {
     if (identical(this, other)) {
       return true;
     }
-    return _deepEquals(metadata, other.metadata) && _deepEquals(files, other.files) && _deepEquals(skipped, other.skipped);
+    return _deepEquals(metadata, other.metadata) &&
+        _deepEquals(files, other.files) &&
+        _deepEquals(skipped, other.skipped);
   }
 
   @override
@@ -1048,7 +1012,6 @@ class RestoreResult {
   }
 }
 
-
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
   @override
@@ -1056,70 +1019,70 @@ class _PigeonCodec extends StandardMessageCodec {
     if (value is int) {
       buffer.putUint8(4);
       buffer.putInt64(value);
-    }    else if (value is BiometricAvailability) {
+    } else if (value is BiometricAvailability) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is BiometricOutcome) {
+    } else if (value is BiometricOutcome) {
       buffer.putUint8(130);
       writeValue(buffer, value.index);
-    }    else if (value is PinOutcome) {
+    } else if (value is PinOutcome) {
       buffer.putUint8(131);
       writeValue(buffer, value.index);
-    }    else if (value is KeyProtection) {
+    } else if (value is KeyProtection) {
       buffer.putUint8(132);
       writeValue(buffer, value.index);
-    }    else if (value is ScanSaveFormat) {
+    } else if (value is ScanSaveFormat) {
       buffer.putUint8(133);
       writeValue(buffer, value.index);
-    }    else if (value is CompressionLevel) {
+    } else if (value is CompressionLevel) {
       buffer.putUint8(134);
       writeValue(buffer, value.index);
-    }    else if (value is SecurityStatus) {
+    } else if (value is SecurityStatus) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is PinVerifyResult) {
+    } else if (value is PinVerifyResult) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is BiometricPromptText) {
+    } else if (value is BiometricPromptText) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is ImportedFile) {
+    } else if (value is ImportedFile) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is DatabaseConfig) {
+    } else if (value is DatabaseConfig) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is StorageInfo) {
+    } else if (value is StorageInfo) {
       buffer.putUint8(140);
       writeValue(buffer, value.encode());
-    }    else if (value is ExportItem) {
+    } else if (value is ExportItem) {
       buffer.putUint8(141);
       writeValue(buffer, value.encode());
-    }    else if (value is ExportSummary) {
+    } else if (value is ExportSummary) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    }    else if (value is ScannedPage) {
+    } else if (value is ScannedPage) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    }    else if (value is ScanPageSpec) {
+    } else if (value is ScanPageSpec) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    }    else if (value is ImagePageSpec) {
+    } else if (value is ImagePageSpec) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    }    else if (value is PageOverlay) {
+    } else if (value is PageOverlay) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    }    else if (value is OcrResult) {
+    } else if (value is OcrResult) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    }    else if (value is BackupSummary) {
+    } else if (value is BackupSummary) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    }    else if (value is RestoredFile) {
+    } else if (value is RestoredFile) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    }    else if (value is RestoreResult) {
+    } else if (value is RestoreResult) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
     } else {
@@ -1191,20 +1154,21 @@ class SecurityHostApi {
   /// available for dependency injection. If it is left null, the default
   /// BinaryMessenger will be used which routes to the host platform.
   SecurityHostApi({
-      BinaryMessenger? binaryMessenger, 
-      String messageChannelSuffix = '', 
-      })
-      : pigeonVar_binaryMessenger = binaryMessenger,
-        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    BinaryMessenger? binaryMessenger,
+    String messageChannelSuffix = '',
+  }) : pigeonVar_binaryMessenger = binaryMessenger,
+       pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty
+           ? '.$messageChannelSuffix'
+           : '';
 
   final BinaryMessenger? pigeonVar_binaryMessenger;
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
   final String pigeonVar_messageChannelSuffix;
 
-
   Future<SecurityStatus> getStatus() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.getStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getStatus$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1214,55 +1178,59 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as SecurityStatus;
   }
 
   /// First-time setup (no PIN yet) or change while unlocked. Unlocks the session.
   Future<void> setPin(Uint8List pinDigits) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.setPin$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setPin$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pinDigits]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pinDigits],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<PinVerifyResult> verifyPin(Uint8List pinDigits) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.verifyPin$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.verifyPin$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pinDigits]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pinDigits],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as PinVerifyResult;
   }
 
   /// Locks the session and wipes decrypted temp files.
   Future<void> lock() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.lock$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.lock$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1272,35 +1240,37 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Shows the system prompt and binds biometric unlock to a new Keystore key.
   Future<BiometricOutcome> enableBiometric(BiometricPromptText text) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.enableBiometric$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.enableBiometric$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[text]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[text],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as BiometricOutcome;
   }
 
   Future<void> disableBiometric() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.disableBiometric$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.disableBiometric$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1310,34 +1280,36 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<BiometricOutcome> unlockWithBiometric(BiometricPromptText text) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.unlockWithBiometric$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.unlockWithBiometric$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[text]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[text],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as BiometricOutcome;
   }
 
   Future<DatabaseConfig> getDatabaseConfig() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.getDatabaseConfig$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getDatabaseConfig$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1347,75 +1319,81 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as DatabaseConfig;
   }
 
   /// Opens the system document picker and encrypts the chosen file straight
   /// from the content provider. Returns null if the user cancelled.
   Future<ImportedFile?> pickAndImportDocument(List<String> mimeTypes) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.pickAndImportDocument$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.pickAndImportDocument$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[mimeTypes]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[mimeTypes],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as ImportedFile?;
   }
 
   Future<String> decryptToTemp(String fileId, String extension) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.decryptToTemp$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.decryptToTemp$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId, extension]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, extension],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as String;
   }
 
   Future<bool> deleteTemp(String path) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.deleteTemp$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.deleteTemp$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[path]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[path],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   Future<int> sweepTemp() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.sweepTemp$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.sweepTemp$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1425,52 +1403,56 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as int;
   }
 
   Future<void> verifyEncryptedFile(String fileId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.verifyEncryptedFile$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.verifyEncryptedFile$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<void> deleteEncryptedFile(String fileId) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.deleteEncryptedFile$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.deleteEncryptedFile$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   Future<List<String>> listEncryptedFileIds() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.listEncryptedFileIds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.listEncryptedFileIds$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1480,16 +1462,16 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<String>();
   }
 
   Future<StorageInfo> getStorageInfo() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.getStorageInfo$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getStorageInfo$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1499,75 +1481,90 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as StorageInfo;
   }
 
   /// Verifies [currentPin] (counts towards the attempt limit) and replaces it
   /// with [newPin]. Requires an unlocked session.
-  Future<PinVerifyResult> changePin(Uint8List currentPin, Uint8List newPin) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.changePin$pigeonVar_messageChannelSuffix';
+  Future<PinVerifyResult> changePin(
+    Uint8List currentPin,
+    Uint8List newPin,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.changePin$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[currentPin, newPin]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[currentPin, newPin],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as PinVerifyResult;
   }
 
   /// Opens the system "save as" dialog and writes the DECRYPTED document to the
   /// chosen location. Returns false if the user cancelled. A failed export
   /// deletes the partially written destination file.
-  Future<bool> exportDocument(String fileId, String fileName, String mimeType) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.exportDocument$pigeonVar_messageChannelSuffix';
+  Future<bool> exportDocument(
+    String fileId,
+    String fileName,
+    String mimeType,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.exportDocument$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId, fileName, mimeType]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, fileName, mimeType],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// Asks the user for a folder, creates [folderName] inside it and writes the
   /// decrypted documents there. Returns null if the user cancelled.
-  Future<ExportSummary?> exportAllToFolder(String folderName, List<ExportItem> items) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.exportAllToFolder$pigeonVar_messageChannelSuffix';
+  Future<ExportSummary?> exportAllToFolder(
+    String folderName,
+    List<ExportItem> items,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.exportAllToFolder$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[folderName, items]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[folderName, items],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as ExportSummary?;
   }
 
@@ -1575,7 +1572,8 @@ class SecurityHostApi {
   /// enrolment and all DocSafe Keystore keys. Works locked or unlocked.
   /// The Dart side must close the database first.
   Future<void> eraseAllData() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.eraseAllData$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.eraseAllData$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1585,16 +1583,16 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Background time before auto-lock: 0, 30, 60 or 300 seconds.
   Future<int> getAutoLockSeconds() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.getAutoLockSeconds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getAutoLockSeconds$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1604,30 +1602,31 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as int;
   }
 
   Future<void> setAutoLockSeconds(int seconds) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.setAutoLockSeconds$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setAutoLockSeconds$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[seconds]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[seconds],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Launches the Google ML Kit document scanner (edge detection, auto crop,
@@ -1636,22 +1635,27 @@ class SecurityHostApi {
   /// module / unsupported device), IO.
   /// Pages stay in app-private cache until [saveScan] + [discardScan], lock,
   /// erase or the next app start.
-  Future<List<ScannedPage>?> startScan(int pageLimit, bool allowGalleryImport) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.startScan$pigeonVar_messageChannelSuffix';
+  Future<List<ScannedPage>?> startScan(
+    int pageLimit,
+    bool allowGalleryImport,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.startScan$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pageLimit, allowGalleryImport]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pageLimit, allowGalleryImport],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return (pigeonVar_replyValue as List<Object?>?)?.cast<ScannedPage>();
   }
 
@@ -1659,62 +1663,71 @@ class SecurityHostApi {
   /// one PDF (pages embedded unchanged, rotation as page metadata) or one
   /// JPEG document per page. Source pages are NOT deleted here, so a failed
   /// save can be retried; call [discardScan] once the result is recorded.
-  Future<List<ImportedFile>> saveScan(List<ScanPageSpec> pages, ScanSaveFormat format) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.saveScan$pigeonVar_messageChannelSuffix';
+  Future<List<ImportedFile>> saveScan(
+    List<ScanPageSpec> pages,
+    ScanSaveFormat format,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.saveScan$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[pages, format]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[pages, format],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return (pigeonVar_replyValue! as List<Object?>).cast<ImportedFile>();
   }
 
   /// Wipes scanned page files (after a confirmed save, or on cancel).
   Future<void> discardScan(List<String> paths) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.discardScan$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.discardScan$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[paths]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[paths],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Encrypts a PDF produced in memory by a page operation (edit, merge,
   /// split). Must start with `%PDF-`. Never written to disk as plaintext.
   Future<ImportedFile> importPdfBytes(Uint8List bytes) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.importPdfBytes$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.importPdfBytes$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[bytes]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[bytes],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as ImportedFile;
   }
 
@@ -1722,43 +1735,50 @@ class SecurityHostApi {
   /// decrypted in memory one at a time and embedded (JPEG unchanged, PNG
   /// converted), streamed into the encryptor.
   Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.imagesToPdf$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.imagesToPdf$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[images]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[images],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as ImportedFile;
   }
 
   /// Re-renders every page of a vault PDF as a JPEG at the preset's
   /// resolution/quality and saves the result as a NEW encrypted PDF. Text
   /// in the result is no longer selectable. Errors: PDF_UNREADABLE.
-  Future<ImportedFile> compressPdf(String fileId, CompressionLevel level) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.compressPdf$pigeonVar_messageChannelSuffix';
+  Future<ImportedFile> compressPdf(
+    String fileId,
+    CompressionLevel level,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.compressPdf$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId, level]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, level],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as ImportedFile;
   }
 
@@ -1767,69 +1787,83 @@ class SecurityHostApi {
   /// flattened pages, in the given order (the caller reassembles the full
   /// document and deletes this intermediate). Flattening removes anything
   /// hidden under "cover" marks. Errors: PDF_UNREADABLE.
-  Future<ImportedFile> flattenPages(String fileId, List<PageOverlay> overlays) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.flattenPages$pigeonVar_messageChannelSuffix';
+  Future<ImportedFile> flattenPages(
+    String fileId,
+    List<PageOverlay> overlays,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.flattenPages$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId, overlays]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, overlays],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as ImportedFile;
   }
 
   /// On-device OCR (ML Kit, bundled model) of a vault document: images, or the
   /// first [maxPages] pages of a PDF. Errors: PDF_UNREADABLE, OCR_FAILED.
-  Future<OcrResult> recognizeText(String fileId, String mimeType, int maxPages) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.recognizeText$pigeonVar_messageChannelSuffix';
+  Future<OcrResult> recognizeText(
+    String fileId,
+    String mimeType,
+    int maxPages,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.recognizeText$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileId, mimeType, maxPages]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, mimeType, maxPages],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as OcrResult;
   }
 
   /// Replaces the reminder schedule: epoch milliseconds only (the sole
   /// reminder data kept outside the encrypted database). Requires unlock.
   Future<void> setReminderSchedule(List<int> epochMillis) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.setReminderSchedule$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setReminderSchedule$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[epochMillis]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[epochMillis],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Whether DocSafe may post notifications (permission + system switch).
   Future<bool> notificationsEnabled() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.notificationsEnabled$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.notificationsEnabled$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1839,17 +1873,17 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// Android 13+: shows the system permission dialog. Returns the result.
   Future<bool> requestNotificationPermission() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.requestNotificationPermission$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.requestNotificationPermission$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1859,17 +1893,17 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as bool;
   }
 
   /// Opens the system notification settings for DocSafe.
   Future<void> openNotificationSettings() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.openNotificationSettings$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.openNotificationSettings$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1879,16 +1913,16 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// "reminders" if the app was opened from a reminder notification; consumed.
   Future<String?> takeLaunchTarget() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.takeLaunchTarget$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.takeLaunchTarget$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1898,40 +1932,47 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as String?;
   }
 
   /// Opens the system "save as" dialog and writes a password-encrypted backup
   /// (metadata JSON + the listed vault files, streamed; no plaintext file).
   /// Returns null if the user cancelled. Errors: LOCKED, IO, LOW_STORAGE.
-  Future<BackupSummary?> createBackup(String fileName, Uint8List password, Uint8List metadata, List<String> fileIds) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.createBackup$pigeonVar_messageChannelSuffix';
+  Future<BackupSummary?> createBackup(
+    String fileName,
+    Uint8List password,
+    Uint8List metadata,
+    List<String> fileIds,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.createBackup$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[fileName, password, metadata, fileIds]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileName, password, metadata, fileIds],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as BackupSummary?;
   }
 
   /// Lets the user pick a backup file and checks its header. Returns an opaque
   /// token for [restoreBackup], or null if cancelled. Errors: BACKUP_INVALID.
   Future<String?> pickBackupFile() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.pickBackupFile$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.pickBackupFile$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1941,11 +1982,10 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as String?;
   }
 
@@ -1953,27 +1993,30 @@ class SecurityHostApi {
   /// On any failure nothing is left in the vault. Errors: BACKUP_PASSWORD
   /// (wrong password or damaged header), BACKUP_INVALID, INTEGRITY, LOW_STORAGE.
   Future<RestoreResult> restoreBackup(String token, Uint8List password) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.restoreBackup$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.restoreBackup$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[token, password]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[token, password],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: false,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
     return pigeonVar_replyValue! as RestoreResult;
   }
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   Future<String?> getLanguage() async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.getLanguage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.getLanguage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -1983,29 +2026,30 @@ class SecurityHostApi {
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
     return pigeonVar_replyValue as String?;
   }
 
   Future<void> setLanguage(String languageCode) async {
-    final pigeonVar_channelName = 'dev.flutter.pigeon.docsafe.SecurityHostApi.setLanguage$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setLanguage$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
       binaryMessenger: pigeonVar_binaryMessenger,
     );
-    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(<Object?>[languageCode]);
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[languageCode],
+    );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 
     _extractReplyValueOrThrow(
-        pigeonVar_replyList,
-        pigeonVar_channelName,
-        isNullValid: true,
-    )
-    ;
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 }
