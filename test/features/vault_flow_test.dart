@@ -51,7 +51,7 @@ void main() {
   ) async {
     final fake = await unlockedFake();
     final app = await pumpApp(tester, fake);
-    expect(find.text(en.homeRecent), findsOneWidget);
+    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
     expect(find.text(en.homeNoRecent), findsOneWidget);
     expect(find.text(en.homeSecurityPinOnly), findsOneWidget);
     expect(find.text(en.categoryIdentity), findsOneWidget);

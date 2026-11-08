@@ -4,8 +4,12 @@ import 'package:flutter/material.dart';
 /// action colour; teal means "protected / OK", amber "attention", red
 /// "expired / danger". Gold is reserved for Premium.
 abstract final class Brand {
+  /// Body text.
   static const fontFamily = 'PlusJakartaSans';
-  static const fontFallback = ['NotoSansDevanagari'];
+
+  /// Headings: geometric display face.
+  static const displayFamily = 'Sora';
+  static const fontFallback = ['PlusJakartaSans', 'NotoSansDevanagari'];
 
   static const navy950 = Color(0xFF060B26);
   static const navy900 = Color(0xFF0B1437);
@@ -29,6 +33,21 @@ abstract final class Brand {
   static const ink = Color(0xFF111633);
   static const inkMuted = Color(0xFF5B6180);
 
+  /// App-wide background: royal blue at the top fading into deep navy.
+  static const backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF0D2A7A), Color(0xFF09195A), Color(0xFF050B26)],
+    stops: [0, .45, 1],
+  );
+
+  /// Glass surfaces on the gradient.
+  static const glass = Color(0x12FFFFFF);
+  static const glassStrong = Color(0x1FFFFFFF);
+  static const glassBorder = Color(0x21FFFFFF);
+  static const textMuted = Color(0xFFA7B2D8);
+  static const dialog = Color(0xFF111C4D);
+
   static const heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -45,27 +64,27 @@ class CategoryStyle {
   final IconData icon;
 
   static const _styles = <String, CategoryStyle>{
-    'identity': CategoryStyle(Color(0xFF3446D4), Icons.badge_outlined),
-    'education': CategoryStyle(Color(0xFF7B4DDB), Icons.school_outlined),
-    'vehicle': CategoryStyle(Color(0xFF1D86C9), Icons.directions_car_outlined),
-    'finance': CategoryStyle(Color(0xFF138A5A), Icons.account_balance_outlined),
+    'identity': CategoryStyle(Color(0xFF8C9BFF), Icons.badge_outlined),
+    'education': CategoryStyle(Color(0xFFB892FF), Icons.school_outlined),
+    'vehicle': CategoryStyle(Color(0xFF5DBBF7), Icons.directions_car_outlined),
+    'finance': CategoryStyle(Color(0xFF4FD99E), Icons.account_balance_outlined),
     'insurance': CategoryStyle(
-      Color(0xFF0E9F87),
+      Color(0xFF4FD1B8),
       Icons.health_and_safety_outlined,
     ),
     'medical': CategoryStyle(
-      Color(0xFFD63B6B),
+      Color(0xFFFF82A9),
       Icons.medical_services_outlined,
     ),
-    'property': CategoryStyle(Color(0xFFB8690B), Icons.home_work_outlined),
-    'work': CategoryStyle(Color(0xFF4B5675), Icons.work_outline),
-    'bills': CategoryStyle(Color(0xFFDB6A1F), Icons.receipt_long_outlined),
-    'personal': CategoryStyle(Color(0xFFC2459A), Icons.person_outline),
-    'other': CategoryStyle(Color(0xFF6B7088), Icons.category_outlined),
+    'property': CategoryStyle(Color(0xFFF6B64E), Icons.home_work_outlined),
+    'work': CategoryStyle(Color(0xFFA9B4D6), Icons.work_outline),
+    'bills': CategoryStyle(Color(0xFFFF9C5E), Icons.receipt_long_outlined),
+    'personal': CategoryStyle(Color(0xFFF58BD0), Icons.person_outline),
+    'other': CategoryStyle(Color(0xFFB1B6CC), Icons.category_outlined),
   };
 
   /// Custom categories share a neutral style.
-  static const custom = CategoryStyle(Color(0xFF5B6180), Icons.label_outline);
+  static const custom = CategoryStyle(Color(0xFFB1B6CC), Icons.label_outline);
 
   static CategoryStyle of(String? key) => _styles[key] ?? custom;
 }

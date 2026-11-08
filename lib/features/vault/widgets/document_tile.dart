@@ -54,7 +54,7 @@ class DocumentTile extends ConsumerWidget {
                   width: 46,
                   height: 46,
                   decoration: BoxDecoration(
-                    color: style.color.withValues(alpha: .12),
+                    color: style.color.withValues(alpha: .18),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Icon(style.icon, color: style.color),

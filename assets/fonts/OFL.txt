@@ -1,3 +1,4 @@
+Sora — Copyright 2019 The Sora Project Authors (https://github.com/sora-xor/sora-font).
 Plus Jakarta Sans — Copyright 2020 The Plus Jakarta Sans Project Authors (https://github.com/tokotype/PlusJakartaSans).
 Noto Sans Devanagari — Copyright 2022 The Noto Project Authors (https://github.com/notofonts/devanagari).
 Both licensed under the SIL Open Font License, Version 1.1. Converted from the Fontsource WOFF2 packages (Latin + Latin Extended subsets merged).

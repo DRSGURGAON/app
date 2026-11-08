@@ -2,240 +2,275 @@ import 'package:flutter/material.dart';
 
 import 'brand.dart';
 
-/// DocSafe Material 3 theme built from explicit brand colours (not a seed),
-/// so every accent is intentional: indigo actions, teal = protected,
-/// amber = attention, red = expired/danger.
+/// DocSafe theme: an immersive royal-blue → navy gradient on every screen,
+/// glass cards, white pill buttons, Sora headings over Plus Jakarta Sans text
+/// (Noto Sans Devanagari for Hindi). Accents: amber = attention, teal =
+/// protected, soft red = expired. One brand look in light and dark system
+/// modes.
 abstract final class AppTheme {
-  /// Kept for existing callers.
   static const brandNavy = Brand.navy900;
-  static const _radius = 16.0;
-  static const _cardRadius = 20.0;
 
-  static ThemeData light() => _build(
-    const ColorScheme(
-      brightness: Brightness.light,
-      primary: Brand.indigo,
-      onPrimary: Colors.white,
-      primaryContainer: Brand.indigoTint,
-      onPrimaryContainer: Brand.navy900,
-      secondary: Brand.teal,
-      onSecondary: Colors.white,
-      secondaryContainer: Brand.tealTint,
-      onSecondaryContainer: Color(0xFF053D34),
-      tertiary: Brand.amber,
-      onTertiary: Colors.white,
-      tertiaryContainer: Brand.amberTint,
-      onTertiaryContainer: Color(0xFF4A2C00),
-      error: Brand.red,
-      onError: Colors.white,
-      errorContainer: Brand.redTint,
-      onErrorContainer: Color(0xFF5C0A14),
-      surface: Brand.canvas,
-      onSurface: Brand.ink,
-      onSurfaceVariant: Brand.inkMuted,
-      surfaceContainerLowest: Colors.white,
-      surfaceContainerLow: Brand.card,
-      surfaceContainer: Color(0xFFEFF1F7),
-      surfaceContainerHigh: Color(0xFFE9EBF3),
-      surfaceContainerHighest: Color(0xFFE2E5EF),
-      outline: Color(0xFFB9BDD0),
-      outlineVariant: Brand.line,
-      inverseSurface: Brand.navy900,
-      onInverseSurface: Colors.white,
-      inversePrimary: Brand.indigoLight,
-      shadow: Color(0xFF0B1437),
-      scrim: Colors.black,
-    ),
+  static ThemeData light() => brand();
+  static ThemeData dark() => brand();
+
+  static const scheme = ColorScheme(
+    brightness: Brightness.dark,
+    primary: Colors.white,
+    onPrimary: Brand.navy900,
+    primaryContainer: Color(0x29FFFFFF),
+    onPrimaryContainer: Colors.white,
+    secondary: Color(0xFF4FD1B8),
+    onSecondary: Color(0xFF00382F),
+    secondaryContainer: Color(0x334FD1B8),
+    onSecondaryContainer: Color(0xFFC9F4EA),
+    tertiary: Color(0xFFF7BE4B),
+    onTertiary: Color(0xFF3D2600),
+    tertiaryContainer: Color(0x33F7BE4B),
+    onTertiaryContainer: Color(0xFFFFE2B0),
+    error: Color(0xFFFF8A94),
+    onError: Color(0xFF5C0A14),
+    errorContainer: Color(0x33FF6B78),
+    onErrorContainer: Color(0xFFFFD9DC),
+    surface: Color(0xFF09195A),
+    onSurface: Colors.white,
+    onSurfaceVariant: Brand.textMuted,
+    surfaceContainerLowest: Brand.glass,
+    surfaceContainerLow: Brand.glass,
+    surfaceContainer: Brand.glass,
+    surfaceContainerHigh: Brand.glassStrong,
+    surfaceContainerHighest: Color(0x29FFFFFF),
+    outline: Color(0x66FFFFFF),
+    outlineVariant: Brand.glassBorder,
+    inverseSurface: Colors.white,
+    onInverseSurface: Brand.navy900,
+    inversePrimary: Brand.navy700,
+    shadow: Colors.black,
+    scrim: Colors.black,
   );
 
-  static ThemeData dark() => _build(
-    const ColorScheme(
-      brightness: Brightness.dark,
-      primary: Brand.indigoLight,
-      onPrimary: Brand.navy950,
-      primaryContainer: Color(0xFF26337F),
-      onPrimaryContainer: Color(0xFFE3E7FF),
-      secondary: Color(0xFF4FD1B8),
-      onSecondary: Color(0xFF00382F),
-      secondaryContainer: Color(0xFF0D4B41),
-      onSecondaryContainer: Color(0xFFC9F4EA),
-      tertiary: Color(0xFFFFC266),
-      onTertiary: Color(0xFF462A00),
-      tertiaryContainer: Color(0xFF5C3B00),
-      onTertiaryContainer: Color(0xFFFFE2B8),
-      error: Color(0xFFFF8A94),
-      onError: Color(0xFF5C0A14),
-      errorContainer: Color(0xFF7A1A26),
-      onErrorContainer: Color(0xFFFFDADD),
-      surface: Color(0xFF080D24),
-      onSurface: Color(0xFFE7E9F5),
-      onSurfaceVariant: Color(0xFFA9AECB),
-      surfaceContainerLowest: Color(0xFF050919),
-      surfaceContainerLow: Color(0xFF111834),
-      surfaceContainer: Color(0xFF151D3D),
-      surfaceContainerHigh: Color(0xFF1B2448),
-      surfaceContainerHighest: Color(0xFF222C54),
-      outline: Color(0xFF545B7E),
-      outlineVariant: Color(0xFF262F57),
-      inverseSurface: Color(0xFFE7E9F5),
-      onInverseSurface: Brand.navy900,
-      inversePrimary: Brand.indigo,
-      shadow: Colors.black,
-      scrim: Colors.black,
-    ),
-  );
-
-  static ThemeData _build(ColorScheme scheme) {
+  static ThemeData brand() {
     final base = ThemeData(
       colorScheme: scheme,
       useMaterial3: true,
       fontFamily: Brand.fontFamily,
-      fontFamilyFallback: Brand.fontFallback,
+      fontFamilyFallback: const ['NotoSansDevanagari'],
     );
     // ThemeData.textTheme carries colours/family but no sizes (geometry is
     // applied later); styles used directly (app bar titles) need sizes.
     final t = Typography.englishLike2021.merge(base.textTheme);
+    TextStyle? display(TextStyle? s, FontWeight w, [double spacing = -.3]) =>
+        s?.copyWith(
+          fontFamily: Brand.displayFamily,
+          fontFamilyFallback: Brand.fontFallback,
+          fontWeight: w,
+          letterSpacing: spacing,
+        );
     final text = t.copyWith(
-      displaySmall: t.displaySmall?.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: -.5,
-      ),
-      headlineMedium: t.headlineMedium?.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: -.4,
-      ),
-      headlineSmall: t.headlineSmall?.copyWith(
-        fontWeight: FontWeight.w800,
-        letterSpacing: -.3,
-      ),
-      titleLarge: t.titleLarge?.copyWith(
-        fontWeight: FontWeight.w700,
-        letterSpacing: -.2,
-      ),
-      titleMedium: t.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+      displaySmall: display(t.displaySmall, FontWeight.w800, -.6),
+      headlineMedium: display(t.headlineMedium, FontWeight.w800, -.5),
+      headlineSmall: display(t.headlineSmall, FontWeight.w700, -.4),
+      titleLarge: display(t.titleLarge, FontWeight.w700),
+      titleMedium: display(t.titleMedium, FontWeight.w600, -.1),
       titleSmall: t.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-      labelLarge: t.labelLarge?.copyWith(fontWeight: FontWeight.w600),
-      bodyMedium: t.bodyMedium?.copyWith(height: 1.4),
-      bodySmall: t.bodySmall?.copyWith(height: 1.35),
+      labelLarge: t.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+      bodyMedium: t.bodyMedium?.copyWith(height: 1.45),
+      bodySmall: t.bodySmall?.copyWith(height: 1.4, color: Brand.textMuted),
     );
-    final dark = scheme.brightness == Brightness.dark;
+    const pill = StadiumBorder();
     return base.copyWith(
       textTheme: text,
-      scaffoldBackgroundColor: scheme.surface,
+      // Each route paints the gradient (see _GradientPageTransitionsBuilder),
+      // so screens themselves are transparent.
+      scaffoldBackgroundColor: Colors.transparent,
+      canvasColor: scheme.surface,
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          TargetPlatform.android: _GradientPageTransitionsBuilder(),
+          TargetPlatform.iOS: _GradientPageTransitionsBuilder(),
+          TargetPlatform.linux: _GradientPageTransitionsBuilder(),
+          TargetPlatform.macOS: _GradientPageTransitionsBuilder(),
+          TargetPlatform.windows: _GradientPageTransitionsBuilder(),
+          TargetPlatform.fuchsia: _GradientPageTransitionsBuilder(),
+        },
+      ),
       appBarTheme: AppBarTheme(
-        backgroundColor: scheme.surface,
-        foregroundColor: scheme.onSurface,
+        backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        scrolledUnderElevation: 0.5,
+        scrolledUnderElevation: 0,
         centerTitle: false,
-        titleTextStyle: text.titleLarge?.copyWith(color: scheme.onSurface),
+        titleTextStyle: text.titleLarge?.copyWith(color: Colors.white),
       ),
       cardTheme: CardThemeData(
         elevation: 0,
-        color: scheme.surfaceContainerLow,
+        color: Brand.glass,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(_cardRadius),
-          side: BorderSide(color: scheme.outlineVariant),
+          borderRadius: BorderRadius.circular(24),
+          side: const BorderSide(color: Brand.glassBorder),
         ),
         margin: EdgeInsets.zero,
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(54),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_radius),
-          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Brand.navy900,
+          disabledBackgroundColor: const Color(0x26FFFFFF),
+          disabledForegroundColor: const Color(0x80FFFFFF),
+          minimumSize: const Size.fromHeight(56),
+          shape: pill,
           textStyle: text.titleMedium,
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(54),
-          side: BorderSide(color: scheme.outlineVariant, width: 1.5),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_radius),
-          ),
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(56),
+          side: const BorderSide(color: Color(0x4DFFFFFF), width: 1.5),
+          shape: pill,
           textStyle: text.titleMedium,
         ),
       ),
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(textStyle: text.labelLarge),
+        style: TextButton.styleFrom(
+          foregroundColor: const Color(0xFFB9C4FF),
+          textStyle: text.labelLarge,
+        ),
       ),
       chipTheme: base.chipTheme.copyWith(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: BorderSide(color: scheme.outlineVariant),
-        backgroundColor: scheme.surfaceContainerLow,
-        labelStyle: text.labelLarge?.copyWith(color: scheme.onSurface),
+        shape: const StadiumBorder(),
+        side: const BorderSide(color: Brand.glassBorder),
+        backgroundColor: Brand.glass,
+        selectedColor: const Color(0x33FFFFFF),
+        labelStyle: text.labelLarge?.copyWith(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainerLowest,
+        fillColor: Brand.glass,
+        labelStyle: const TextStyle(color: Brand.textMuted),
+        hintStyle: const TextStyle(color: Brand.textMuted),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: scheme.outlineVariant),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Brand.glassBorder),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: scheme.outlineVariant),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Brand.glassBorder),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide(color: scheme.primary, width: 2),
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: Colors.white, width: 1.5),
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        height: 70,
+        height: 72,
         elevation: 0,
-        backgroundColor: dark ? scheme.surfaceContainerLow : Colors.white,
+        backgroundColor: const Color(0xFF060E33),
         surfaceTintColor: Colors.transparent,
-        indicatorColor: scheme.primaryContainer,
+        indicatorColor: const Color(0x29FFFFFF),
         labelTextStyle: WidgetStateProperty.resolveWith(
           (s) => text.labelMedium?.copyWith(
             fontWeight: s.contains(WidgetState.selected)
                 ? FontWeight.w700
                 : FontWeight.w500,
             color: s.contains(WidgetState.selected)
-                ? scheme.onSurface
-                : scheme.onSurfaceVariant,
+                ? Colors.white
+                : const Color(0xFF8E9AC7),
           ),
         ),
         iconTheme: WidgetStateProperty.resolveWith(
           (s) => IconThemeData(
             color: s.contains(WidgetState.selected)
-                ? scheme.primary
-                : scheme.onSurfaceVariant,
+                ? Colors.white
+                : const Color(0xFF8E9AC7),
           ),
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: scheme.surfaceContainerLowest,
+        backgroundColor: Brand.dialog,
         surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       ),
-      bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: scheme.surfaceContainerLowest,
+      bottomSheetTheme: const BottomSheetThemeData(
+        backgroundColor: Brand.dialog,
+        surfaceTintColor: Colors.transparent,
+        dragHandleColor: Color(0x66FFFFFF),
+      ),
+      popupMenuTheme: const PopupMenuThemeData(
+        color: Brand.dialog,
+        surfaceTintColor: Colors.transparent,
+      ),
+      datePickerTheme: const DatePickerThemeData(
+        backgroundColor: Brand.dialog,
         surfaceTintColor: Colors.transparent,
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        backgroundColor: dark ? scheme.surfaceContainerHighest : Brand.navy900,
-        contentTextStyle: text.bodyMedium?.copyWith(color: Colors.white),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        backgroundColor: Colors.white,
+        contentTextStyle: text.bodyMedium?.copyWith(color: Brand.navy900),
+        actionTextColor: Brand.navy700,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       listTileTheme: ListTileThemeData(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         titleTextStyle: text.bodyLarge?.copyWith(
           fontWeight: FontWeight.w600,
-          color: scheme.onSurface,
+          color: Colors.white,
         ),
-        subtitleTextStyle: text.bodyMedium?.copyWith(
-          color: scheme.onSurfaceVariant,
-        ),
-        iconColor: scheme.onSurfaceVariant,
+        subtitleTextStyle: text.bodyMedium?.copyWith(color: Brand.textMuted),
+        iconColor: Brand.textMuted,
       ),
-      dividerTheme: DividerThemeData(color: scheme.outlineVariant, space: 1),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? Brand.navy900
+              : const Color(0xFF8E9AC7),
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected)
+              ? const Color(0xFF4FD1B8)
+              : const Color(0x1FFFFFFF),
+        ),
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? Colors.white : null,
+        ),
+        checkColor: const WidgetStatePropertyAll(Brand.navy900),
+        side: const BorderSide(color: Color(0x99FFFFFF), width: 1.5),
+      ),
+      progressIndicatorTheme: const ProgressIndicatorThemeData(
+        color: Colors.white,
+      ),
+      dividerTheme: const DividerThemeData(color: Brand.glassBorder, space: 1),
     );
   }
+}
+
+/// Paints the brand gradient behind every route, so transparent screens never
+/// show the previous page during a transition.
+class _GradientPageTransitionsBuilder extends PageTransitionsBuilder {
+  const _GradientPageTransitionsBuilder();
+
+  static const _inner = ZoomPageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) => _inner.buildTransitions(
+    route,
+    context,
+    animation,
+    secondaryAnimation,
+    DecoratedBox(
+      decoration: const BoxDecoration(gradient: Brand.backgroundGradient),
+      child: child,
+    ),
+  );
 }

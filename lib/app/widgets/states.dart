@@ -92,7 +92,16 @@ class SectionHeader extends StatelessWidget {
         Expanded(
           child: Semantics(
             header: true,
-            child: Text(title, style: Theme.of(context).textTheme.titleMedium),
+            // Spaced capitals in a muted tone, like a label above a group.
+            child: Text(
+              title.toUpperCase(),
+              semanticsLabel: title,
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                letterSpacing: 1.8,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
           ),
         ),
         ?trailing,

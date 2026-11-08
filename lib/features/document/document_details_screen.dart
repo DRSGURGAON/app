@@ -125,7 +125,7 @@ class _DetailsView extends ConsumerWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: style.color.withValues(alpha: .12),
+                    color: style.color.withValues(alpha: .18),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(style.icon, color: style.color, size: 28),

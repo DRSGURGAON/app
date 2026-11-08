@@ -7,6 +7,7 @@ import 'localization/gen/app_localizations.dart';
 import 'localization/locale_controller.dart';
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
+import 'theme/brand.dart';
 
 class DocSafeApp extends ConsumerStatefulWidget {
   const DocSafeApp({super.key});
@@ -60,6 +61,12 @@ class _DocSafeAppState extends ConsumerState<DocSafeApp>
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: ref.watch(routerProvider),
+      // Brand gradient behind every screen (screens are transparent); routes
+      // using the theme's transitions also paint it so pages never overlap.
+      builder: (context, child) => DecoratedBox(
+        decoration: const BoxDecoration(gradient: Brand.backgroundGradient),
+        child: child,
+      ),
     );
   }
 }

@@ -168,9 +168,8 @@ class _LockScreenState extends ConsumerState<LockScreen> {
   ) {
     final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Brand.navy900,
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: Brand.heroGradient),
+        decoration: const BoxDecoration(gradient: Brand.backgroundGradient),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, c) => SingleChildScrollView(

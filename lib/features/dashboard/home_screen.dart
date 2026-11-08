@@ -64,27 +64,27 @@ class HomeScreen extends ConsumerWidget {
                     children: [
                       _QuickAction(
                         icon: Icons.document_scanner_outlined,
-                        color: const Color(0xFF3446D4),
+                        color: const Color(0xFF8C9BFF),
                         label: l.scanDocument,
                         onTap: () => context.push(Routes.scan),
                       ),
                       _QuickAction(
                         icon: Icons.picture_as_pdf_outlined,
-                        color: const Color(0xFFD63B4A),
+                        color: const Color(0xFFFF8A94),
                         label: l.homeImportPdf,
                         onTap: () =>
                             runImport(context, ref, kind: ImportKind.pdf),
                       ),
                       _QuickAction(
                         icon: Icons.image_outlined,
-                        color: const Color(0xFF0E9F87),
+                        color: const Color(0xFF4FD1B8),
                         label: l.homeImportImage,
                         onTap: () =>
                             runImport(context, ref, kind: ImportKind.image),
                       ),
                       _QuickAction(
                         icon: Icons.create_new_folder_outlined,
-                        color: const Color(0xFFC77700),
+                        color: const Color(0xFFF7BE4B),
                         label: l.homeCreateFolder,
                         onTap: () => createFolder(context, ref),
                       ),
@@ -164,10 +164,7 @@ class _Hero extends StatelessWidget {
     final l = AppLocalizations.of(context);
     final text = Theme.of(context).textTheme;
     return DecoratedBox(
-      decoration: const BoxDecoration(
-        gradient: Brand.heroGradient,
-        borderRadius: BorderRadius.vertical(bottom: Radius.circular(28)),
-      ),
+      decoration: const BoxDecoration(),
       child: SafeArea(
         bottom: false,
         child: Padding(
@@ -285,7 +282,6 @@ class _SearchBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
     return Semantics(
       button: true,
       label: l.homeSearchHint,
@@ -299,13 +295,13 @@ class _SearchBar extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                Icon(Icons.search, color: scheme.onSurfaceVariant),
+                const Icon(Icons.search, color: Brand.inkMuted),
                 const SizedBox(width: 12),
                 Expanded(
                   child: ExcludeSemantics(
                     child: Text(
                       l.homeSearchHint,
-                      style: TextStyle(color: scheme.onSurfaceVariant),
+                      style: const TextStyle(color: Brand.inkMuted),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -407,7 +403,7 @@ class _QuickAction extends StatelessWidget {
               width: 50,
               height: 50,
               decoration: BoxDecoration(
-                color: color.withValues(alpha: .12),
+                color: color.withValues(alpha: .18),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Icon(icon, color: color),

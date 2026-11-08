@@ -91,7 +91,7 @@ void main() {
     // Skipping biometric setup lands on the Home dashboard.
     await tester.tap(find.text(en.biometricSkip));
     await settle(tester);
-    expect(find.text(en.homeRecent), findsOneWidget);
+    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
     await app.dispose();
   });
 
@@ -130,7 +130,7 @@ void main() {
     fake.lockoutMillis = 0;
     await tester.pump(const Duration(seconds: 31));
     await enterPin(tester, '258036');
-    expect(find.text(en.homeRecent), findsOneWidget);
+    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
     await app.dispose();
   });
 

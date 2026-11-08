@@ -43,6 +43,9 @@ Future<void> loadFonts() async {
   await loadFont('PlusJakartaSans', [
     for (final w in [400, 500, 600, 700, 800]) 'assets/fonts/PlusJakartaSans-$w.ttf',
   ]);
+  await loadFont('Sora', [
+    for (final w in [400, 600, 700, 800]) 'assets/fonts/Sora-$w.ttf',
+  ]);
   await loadFont('NotoSansDevanagari', [
     for (final w in [400, 600, 700]) 'assets/fonts/NotoSansDevanagari-$w.ttf',
   ]);

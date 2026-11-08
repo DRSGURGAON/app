@@ -47,7 +47,7 @@ void main() {
     final app = await pumpApp(tester, fake);
     fake.nextScan = null; // user pressed back in the scanner
     await startScan(tester);
-    expect(find.text(en.homeRecent), findsOneWidget);
+    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
     expect(fake.pendingScanPages, isEmpty);
     expect(fake.lastSavedScan, isNull);
     await app.dispose();
@@ -185,7 +185,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, en.scanDiscard));
     await settle(tester);
     expect(fake.pendingScanPages, isEmpty);
-    expect(find.text(en.homeRecent), findsOneWidget);
+    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
     await app.dispose();
   });
 
