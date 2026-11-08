@@ -904,6 +904,148 @@ data class OcrResult (
     return "OcrResult(text=$text, pagesRead=$pagesRead, pageCount=$pageCount)"
   }
 }
+
+/**
+ * Result of writing a backup file.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class BackupSummary (
+  val files: Long,
+  /** Vault files that failed their integrity check and were left out. */
+  val skipped: Long,
+  val bytes: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): BackupSummary {
+      val files = pigeonVar_list[0] as Long
+      val skipped = pigeonVar_list[1] as Long
+      val bytes = pigeonVar_list[2] as Long
+      return BackupSummary(files, skipped, bytes)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      files,
+      skipped,
+      bytes,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as BackupSummary
+    return SecurityApiPigeonUtils.deepEquals(this.files, other.files) && SecurityApiPigeonUtils.deepEquals(this.skipped, other.skipped) && SecurityApiPigeonUtils.deepEquals(this.bytes, other.bytes)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.files)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.skipped)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.bytes)
+    return result
+  }
+  override fun toString(): String {
+    return "BackupSummary(files=$files, skipped=$skipped, bytes=$bytes)"
+  }
+}
+
+/**
+ * A document file restored from a backup: its id inside the backup and the
+ * new vault container it was re-encrypted into.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class RestoredFile (
+  val originalFileId: String,
+  val file: ImportedFile
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): RestoredFile {
+      val originalFileId = pigeonVar_list[0] as String
+      val file = pigeonVar_list[1] as ImportedFile
+      return RestoredFile(originalFileId, file)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      originalFileId,
+      file,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as RestoredFile
+    return SecurityApiPigeonUtils.deepEquals(this.originalFileId, other.originalFileId) && SecurityApiPigeonUtils.deepEquals(this.file, other.file)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.originalFileId)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.file)
+    return result
+  }
+  override fun toString(): String {
+    return "RestoredFile(originalFileId=$originalFileId, file=$file)"
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class RestoreResult (
+  /** JSON written by the Dart side when the backup was made. */
+  val metadata: ByteArray,
+  val files: List<RestoredFile>,
+  val skipped: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): RestoreResult {
+      val metadata = pigeonVar_list[0] as ByteArray
+      val files = pigeonVar_list[1] as List<RestoredFile>
+      val skipped = pigeonVar_list[2] as Long
+      return RestoreResult(metadata, files, skipped)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      metadata,
+      files,
+      skipped,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as RestoreResult
+    return SecurityApiPigeonUtils.deepEquals(this.metadata, other.metadata) && SecurityApiPigeonUtils.deepEquals(this.files, other.files) && SecurityApiPigeonUtils.deepEquals(this.skipped, other.skipped)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.metadata)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.files)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.skipped)
+    return result
+  }
+  override fun toString(): String {
+    return "RestoreResult(metadata=${metadata.contentToString()}, files=$files, skipped=$skipped)"
+  }
+}
 private open class SecurityApiPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -1002,6 +1144,21 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
           OcrResult.fromList(it)
         }
       }
+      148.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          BackupSummary.fromList(it)
+        }
+      }
+      149.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          RestoredFile.fromList(it)
+        }
+      }
+      150.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          RestoreResult.fromList(it)
+        }
+      }
       else -> super.readValueOfType(type, buffer)
     }
   }
@@ -1081,6 +1238,18 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       is OcrResult -> {
         stream.write(147)
+        writeValue(stream, value.toList())
+      }
+      is BackupSummary -> {
+        stream.write(148)
+        writeValue(stream, value.toList())
+      }
+      is RestoredFile -> {
+        stream.write(149)
+        writeValue(stream, value.toList())
+      }
+      is RestoreResult -> {
+        stream.write(150)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1200,6 +1369,23 @@ interface SecurityHostApi {
   fun openNotificationSettings()
   /** "reminders" if the app was opened from a reminder notification; consumed. */
   fun takeLaunchTarget(): String?
+  /**
+   * Opens the system "save as" dialog and writes a password-encrypted backup
+   * (metadata JSON + the listed vault files, streamed; no plaintext file).
+   * Returns null if the user cancelled. Errors: LOCKED, IO, LOW_STORAGE.
+   */
+  suspend fun createBackup(fileName: String, password: ByteArray, metadata: ByteArray, fileIds: List<String>): BackupSummary?
+  /**
+   * Lets the user pick a backup file and checks its header. Returns an opaque
+   * token for [restoreBackup], or null if cancelled. Errors: BACKUP_INVALID.
+   */
+  suspend fun pickBackupFile(): String?
+  /**
+   * Decrypts the picked backup and re-encrypts every document into the vault.
+   * On any failure nothing is left in the vault. Errors: BACKUP_PASSWORD
+   * (wrong password or damaged header), BACKUP_INVALID, INTEGRITY, LOW_STORAGE.
+   */
+  suspend fun restoreBackup(token: String, password: ByteArray): RestoreResult
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -1858,6 +2044,65 @@ interface SecurityHostApi {
               SecurityApiPigeonUtils.wrapError(exception)
             }
             reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.createBackup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileNameArg = args[0] as String
+            val passwordArg = args[1] as ByteArray
+            val metadataArg = args[2] as ByteArray
+            val fileIdsArg = args[3] as List<String>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.createBackup(fileNameArg, passwordArg, metadataArg, fileIdsArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.pickBackupFile$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.pickBackupFile())
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.restoreBackup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val tokenArg = args[0] as String
+            val passwordArg = args[1] as ByteArray
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.restoreBackup(tokenArg, passwordArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
           }
         } else {
           channel.setMessageHandler(null)

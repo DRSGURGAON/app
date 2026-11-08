@@ -178,9 +178,11 @@ object BackupContainer {
                 producer(frames)
                 frames.flushFrame()
                 true
-            } catch (e: SinkException) {
-                throw e
             } catch (e: Exception) {
+                // The producer may wrap our own destination failure (e.g. VaultStore maps
+                // IOExceptions); that must abort the backup, not just this entry.
+                generateSequence<Throwable>(e) { it.cause }.filterIsInstance<SinkException>().firstOrNull()
+                    ?.let { throw it }
                 false
             }
             sink {

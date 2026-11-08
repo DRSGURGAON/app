@@ -17,8 +17,10 @@ import `in`.docsafe.app.scanner.ScanStore
 import `in`.docsafe.app.scanner.ScannerLauncher
 import `in`.docsafe.app.scanner.ScannerUnavailableException
 import `in`.docsafe.app.security.VaultSession
+import `in`.docsafe.app.storage.BackupManager
 import `in`.docsafe.app.storage.DocumentExporter
 import `in`.docsafe.app.storage.DocumentImporter
+import `in`.docsafe.crypto.BackupPasswordException
 import `in`.docsafe.crypto.ExportNames
 import `in`.docsafe.crypto.FormatException
 import `in`.docsafe.crypto.InsufficientStorageException
@@ -26,6 +28,7 @@ import `in`.docsafe.crypto.IntegrityException
 import `in`.docsafe.crypto.InvalidInputException
 import `in`.docsafe.crypto.KeyUnavailableException
 import `in`.docsafe.crypto.PinManager
+import `in`.docsafe.crypto.VaultIoException
 import `in`.docsafe.crypto.VaultStore
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -380,6 +383,75 @@ class SecurityHostApiImpl(
 
     override fun takeLaunchTarget(): String? = LaunchTarget.take()
 
+    /** Backup files picked for restore, by opaque token (URIs only; no secrets). */
+    private val pickedBackups = java.util.concurrent.ConcurrentHashMap<String, Uri>()
+
+    override suspend fun createBackup(
+        fileName: String,
+        password: ByteArray,
+        metadata: ByteArray,
+        fileIds: List<String>,
+    ): BackupSummary? = guard {
+        try {
+            session.requireUnlocked()
+            if (password.size < MIN_BACKUP_PASSWORD_BYTES) throw InvalidInputException("Password too short")
+            fileIds.forEach(VaultStore::validateId)
+            val target = documentUi.createDocument(BackupManager.fileName(fileName), BackupManager.MIME)
+                ?: return@guard null
+            io {
+                session.requireUnlocked()
+                val w = BackupManager(session.vaultStore)
+                    .writeTo(appContext.contentResolver, target, password, metadata, fileIds)
+                BackupSummary(w.files.toLong(), w.skipped.toLong(), w.bytes)
+            }
+        } finally {
+            password.fill(0)
+        }
+    }
+
+    override suspend fun pickBackupFile(): String? = guard {
+        session.requireUnlocked()
+        val uri = documentUi.openDocument(arrayOf("*/*")) ?: return@guard null
+        io {
+            try {
+                appContext.contentResolver.openInputStream(uri)?.use { BackupManager(session.vaultStore).looksLikeBackup(it) }
+                    ?: throw VaultIoException("Cannot open backup")
+            } catch (e: FormatException) {
+                throw SecurityBridgeError(ERR_BACKUP_INVALID, ERR_BACKUP_INVALID)
+            }
+        }
+        val token = java.util.UUID.randomUUID().toString()
+        pickedBackups[token] = uri
+        token
+    }
+
+    override suspend fun restoreBackup(token: String, password: ByteArray): RestoreResult = guard {
+        try {
+            session.requireUnlocked()
+            val uri = pickedBackups[token] ?: throw InvalidInputException("Unknown backup")
+            val restored = io {
+                session.requireUnlocked()
+                try {
+                    appContext.contentResolver.openInputStream(uri)?.use {
+                        BackupManager(session.vaultStore).read(it, password)
+                    } ?: throw VaultIoException("Cannot open backup")
+                } catch (e: BackupPasswordException) {
+                    throw SecurityBridgeError(ERR_BACKUP_PASSWORD, ERR_BACKUP_PASSWORD)
+                } catch (e: FormatException) {
+                    throw SecurityBridgeError(ERR_BACKUP_INVALID, ERR_BACKUP_INVALID)
+                }
+            }
+            pickedBackups.remove(token)
+            RestoreResult(
+                metadata = restored.metadata,
+                files = restored.files.map { (original, r) -> RestoredFile(original, r.toPigeon("")) },
+                skipped = restored.skipped.toLong(),
+            )
+        } finally {
+            password.fill(0)
+        }
+    }
+
     private fun VaultStore.ImportResult.toPigeon(mime: String) = ImportedFile(
         fileId = fileId,
         displayName = "",
@@ -482,6 +554,9 @@ class SecurityHostApiImpl(
         const val ERR_SCANNER_UNAVAILABLE = "SCANNER_UNAVAILABLE"
         const val ERR_PDF_UNREADABLE = "PDF_UNREADABLE"
         const val ERR_OCR_FAILED = "OCR_FAILED"
+        const val ERR_BACKUP_PASSWORD = "BACKUP_PASSWORD"
+        const val ERR_BACKUP_INVALID = "BACKUP_INVALID"
+        private const val MIN_BACKUP_PASSWORD_BYTES = 8
         const val ERR_UNKNOWN = "UNKNOWN"
     }
 }

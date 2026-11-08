@@ -7,7 +7,8 @@
 //   paths of short-lived temp files inside app-private cache. Documented
 //   exceptions (in-process memory only, never written to disk): the PDF built
 //   by a page operation (importPdfBytes), annotation overlays (flattenPages)
-//   and recognised text (recognizeText).
+//   recognised text (recognizeText) and backup metadata (createBackup /
+//   restoreBackup). Document bytes of a backup are streamed natively.
 // - PINs cross as Uint8List so Dart can zero its copy after the call.
 // - Every vault/database operation is refused natively unless the session is unlocked.
 // - Errors are raised as PlatformException with a code from SecurityErrorCode
@@ -207,6 +208,43 @@ class OcrResult {
   int pageCount;
 }
 
+/// Result of writing a backup file.
+class BackupSummary {
+  BackupSummary({
+    required this.files,
+    required this.skipped,
+    required this.bytes,
+  });
+
+  int files;
+
+  /// Vault files that failed their integrity check and were left out.
+  int skipped;
+  int bytes;
+}
+
+/// A document file restored from a backup: its id inside the backup and the
+/// new vault container it was re-encrypted into.
+class RestoredFile {
+  RestoredFile({required this.originalFileId, required this.file});
+
+  String originalFileId;
+  ImportedFile file;
+}
+
+class RestoreResult {
+  RestoreResult({
+    required this.metadata,
+    required this.files,
+    required this.skipped,
+  });
+
+  /// JSON written by the Dart side when the backup was made.
+  Uint8List metadata;
+  List<RestoredFile> files;
+  int skipped;
+}
+
 /// Compression presets: pages are re-rendered as JPEG at this resolution/quality.
 enum CompressionLevel { high, balanced, smallest }
 
@@ -359,6 +397,28 @@ abstract class SecurityHostApi {
 
   /// "reminders" if the app was opened from a reminder notification; consumed.
   String? takeLaunchTarget();
+
+  /// Opens the system "save as" dialog and writes a password-encrypted backup
+  /// (metadata JSON + the listed vault files, streamed; no plaintext file).
+  /// Returns null if the user cancelled. Errors: LOCKED, IO, LOW_STORAGE.
+  @async
+  BackupSummary? createBackup(
+    String fileName,
+    Uint8List password,
+    Uint8List metadata,
+    List<String> fileIds,
+  );
+
+  /// Lets the user pick a backup file and checks its header. Returns an opaque
+  /// token for [restoreBackup], or null if cancelled. Errors: BACKUP_INVALID.
+  @async
+  String? pickBackupFile();
+
+  /// Decrypts the picked backup and re-encrypts every document into the vault.
+  /// On any failure nothing is left in the vault. Errors: BACKUP_PASSWORD
+  /// (wrong password or damaged header), BACKUP_INVALID, INTEGRITY, LOW_STORAGE.
+  @async
+  RestoreResult restoreBackup(String token, Uint8List password);
 
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();
