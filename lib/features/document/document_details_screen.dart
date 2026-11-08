@@ -110,81 +110,100 @@ class _DetailsView extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.only(bottom: 32),
         children: [
-          ListTile(
-            leading: Builder(
-              builder: (context) {
-                final style = category == null
-                    ? CategoryStyle(
-                        theme.colorScheme.primary,
-                        doc.isPdf
-                            ? Icons.picture_as_pdf_outlined
-                            : Icons.image_outlined,
-                      )
-                    : CategoryStyle.of(category.key);
-                return Container(
-                  width: 52,
-                  height: 52,
-                  decoration: BoxDecoration(
-                    color: style.color.withValues(alpha: .18),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Icon(style.icon, color: style.color, size: 28),
-                );
-              },
-            ),
-            title: Text(doc.title, style: theme.textTheme.titleLarge),
-            subtitle: Text(
-              l.detailsFileInfo(
-                l.documentTypeLabel(doc),
-                formatBytes(doc.sizeBytes, locale),
-                formatDate(doc.createdAt, locale),
+          // Hero card: identity of the document and its main actions.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: Builder(
+                        builder: (context) {
+                          final style = category == null
+                              ? CategoryStyle(
+                                  theme.colorScheme.primary,
+                                  doc.isPdf
+                                      ? Icons.picture_as_pdf_outlined
+                                      : Icons.image_outlined,
+                                )
+                              : CategoryStyle.of(category.key);
+                          return Container(
+                            width: 52,
+                            height: 52,
+                            decoration: BoxDecoration(
+                              color: style.color.withValues(alpha: .18),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Icon(
+                              style.icon,
+                              color: style.color,
+                              size: 28,
+                            ),
+                          );
+                        },
+                      ),
+                      title: Text(doc.title, style: theme.textTheme.titleLarge),
+                      subtitle: Text(
+                        l.detailsFileInfo(
+                          l.documentTypeLabel(doc),
+                          formatBytes(doc.sizeBytes, locale),
+                          formatDate(doc.createdAt, locale),
+                        ),
+                      ),
+                      trailing: inTrash
+                          ? null
+                          : IconButton(
+                              tooltip: l.rename,
+                              icon: const Icon(Icons.edit_outlined),
+                              onPressed: () async {
+                                final t = await showTextInputDialog(
+                                  context,
+                                  title: l.rename,
+                                  label: l.detailsTitleLabel,
+                                  initial: doc.title,
+                                  confirmLabel: l.save,
+                                  maxLength: maxTitleLength,
+                                );
+                                if (t == null || !context.mounted) return;
+                                await _guarded(
+                                  context,
+                                  () async =>
+                                      (await _repo(ref)).rename(doc.id, t),
+                                );
+                              },
+                            ),
+                    ),
+                    if (!inTrash)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: FilledButton.icon(
+                                onPressed: () =>
+                                    context.push(Routes.viewer(doc.id)),
+                                icon: const Icon(Icons.visibility_outlined),
+                                label: Text(l.detailsOpen),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _export(context, ref),
+                                icon: const Icon(Icons.ios_share_outlined),
+                                label: Text(l.detailsExport),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-            trailing: inTrash
-                ? null
-                : IconButton(
-                    tooltip: l.rename,
-                    icon: const Icon(Icons.edit_outlined),
-                    onPressed: () async {
-                      final t = await showTextInputDialog(
-                        context,
-                        title: l.rename,
-                        label: l.detailsTitleLabel,
-                        initial: doc.title,
-                        confirmLabel: l.save,
-                        maxLength: maxTitleLength,
-                      );
-                      if (t == null || !context.mounted) return;
-                      await _guarded(
-                        context,
-                        () async => (await _repo(ref)).rename(doc.id, t),
-                      );
-                    },
-                  ),
           ),
-          if (!inTrash)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: FilledButton.icon(
-                      onPressed: () => context.push(Routes.viewer(doc.id)),
-                      icon: const Icon(Icons.visibility_outlined),
-                      label: Text(l.detailsOpen),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => _export(context, ref),
-                      icon: const Icon(Icons.ios_share_outlined),
-                      label: Text(l.detailsExport),
-                    ),
-                  ),
-                ],
-              ),
-            ),
           if (!inTrash && doc.isPdf)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),

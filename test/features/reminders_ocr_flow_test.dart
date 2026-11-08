@@ -209,7 +209,7 @@ void main() {
     await setExpiry(app, 'Old Permit', isoIn(-10));
     await setExpiry(app, 'New Permit', isoIn(400));
     await goTab(tester, en.navReminders);
-    expect(find.text(en.remindersExpiredDocs), findsOneWidget);
+    expect(find.text(en.remindersExpiredDocs.toUpperCase()), findsOneWidget);
     expect(find.text('Old Permit'), findsOneWidget);
     expect(find.text('New Permit'), findsOneWidget);
     expect(find.text(en.remindersEmpty), findsOneWidget);

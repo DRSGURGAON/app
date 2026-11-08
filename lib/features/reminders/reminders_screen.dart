@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/localization/display_names.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/router/app_router.dart';
+import '../../app/widgets/states.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../data/repositories/reminder_repository.dart';
@@ -61,10 +62,7 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
         .where((r) => r.date != null && r.date!.compareTo(today) >= 0)
         .length;
 
-    Widget header(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
-      child: Text(text, style: theme.textTheme.titleSmall),
-    );
+    Widget header(String text) => SectionHeader(title: text);
 
     return Scaffold(
       appBar: AppBar(title: Text(l.remindersTitle)),

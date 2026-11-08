@@ -7,6 +7,7 @@ import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/localization/locale_controller.dart';
 import '../../app/router/app_router.dart';
+import '../../app/widgets/states.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
@@ -181,15 +182,5 @@ class _Header extends StatelessWidget {
   final String text;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(16, 24, 16, 4),
-    child: Semantics(
-      header: true,
-      child: Text(
-        text,
-        style: Theme.of(context).textTheme.labelLarge
-            ?.copyWith(color: Theme.of(context).colorScheme.primary),
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => SectionHeader(title: text);
 }

@@ -24,8 +24,29 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Icon in layered glass rings.
             ExcludeSemantics(
-              child: Icon(icon, size: 56, color: theme.colorScheme.primary),
+              child: Container(
+                width: 112,
+                height: 112,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: .05),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: .08),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Container(
+                  width: 76,
+                  height: 76,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: .10),
+                  ),
+                  child: Icon(icon, size: 36, color: theme.colorScheme.primary),
+                ),
+              ),
             ),
             const SizedBox(height: 16),
             Text(

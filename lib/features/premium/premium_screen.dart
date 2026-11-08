@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/theme/brand.dart';
 
 /// Explains Premium. There is no billing in this version, so there is no buy
 /// button: plans are shown with an honest "coming in an update" note.
@@ -16,10 +17,41 @@ class PremiumScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(l.premiumTitle)),
+      appBar: AppBar(),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
         children: [
+          // Gold crest.
+          ExcludeSemantics(
+            child: Center(
+              child: Container(
+                width: 88,
+                height: 88,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: Brand.premiumGradient,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Brand.gold.withValues(alpha: .35),
+                      blurRadius: 32,
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.workspace_premium,
+                  size: 46,
+                  color: Color(0xFF3D2600),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Text(
+            l.premiumTitle,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 16),
           if (feature != null)
             Card(
               color: scheme.tertiaryContainer,
@@ -84,12 +116,17 @@ class _Plan extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(24),
+      side: BorderSide(color: Brand.gold.withValues(alpha: .6), width: 1.5),
+    ),
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 8),
       child: Text(
         label,
         textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.titleMedium,
+        style: Theme.of(context).textTheme.titleMedium
+            ?.copyWith(color: const Color(0xFFFFD27A)),
       ),
     ),
   );
