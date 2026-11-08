@@ -111,6 +111,15 @@ jobs:
           name: docsafe-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
           retention-days: 14
+      # For manual phone testing: release build (R8, Premium locked, no developer switch),
+      # arm64 only (almost every phone sold in India since ~2017). Signed with the CI
+      # runner's throwaway debug key: NOT for distribution; uninstall before installing a
+      # build from another run.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: docsafe-release-arm64-apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+          retention-days: 14
 
   device:
     name: On-device security tests (emulator)
