@@ -184,6 +184,96 @@ class StreamingAead(private val random: SecureRandom = SecureRandom()) {
         }
     }
 
+    /**
+     * Pull-style decryptor for the same format: reading returns plaintext chunk
+     * by chunk; every chunk is authenticated before any of its bytes are
+     * returned, and end-of-stream (-1) is only reported after the chunk flagged
+     * final has verified, so truncation, reordering and appended data all fail
+     * with [IntegrityException]. Bytes already returned before a later failure
+     * are authentic but the stream as a whole is not: callers must discard
+     * everything they produced if a read throws. Does not close [input].
+     */
+    fun openDecryptor(input: InputStream, keyWrapper: KeyWrapper, expectedFileId: ByteArray? = null): InputStream =
+        DecryptingInputStream(input, keyWrapper, expectedFileId)
+
+    private inner class DecryptingInputStream(
+        private val input: InputStream,
+        keyWrapper: KeyWrapper,
+        expectedFileId: ByteArray?,
+    ) : InputStream() {
+        private val header = readHeader(input)
+        private val key: SecretKeySpec
+        private val cipher = Cipher.getInstance(TRANSFORMATION)
+        private val full = header.chunkSize + TAG_LEN
+        private var bufCur = ByteArray(full)
+        private var bufNext = ByteArray(full)
+        private val out = ByteArray(header.chunkSize)
+        private var outPos = 0
+        private var outLen = 0
+        private var index = 0L
+        private var curLen: Int
+        private var done = false
+
+        init {
+            if (expectedFileId != null && !java.security.MessageDigest.isEqual(expectedFileId, header.fileId)) {
+                throw IntegrityException("File id mismatch")
+            }
+            val dek = keyWrapper.unwrap(header.wrappedDek, dekAad(header.fileId))
+            try {
+                if (dek.size != DEK_LEN) throw IntegrityException("Invalid key length")
+                key = SecretKeySpec(dek, "AES")
+            } finally {
+                dek.fill(0)
+            }
+            curLen = readFully(input, bufCur, full)
+        }
+
+        private fun fill(): Boolean {
+            if (done) return false
+            if (curLen < TAG_LEN) throw IntegrityException("Truncated ciphertext")
+            val next = if (curLen == full) readFully(input, bufNext, full) else 0
+            val isFinal = next == 0
+            cipher.init(Cipher.DECRYPT_MODE, key, GCMParameterSpec(TAG_LEN * 8, nonce(index)))
+            cipher.updateAAD(chunkAad(header.encoded, index, isFinal))
+            outLen = try {
+                cipher.doFinal(bufCur, 0, curLen, out, 0)
+            } catch (e: AEADBadTagException) {
+                throw IntegrityException("Chunk failed authentication", e)
+            }
+            outPos = 0
+            if (isFinal) {
+                done = true
+            } else {
+                val t = bufCur; bufCur = bufNext; bufNext = t
+                curLen = next
+                index++
+            }
+            return true
+        }
+
+        override fun read(): Int {
+            val one = ByteArray(1)
+            return if (read(one, 0, 1) < 0) -1 else one[0].toInt() and 0xFF
+        }
+
+        override fun read(b: ByteArray, off: Int, len: Int): Int {
+            if (len == 0) return 0
+            while (outPos == outLen) {
+                if (!fill()) return -1
+            }
+            val n = minOf(len, outLen - outPos)
+            System.arraycopy(out, outPos, b, off, n)
+            outPos += n
+            return n
+        }
+
+        override fun close() {
+            out.fill(0)
+            bufCur.fill(0)
+            bufNext.fill(0)
+        }
+    }
+
     /** Reads and validates the header (structure only; authenticity is established when chunks verify). */
     fun readHeader(input: InputStream): Header {
         val fixed = ByteArray(4 + 1 + 4 + FILE_ID_LEN + 2)

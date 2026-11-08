@@ -21,3 +21,6 @@ class VaultIoException(message: String, cause: Throwable? = null) : DocSafeSecur
 
 /** Input rejected before any processing (bad id, bad PIN format, ...). */
 class InvalidInputException(message: String) : DocSafeSecurityException(message)
+
+/** A backup could not be opened with the given password (wrong password or a damaged header). */
+class BackupPasswordException(message: String, cause: Throwable? = null) : DocSafeSecurityException(message, cause)
