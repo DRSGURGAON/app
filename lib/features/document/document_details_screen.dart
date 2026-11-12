@@ -185,7 +185,10 @@ class _DetailsView extends ConsumerWidget {
                                 onPressed: () =>
                                     context.push(Routes.viewer(doc.id)),
                                 icon: const Icon(Icons.visibility_outlined),
-                                label: Text(l.detailsOpen),
+                                label: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(l.detailsOpen, maxLines: 1),
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -193,7 +196,10 @@ class _DetailsView extends ConsumerWidget {
                               child: OutlinedButton.icon(
                                 onPressed: () => _export(context, ref),
                                 icon: const Icon(Icons.ios_share_outlined),
-                                label: Text(l.detailsExport),
+                                label: FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(l.detailsExport, maxLines: 1),
+                                ),
                               ),
                             ),
                           ],
@@ -490,7 +496,9 @@ class _DateTile extends StatelessWidget {
       title: Text(label),
       subtitle: value == null
           ? Text(l.detailsNotSet)
-          : badge ?? Text(formatIsoDate(value!, locale)),
+          : badge != null
+          ? Align(alignment: AlignmentDirectional.centerStart, child: badge)
+          : Text(formatIsoDate(value!, locale)),
       enabled: enabled,
       trailing: value == null || !enabled
           ? null

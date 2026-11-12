@@ -412,6 +412,10 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
+  String get vaultNoFolders =>
+      'अभी कोई फ़ोल्डर नहीं। बनाने के लिए फ़ोल्डर बटन दबाएँ।';
+
+  @override
   String get vaultFolders => 'फ़ोल्डर';
 
   @override

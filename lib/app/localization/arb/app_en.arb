@@ -159,6 +159,7 @@
       }
     }
   },
+  "vaultNoFolders": "No folders yet. Tap the folder button to create one.",
   "vaultFolders": "Folders",
   "vaultAllDocuments": "All documents",
   "sortLabel": "Sort",

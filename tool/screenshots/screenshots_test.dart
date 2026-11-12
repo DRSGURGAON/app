@@ -41,7 +41,8 @@ Future<void> loadFonts() async {
   await loadFont('Roboto', roboto);
   // The app's bundled brand fonts.
   await loadFont('PlusJakartaSans', [
-    for (final w in [400, 500, 600, 700, 800]) 'assets/fonts/PlusJakartaSans-$w.ttf',
+    for (final w in [400, 500, 600, 700, 800])
+      'assets/fonts/PlusJakartaSans-$w.ttf',
   ]);
   await loadFont('Sora', [
     for (final w in [400, 600, 700, 800]) 'assets/fonts/Sora-$w.ttf',
@@ -157,7 +158,9 @@ void main() {
       pdfEngine: engine,
       size: small ? const Size(800, 1200) : const Size(1080, 2400),
     );
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(false);
+    app.container
+        .read(premiumUnlockedProvider.notifier)
+        .setDebugUnlocked(false);
     await seed(
       app,
       fake,
@@ -174,6 +177,15 @@ void main() {
     await goTab(tester, t.navVault);
     await shot(tester, '03-vault');
     await goTab(tester, t.navVault);
+    await tester.scrollUntilVisible(
+      find.text('Driving Licence'),
+      200,
+      scrollable: find
+          .byWidgetPredicate(
+            (w) => w is Scrollable && w.axisDirection == AxisDirection.down,
+          )
+          .first,
+    );
     await tester.tap(find.text('Driving Licence').first);
     await shot(tester, '04-details');
     await tester.drag(find.byType(Scrollable).first, const Offset(0, -700));
@@ -202,7 +214,9 @@ void main() {
     await shot(tester, '10-onboarding');
     await app.dispose();
 
-    final locked = await unlockedFake();
+    final locked = await unlockedFake(
+      lang: Platform.environment['SHOTS_LANG'] ?? 'en',
+    );
     await locked.lock();
     final app2 = await pumpApp(tester, locked);
     await shot(tester, '11-lock');

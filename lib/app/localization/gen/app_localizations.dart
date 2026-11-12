@@ -800,6 +800,12 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No documents} =1{1 document} other{{count} documents}}'**
   String documentCount(int count);
 
+  /// No description provided for @vaultNoFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'No folders yet. Tap the folder button to create one.'**
+  String get vaultNoFolders;
+
   /// No description provided for @vaultFolders.
   ///
   /// In en, this message translates to:

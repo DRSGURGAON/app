@@ -159,6 +159,7 @@
       }
     }
   },
+  "vaultNoFolders": "अभी कोई फ़ोल्डर नहीं। बनाने के लिए फ़ोल्डर बटन दबाएँ।",
   "vaultFolders": "फ़ोल्डर",
   "vaultAllDocuments": "सभी दस्तावेज़",
   "sortLabel": "क्रम",

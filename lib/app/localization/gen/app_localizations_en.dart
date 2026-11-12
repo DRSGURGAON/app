@@ -411,6 +411,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get vaultNoFolders =>
+      'No folders yet. Tap the folder button to create one.';
+
+  @override
   String get vaultFolders => 'Folders';
 
   @override

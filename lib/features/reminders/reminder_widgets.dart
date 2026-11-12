@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/localization/display_names.dart';
 import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/widgets/states.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
 import '../../data/repositories/reminder_repository.dart';
@@ -206,13 +207,7 @@ class DocumentRemindersSection extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-          child: Text(
-            l.detailsReminders,
-            style: Theme.of(context).textTheme.titleSmall,
-          ),
-        ),
+        SectionHeader(title: l.detailsReminders),
         for (final r in items) ReminderTile(item: r, showTitle: false),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),

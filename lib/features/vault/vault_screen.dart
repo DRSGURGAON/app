@@ -77,7 +77,13 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               loading: () => const SizedBox(height: 56),
               error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
               data: (list) => list.isEmpty
-                  ? const SizedBox.shrink()
+                  ? Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),
+                      child: Text(
+                        l.vaultNoFolders,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    )
                   : SizedBox(
                       height: 108,
                       child: ListView.separated(

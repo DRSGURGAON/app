@@ -9,7 +9,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-Future<void> render(WidgetTester tester, double px, String path, {bool square = false}) async {
+Future<void> render(
+  WidgetTester tester,
+  double px,
+  String path, {
+  bool square = false,
+}) async {
   final key = GlobalKey();
   tester.view.physicalSize = Size(px, px);
   tester.view.devicePixelRatio = 1;
@@ -29,7 +34,8 @@ Future<void> render(WidgetTester tester, double px, String path, {bool square = 
     ),
   );
   await tester.runAsync(() async {
-    final boundary = key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+    final boundary =
+        key.currentContext!.findRenderObject()! as RenderRepaintBoundary;
     final image = await boundary.toImage();
     final data = await image.toByteData(format: ui.ImageByteFormat.png);
     File(path)
@@ -41,7 +47,13 @@ Future<void> render(WidgetTester tester, double px, String path, {bool square = 
 void main() {
   testWidgets('icons', (tester) async {
     const res = 'android/app/src/main/res';
-    for (final (dir, px) in [('mdpi', 48.0), ('hdpi', 72.0), ('xhdpi', 96.0), ('xxhdpi', 144.0), ('xxxhdpi', 192.0)]) {
+    for (final (dir, px) in [
+      ('mdpi', 48.0),
+      ('hdpi', 72.0),
+      ('xhdpi', 96.0),
+      ('xxhdpi', 144.0),
+      ('xxxhdpi', 192.0),
+    ]) {
       await render(tester, px, '$res/mipmap-$dir/ic_launcher.png');
     }
     await render(tester, 512, 'docs/brand/icon-512.png', square: true);
