@@ -11,6 +11,8 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
+import `in`.docsafe.app.billing.PlayBilling
+import `in`.docsafe.app.bridge.BillingHostApi
 import `in`.docsafe.app.bridge.SecurityBridgeError
 import `in`.docsafe.app.bridge.SecurityHostApi
 import `in`.docsafe.app.bridge.LaunchTarget
@@ -28,6 +30,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  */
 class MainActivity : FlutterFragmentActivity() {
     private var pending: CancellableContinuation<Uri?>? = null
+    private var billing: PlayBilling? = null
 
     // One launcher for every Storage Access Framework dialog. Must be registered
     // before the activity is STARTED.
@@ -134,6 +137,9 @@ class MainActivity : FlutterFragmentActivity() {
                 documentUi = documentUi,
             ),
         )
+        billing?.close()
+        billing = PlayBilling(this, activityProvider = { this.takeUnless { it.isFinishing || it.isDestroyed } })
+        BillingHostApi.setUp(flutterEngine.dartExecutor.binaryMessenger, billing)
         // Debug builds only; a no-op object in release/profile (see src/debug, src/release).
         TestFixtures.register(flutterEngine, this)
     }
@@ -145,6 +151,8 @@ class MainActivity : FlutterFragmentActivity() {
         pendingSender = null
         pendingPermission?.let { if (it.isActive) it.resume(false) }
         pendingPermission = null
+        billing?.close()
+        billing = null
         super.onDestroy()
     }
 }

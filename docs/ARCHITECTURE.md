@@ -87,6 +87,22 @@ PDF Tools tab / document details ─► picker / page editor / ordered list / co
 decrypted on demand) need no size up front. `PdfEngine` is an interface so widget tests run on the
 host without PDFium; the real engine is exercised on the emulator (`integration_test/pdf_tools_test.dart`).
 
+## Premium and billing (Phase 6)
+
+```
+PremiumScreen / tool gates ─▶ premiumProvider (PremiumController, in memory)
+                                   │ refresh(): on unlock, on resume, after purchase, on restore
+                                   ▼
+                       BillingService (Pigeon: pigeons/billing_api.dart)
+                                   ▼
+          PlayBilling.kt (Play Billing Library 8) ─▶ Play Store app (IPC)
+                                   │ signature check + entitlement rule
+                                   ▼
+                  docsafe-crypto PlayPurchases.kt (pure JVM, unit-tested)
+```
+
+`premiumUnlockedProvider` (bool) is what features read. See docs/BILLING.md.
+
 ## Platform choices
 
 - minSdk 26, target/compile SDK from Flutter (36). `FlutterFragmentActivity` (needed by BiometricPrompt).

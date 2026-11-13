@@ -30,6 +30,9 @@ flutter test integration_test/annotate_test.dart -d "$DEVICE"
 echo "== 3d. OCR (bundled ML Kit model) and reminders"
 flutter test integration_test/ocr_reminders_test.dart -d "$DEVICE"
 
+echo "== 3e. Google Play Billing bridge (no licence key, app not on Play)"
+flutter test integration_test/billing_test.dart -d "$DEVICE"
+
 echo "== 4. True process restart"
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
 flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall

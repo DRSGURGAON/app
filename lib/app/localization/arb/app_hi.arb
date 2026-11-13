@@ -415,7 +415,7 @@
   "toolCompress": "PDF छोटा करें",
   "toolCompressDesc": "फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ",
   "premiumBadge": "प्रीमियम",
-  "toolsPremiumNote": "इस परीक्षण संस्करण में जोड़ना, अलग करना और छोटा करना सभी के लिए खुले हैं। 'लिखें और साइन करें' के लिए प्रीमियम चाहिए, और सदस्यता बाद के अपडेट में आएगी।",
+  "toolsPremiumNote": "जोड़ना, अलग करना, छोटा करना और 'लिखें और साइन करें' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।",
   "toolsPrivacyNote": "सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।",
   "pickPdf": "एक PDF चुनें",
   "pickPdfs": "PDF चुनें",
@@ -555,9 +555,6 @@
   "premiumTitle": "DocSafe प्रीमियम",
   "premiumLocked": "{feature} एक प्रीमियम सुविधा है।",
   "premiumIncludes": "प्रीमियम में शामिल है",
-  "premiumMonthly": "₹49 / महीना",
-  "premiumYearly": "₹299 / साल",
-  "premiumComingSoon": "सदस्यता आने वाले अपडेट में शुरू होगी। इस संस्करण में कोई भुगतान नहीं किया जा सकता।",
   "premiumLockedBadge": "लॉक",
   "settingsDeveloperSection": "डेवलपर (सिर्फ़ डीबग बिल्ड)",
   "settingsDevUnlockPremium": "टेस्ट के लिए प्रीमियम सुविधाएं खोलें",
@@ -754,6 +751,77 @@
   "@restoreMissing": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPdfTools": "PDF जोड़ें, अलग करें और छोटा करें",
+  "premiumPdfToolsDesc": "फ़ाइलें जोड़ें, पेज निकालें और PDF छोटे करें — सब इसी फ़ोन पर।",
+  "premiumOcrSearch": "दस्तावेज़ों के अंदर खोजें",
+  "premiumOcrSearchDesc": "पहचाना गया टेक्स्ट सहेजें ताकि खोज दस्तावेज़ों के अंदर के शब्द भी ढूँढ सके।",
+  "premiumReminders": "असीमित रिमाइंडर",
+  "premiumRemindersDesc": "फ़्री प्लान में {count} सक्रिय रिमाइंडर होते हैं।",
+  "premiumChoosePlan": "प्लान चुनें",
+  "premiumMonthlyLabel": "मासिक",
+  "premiumYearlyLabel": "सालाना",
+  "premiumPerMonth": "{price} / महीना",
+  "premiumPerYear": "{price} / साल",
+  "premiumSave": "{percent}% बचत",
+  "premiumFreeTrial": "{days} दिन का मुफ़्त ट्रायल",
+  "premiumContinue": "आगे बढ़ें",
+  "premiumStartTrial": "मुफ़्त ट्रायल शुरू करें",
+  "premiumRestore": "खरीदारी बहाल करें",
+  "premiumManage": "सदस्यता प्रबंधित करें",
+  "premiumLegal": "भुगतान Google Play के ज़रिए आपके Google खाते से होगा। सदस्यता अपने-आप रिन्यू होती है जब तक आप रद्द न करें। Google Play में सदस्यताएँ सेक्शन से कभी भी रद्द करें।",
+  "premiumPrivacy": "DocSafe का कोई सर्वर नहीं है और वह आपकी भुगतान जानकारी कभी नहीं देखता। आपके दस्तावेज़ इसी फ़ोन पर रहते हैं।",
+  "premiumActiveTitle": "प्रीमियम चालू है",
+  "premiumActiveBody": "DocSafe का साथ देने के लिए धन्यवाद।",
+  "premiumEndsNote": "ऑटो-रिन्यू बंद है। भुगतान की गई अवधि के अंत तक प्रीमियम चालू रहेगा।",
+  "premiumPendingTitle": "भुगतान बाकी है",
+  "premiumPendingBody": "Google Play के भुगतान की पुष्टि करते ही प्रीमियम खुल जाएगा।",
+  "premiumUnavailable": "इस फ़ोन पर Google Play उपलब्ध नहीं है, इसलिए यहाँ प्रीमियम नहीं खरीदा जा सकता।",
+  "premiumNotConfigured": "DocSafe के इस बिल्ड में खरीदारी चालू नहीं है।",
+  "premiumNoPlans": "Google Play से प्लान लोड नहीं हो सके। कनेक्शन जाँचें और फिर कोशिश करें।",
+  "premiumTryAgain": "फिर कोशिश करें",
+  "premiumWelcome": "प्रीमियम में आपका स्वागत है!",
+  "premiumPurchaseFailed": "खरीदारी पूरी नहीं हो सकी। कृपया फिर कोशिश करें।",
+  "premiumRestored": "प्रीमियम बहाल हो गया।",
+  "premiumNothingToRestore": "इस Google खाते के लिए कोई सक्रिय प्रीमियम सदस्यता नहीं मिली।",
+  "settingsPremium": "DocSafe प्रीमियम",
+  "settingsPremiumActive": "चालू",
+  "settingsPremiumPending": "भुगतान बाकी",
+  "settingsPremiumInactive": "प्लान देखें",
+  "@premiumRemindersDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@premiumPerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@premiumPerYear": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@premiumSave": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@premiumFreeTrial": {
+    "placeholders": {
+      "days": {
         "type": "int"
       }
     }

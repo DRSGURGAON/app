@@ -43,8 +43,8 @@ Future<void> tapOnPage(WidgetTester tester, Offset at) async {
 }
 
 void main() {
-  testWidgets('locked: tool card and details chip open the Premium screen, '
-      'which has no purchase button', (tester) async {
+  testWidgets('locked: tool card and details chip open the Premium screen; '
+      'without Google Play nothing can be bought', (tester) async {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
@@ -54,13 +54,9 @@ void main() {
     await scrollAndTap(tester, find.byKey(const Key('tool-annotate')));
     expect(find.byType(PremiumScreen), findsOneWidget);
     expect(find.text(en.premiumLocked(en.toolAnnotate)), findsOneWidget);
-    expect(find.text(en.premiumMonthly), findsOneWidget);
-    expect(find.text(en.premiumYearly), findsOneWidget);
-    expect(find.text(en.premiumComingSoon), findsOneWidget);
-    // The only button closes the screen.
-    expect(find.byType(FilledButton), findsOneWidget);
-    expect(find.widgetWithText(FilledButton, en.previewClose), findsOneWidget);
-    await tester.tap(find.text(en.previewClose));
+    expect(find.text(en.premiumUnavailable), findsOneWidget);
+    expect(find.byKey(const Key('premium-buy')), findsNothing);
+    await tester.binding.handlePopRoute();
     await settle(tester);
     expect(find.byType(PremiumScreen), findsNothing);
 
@@ -176,7 +172,7 @@ void main() {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(true);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await importDoc(tester, fake, engine, 'Aadhaar.pdf');
     await tester.tap(find.text('Aadhaar'));
     await settle(tester);
@@ -198,7 +194,7 @@ void main() {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(true);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await importDoc(tester, fake, engine, 'Notes.pdf');
     await tester.tap(find.text('Notes'));
     await settle(tester);
@@ -238,10 +234,11 @@ void main() {
     await goTab(tester, hi.navTools);
     await scrollAndTap(tester, find.byKey(const Key('tool-annotate')));
     expect(find.text(hi.premiumLocked(hi.toolAnnotate)), findsOneWidget);
-    await scrollAndTap(tester, find.text(hi.previewClose));
+    await tester.binding.handlePopRoute();
+    await settle(tester);
     await settle(tester);
 
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(true);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await settle(tester);
     await scrollAndTap(tester, find.byKey(const Key('tool-annotate')));
     await tester.tap(find.textContaining('फ़ॉर्म'));

@@ -16,6 +16,7 @@ import '../../test/features/pdf_tools_flow_test.dart'
     show en, hi, goTab, importDoc, unlockedFake;
 import '../../test/features/reminders_ocr_flow_test.dart'
     show pumpUntil, docIdByTitle;
+import '../../test/helpers/fake_billing_service.dart';
 import '../../test/helpers/fake_pdf_engine.dart';
 import '../../test/helpers/fake_security_service.dart';
 import '../../test/helpers/pump_app.dart';
@@ -158,9 +159,7 @@ void main() {
       pdfEngine: engine,
       size: small ? const Size(800, 1200) : const Size(1080, 2400),
     );
-    app.container
-        .read(premiumUnlockedProvider.notifier)
-        .setDebugUnlocked(false);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(false);
     await seed(
       app,
       fake,
@@ -221,5 +220,31 @@ void main() {
     final app2 = await pumpApp(tester, locked);
     await shot(tester, '11-lock');
     await app2.dispose();
+  });
+
+  testWidgets('premium', (tester) async {
+    await loadFonts();
+    final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final small = Platform.environment['SHOTS_SMALL'] == '1';
+    final t = lang == 'hi' ? hi : en;
+    final billing = FakeBillingService(
+      offers: FakeBillingService.defaultPlans(yearlyTrial: 'P7D'),
+    );
+    final app = await pumpApp(
+      tester,
+      await unlockedFake(lang: lang),
+      billing: billing,
+      size: small ? const Size(800, 1200) : const Size(1080, 2400),
+    );
+    await goTab(tester, t.navSettings);
+    await tester.tap(find.byKey(const Key('settings-premium')));
+    await shot(tester, '20-premium');
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -900));
+    await shot(tester, '21-premium-plans');
+    await tester.tap(find.byKey(const Key('premium-buy')));
+    await settle(tester);
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, 2000));
+    await shot(tester, '22-premium-active');
+    await app.dispose();
   });
 }

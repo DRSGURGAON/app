@@ -22,6 +22,20 @@ android {
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // Google Play licence key (Play Console -> Monetize -> Licensing): a PUBLIC
+        // RSA key used to verify purchase signatures. Not a secret, but it is
+        // per-app, so it is supplied at build time (-PdocsafePlayLicenseKey=... or
+        // DOCSAFE_PLAY_LICENSE_KEY) instead of being committed. Without it the
+        // build cannot verify purchases and Premium can't be bought.
+        val playLicenseKey = (project.findProperty("docsafePlayLicenseKey") as String?)
+            ?: System.getenv("DOCSAFE_PLAY_LICENSE_KEY")
+            ?: ""
+        require(Regex("[A-Za-z0-9+/=\\s]*").matches(playLicenseKey)) { "docsafePlayLicenseKey must be base64" }
+        buildConfigField("String", "PLAY_LICENSE_KEY", "\"${playLicenseKey.replace(Regex("\\s"), "")}\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {
@@ -55,6 +69,9 @@ dependencies {
     // Phase 5 OCR: on-device text recognition, Devanagari model (also reads Latin) bundled
     // in the APK, so nothing is downloaded and no image leaves the device.
     implementation("com.google.mlkit:text-recognition-devanagari:16.0.1")
+    // Phase 6: Google Play Billing (subscriptions). Talks to the Play Store app over
+    // IPC; DocSafe itself makes no network requests.
+    implementation("com.android.billingclient:billing:8.0.0")
 
     // Versions aligned with what Flutter's integration_test plugin puts on the debug runtime
     // classpath; Gradle's consistent resolution rejects anything newer here.

@@ -916,7 +916,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'इस परीक्षण संस्करण में जोड़ना, अलग करना और छोटा करना सभी के लिए खुले हैं। \'लिखें और साइन करें\' के लिए प्रीमियम चाहिए, और सदस्यता बाद के अपडेट में आएगी।';
+      'जोड़ना, अलग करना, छोटा करना और \'लिखें और साइन करें\' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।';
 
   @override
   String get toolsPrivacyNote =>
@@ -1186,16 +1186,6 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get premiumIncludes => 'प्रीमियम में शामिल है';
-
-  @override
-  String get premiumMonthly => '₹49 / महीना';
-
-  @override
-  String get premiumYearly => '₹299 / साल';
-
-  @override
-  String get premiumComingSoon =>
-      'सदस्यता आने वाले अपडेट में शुरू होगी। इस संस्करण में कोई भुगतान नहीं किया जा सकता।';
 
   @override
   String get premiumLockedBadge => 'लॉक';
@@ -1491,4 +1481,133 @@ class AppLocalizationsHi extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get premiumPdfTools => 'PDF जोड़ें, अलग करें और छोटा करें';
+
+  @override
+  String get premiumPdfToolsDesc =>
+      'फ़ाइलें जोड़ें, पेज निकालें और PDF छोटे करें — सब इसी फ़ोन पर।';
+
+  @override
+  String get premiumOcrSearch => 'दस्तावेज़ों के अंदर खोजें';
+
+  @override
+  String get premiumOcrSearchDesc =>
+      'पहचाना गया टेक्स्ट सहेजें ताकि खोज दस्तावेज़ों के अंदर के शब्द भी ढूँढ सके।';
+
+  @override
+  String get premiumReminders => 'असीमित रिमाइंडर';
+
+  @override
+  String premiumRemindersDesc(int count) {
+    return 'फ़्री प्लान में $count सक्रिय रिमाइंडर होते हैं।';
+  }
+
+  @override
+  String get premiumChoosePlan => 'प्लान चुनें';
+
+  @override
+  String get premiumMonthlyLabel => 'मासिक';
+
+  @override
+  String get premiumYearlyLabel => 'सालाना';
+
+  @override
+  String premiumPerMonth(String price) {
+    return '$price / महीना';
+  }
+
+  @override
+  String premiumPerYear(String price) {
+    return '$price / साल';
+  }
+
+  @override
+  String premiumSave(int percent) {
+    return '$percent% बचत';
+  }
+
+  @override
+  String premiumFreeTrial(int days) {
+    return '$days दिन का मुफ़्त ट्रायल';
+  }
+
+  @override
+  String get premiumContinue => 'आगे बढ़ें';
+
+  @override
+  String get premiumStartTrial => 'मुफ़्त ट्रायल शुरू करें';
+
+  @override
+  String get premiumRestore => 'खरीदारी बहाल करें';
+
+  @override
+  String get premiumManage => 'सदस्यता प्रबंधित करें';
+
+  @override
+  String get premiumLegal =>
+      'भुगतान Google Play के ज़रिए आपके Google खाते से होगा। सदस्यता अपने-आप रिन्यू होती है जब तक आप रद्द न करें। Google Play में सदस्यताएँ सेक्शन से कभी भी रद्द करें।';
+
+  @override
+  String get premiumPrivacy =>
+      'DocSafe का कोई सर्वर नहीं है और वह आपकी भुगतान जानकारी कभी नहीं देखता। आपके दस्तावेज़ इसी फ़ोन पर रहते हैं।';
+
+  @override
+  String get premiumActiveTitle => 'प्रीमियम चालू है';
+
+  @override
+  String get premiumActiveBody => 'DocSafe का साथ देने के लिए धन्यवाद।';
+
+  @override
+  String get premiumEndsNote =>
+      'ऑटो-रिन्यू बंद है। भुगतान की गई अवधि के अंत तक प्रीमियम चालू रहेगा।';
+
+  @override
+  String get premiumPendingTitle => 'भुगतान बाकी है';
+
+  @override
+  String get premiumPendingBody =>
+      'Google Play के भुगतान की पुष्टि करते ही प्रीमियम खुल जाएगा।';
+
+  @override
+  String get premiumUnavailable =>
+      'इस फ़ोन पर Google Play उपलब्ध नहीं है, इसलिए यहाँ प्रीमियम नहीं खरीदा जा सकता।';
+
+  @override
+  String get premiumNotConfigured =>
+      'DocSafe के इस बिल्ड में खरीदारी चालू नहीं है।';
+
+  @override
+  String get premiumNoPlans =>
+      'Google Play से प्लान लोड नहीं हो सके। कनेक्शन जाँचें और फिर कोशिश करें।';
+
+  @override
+  String get premiumTryAgain => 'फिर कोशिश करें';
+
+  @override
+  String get premiumWelcome => 'प्रीमियम में आपका स्वागत है!';
+
+  @override
+  String get premiumPurchaseFailed =>
+      'खरीदारी पूरी नहीं हो सकी। कृपया फिर कोशिश करें।';
+
+  @override
+  String get premiumRestored => 'प्रीमियम बहाल हो गया।';
+
+  @override
+  String get premiumNothingToRestore =>
+      'इस Google खाते के लिए कोई सक्रिय प्रीमियम सदस्यता नहीं मिली।';
+
+  @override
+  String get settingsPremium => 'DocSafe प्रीमियम';
+
+  @override
+  String get settingsPremiumActive => 'चालू';
+
+  @override
+  String get settingsPremiumPending => 'भुगतान बाकी';
+
+  @override
+  String get settingsPremiumInactive => 'प्लान देखें';
 }

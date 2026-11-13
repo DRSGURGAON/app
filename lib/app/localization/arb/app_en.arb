@@ -415,7 +415,7 @@
   "toolCompress": "Compress PDF",
   "toolCompressDesc": "Reduce file size — one or several PDFs at once",
   "premiumBadge": "Premium",
-  "toolsPremiumNote": "Merge, split and compress are open to everyone in this test version. Annotate & Sign needs Premium, and subscriptions arrive in a later update.",
+  "toolsPremiumNote": "Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.",
   "toolsPrivacyNote": "Everything runs on this phone. Results are saved as new encrypted documents.",
   "pickPdf": "Choose a PDF",
   "pickPdfs": "Choose PDFs",
@@ -555,9 +555,6 @@
   "premiumTitle": "DocSafe Premium",
   "premiumLocked": "{feature} is a Premium feature.",
   "premiumIncludes": "Premium includes",
-  "premiumMonthly": "₹49 / month",
-  "premiumYearly": "₹299 / year",
-  "premiumComingSoon": "Subscriptions open in an upcoming update. No payment can be made in this version.",
   "premiumLockedBadge": "Locked",
   "settingsDeveloperSection": "Developer (debug build only)",
   "settingsDevUnlockPremium": "Unlock Premium features for testing",
@@ -754,6 +751,77 @@
   "@restoreMissing": {
     "placeholders": {
       "count": {
+        "type": "int"
+      }
+    }
+  },
+  "premiumPdfTools": "Merge, split and compress PDFs",
+  "premiumPdfToolsDesc": "Combine files, pull out pages and shrink PDFs, all on this phone.",
+  "premiumOcrSearch": "Search inside documents",
+  "premiumOcrSearchDesc": "Keep the recognised text so search finds words inside your documents.",
+  "premiumReminders": "Unlimited reminders",
+  "premiumRemindersDesc": "The free plan has {count} active reminders.",
+  "premiumChoosePlan": "Choose a plan",
+  "premiumMonthlyLabel": "Monthly",
+  "premiumYearlyLabel": "Yearly",
+  "premiumPerMonth": "{price} / month",
+  "premiumPerYear": "{price} / year",
+  "premiumSave": "Save {percent}%",
+  "premiumFreeTrial": "{days}-day free trial",
+  "premiumContinue": "Continue",
+  "premiumStartTrial": "Start free trial",
+  "premiumRestore": "Restore purchases",
+  "premiumManage": "Manage subscription",
+  "premiumLegal": "Billed through Google Play to your Google account. The subscription renews automatically until you cancel. Cancel anytime in Google Play, under Subscriptions.",
+  "premiumPrivacy": "DocSafe has no server and never sees your payment details. Your documents stay on this phone.",
+  "premiumActiveTitle": "Premium is active",
+  "premiumActiveBody": "Thank you for supporting DocSafe.",
+  "premiumEndsNote": "Auto-renew is off. Premium stays on until the end of the period you paid for.",
+  "premiumPendingTitle": "Payment pending",
+  "premiumPendingBody": "Premium unlocks as soon as Google Play confirms your payment.",
+  "premiumUnavailable": "Google Play isn't available on this phone, so Premium can't be bought here.",
+  "premiumNotConfigured": "Purchases aren't enabled in this build of DocSafe.",
+  "premiumNoPlans": "Plans couldn't be loaded from Google Play. Check your connection and try again.",
+  "premiumTryAgain": "Try again",
+  "premiumWelcome": "Welcome to Premium!",
+  "premiumPurchaseFailed": "The purchase couldn't be completed. Please try again.",
+  "premiumRestored": "Premium restored.",
+  "premiumNothingToRestore": "No active Premium subscription was found for this Google account.",
+  "settingsPremium": "DocSafe Premium",
+  "settingsPremiumActive": "Active",
+  "settingsPremiumPending": "Payment pending",
+  "settingsPremiumInactive": "See plans",
+  "@premiumRemindersDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@premiumPerMonth": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@premiumPerYear": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "@premiumSave": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "@premiumFreeTrial": {
+    "placeholders": {
+      "days": {
         "type": "int"
       }
     }

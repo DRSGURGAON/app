@@ -28,7 +28,21 @@ abstract final class PdfToolFlows {
     );
   }
 
+  /// Premium tools open the Premium screen instead when locked. Returns
+  /// true if the tool may run.
+  static Future<bool> _premiumOk(BuildContext context, String feature) async {
+    final container = ProviderScope.containerOf(context, listen: false);
+    if (container.read(premiumUnlockedProvider)) return true;
+    await _push(context, PremiumScreen(feature: feature));
+    // Bought on the Premium screen: continue straight into the tool.
+    return context.mounted && container.read(premiumUnlockedProvider);
+  }
+
   static Future<void> split(BuildContext context, {VaultDocument? doc}) async {
+    if (!await _premiumOk(context, AppLocalizations.of(context).toolSplit) ||
+        !context.mounted) {
+      return;
+    }
     final d =
         doc ?? await _pickOne(context, AppLocalizations.of(context).pickPdf);
     if (d == null || !context.mounted) return;
@@ -39,6 +53,10 @@ abstract final class PdfToolFlows {
   }
 
   static Future<void> merge(BuildContext context) async {
+    if (!await _premiumOk(context, AppLocalizations.of(context).toolMerge) ||
+        !context.mounted) {
+      return;
+    }
     final docs = await pickDocuments(
       context,
       title: AppLocalizations.of(context).pickPdfs,
@@ -71,6 +89,10 @@ abstract final class PdfToolFlows {
     BuildContext context, {
     VaultDocument? doc,
   }) async {
+    if (!await _premiumOk(context, AppLocalizations.of(context).toolCompress) ||
+        !context.mounted) {
+      return;
+    }
     final docs = doc != null
         ? [doc]
         : await pickDocuments(
@@ -90,10 +112,7 @@ abstract final class PdfToolFlows {
   }) async {
     final l = AppLocalizations.of(context);
     final container = ProviderScope.containerOf(context, listen: false);
-    if (!container.read(premiumUnlockedProvider)) {
-      await _push(context, PremiumScreen(feature: l.toolAnnotate));
-      return;
-    }
+    if (!await _premiumOk(context, l.toolAnnotate) || !context.mounted) return;
     final d = doc ?? await _pickOne(context, l.pickPdf);
     if (d == null || !context.mounted) return;
     final service = await container.read(pdfToolsServiceProvider.future);
@@ -164,6 +183,7 @@ class PdfToolsScreen extends ConsumerWidget {
             title: l.toolMerge,
             body: l.toolMergeDesc,
             premium: true,
+            locked: !premium,
             onTap: () => PdfToolFlows.merge(context),
           ),
           _Tool(
@@ -171,6 +191,7 @@ class PdfToolsScreen extends ConsumerWidget {
             title: l.toolSplit,
             body: l.toolSplitDesc,
             premium: true,
+            locked: !premium,
             onTap: () => PdfToolFlows.split(context),
           ),
           _Tool(
@@ -178,6 +199,7 @@ class PdfToolsScreen extends ConsumerWidget {
             title: l.toolCompress,
             body: l.toolCompressDesc,
             premium: true,
+            locked: !premium,
             onTap: () => PdfToolFlows.compress(context),
           ),
           _Tool(

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:docsafe/app/app.dart';
 import 'package:docsafe/app/localization/locale_controller.dart';
+import 'package:docsafe/core/billing/billing_service.dart';
 import 'package:docsafe/core/database/app_database.dart';
 import 'package:docsafe/core/database/database_opener.dart';
 import 'package:docsafe/core/database/database_provider.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'fake_billing_service.dart';
 import 'fake_pdf_engine.dart';
 import 'fake_security_service.dart';
 
@@ -58,6 +60,7 @@ Future<TestApp> pumpApp(
   PdfEngine? pdfEngine,
   OverlayRenderer? overlayRenderer,
   Locale deviceLocale = const Locale('en', 'US'),
+  BillingService? billing,
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -67,6 +70,13 @@ Future<TestApp> pumpApp(
   final container = ProviderContainer(
     overrides: [
       securityServiceProvider.overrideWithValue(fake),
+      // No Google Play on the host: not purchased unless a test scripts it.
+      billingServiceProvider.overrideWithValue(
+        billing ??
+            FakeBillingService(
+              availabilityResult: BillingAvailability.unavailable,
+            ),
+      ),
       deviceLocaleProvider.overrideWithValue(deviceLocale),
       // Only the opener is replaced: open-on-unlock, close-on-lock and the
       // erase close-wait run the production code paths.

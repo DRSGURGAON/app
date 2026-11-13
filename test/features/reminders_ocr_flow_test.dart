@@ -157,10 +157,10 @@ void main() {
       find.text(en.premiumLocked(en.reminderLimitFeature)),
       findsOneWidget,
     );
-    await tester.tap(find.text(en.previewClose));
+    await tester.binding.handlePopRoute();
     await settle(tester);
 
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(true);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await scrollAndTap(tester, find.byKey(const Key('add-reminder')));
     await tester.tap(find.text(en.reminderOnExpiryDay));
     await settle(tester);
@@ -268,9 +268,9 @@ void main() {
     // Save for search: Premium.
     await scrollAndTap(tester, find.byKey(const Key('ocr-save')));
     expect(find.byType(PremiumScreen), findsOneWidget);
-    await tester.tap(find.text(en.previewClose));
+    await tester.binding.handlePopRoute();
     await settle(tester);
-    app.container.read(premiumUnlockedProvider.notifier).setDebugUnlocked(true);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await settle(tester);
     await scrollAndTap(tester, find.byKey(const Key('ocr-save')));
     expect(find.text(en.ocrSavedForSearch), findsWidgets);

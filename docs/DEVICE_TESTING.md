@@ -134,12 +134,12 @@ Expected: renders or shows "This document failed its integrity check…" — nev
 
 ## 9. Annotate & Sign
 
-Debug build: Settings → Developer → "Unlock Premium features for testing". Release build: the
-tool must stay locked and show the Premium screen (no purchase button).
+Debug build: Settings → Developer → "Unlock Premium features for testing". Release build
+without a subscription: the tool is locked and opens the Premium screen (§12).
 
 | # | Step | Expected |
 |---|---|---|
-| A1 | Release build: PDF Tools → Annotate & Sign | Premium screen, ₹49 / ₹299, "upcoming update", only a Close button |
+| A1 | Release build, no subscription: PDF Tools → Annotate & Sign | Premium screen; with a key-less build: "Purchases aren't enabled in this build", no buy button |
 | A2 | Debug, unlocked: open a real multi-page PDF (bank form, letter-size and A4) | Pages display with correct orientation; page arrows work |
 | A3 | Text in Hindi and English at three sizes, three colours | Text lands where tapped; same position in the saved copy |
 | A4 | Draw a signature, tick "Save on this device", place it twice; reopen editor → Sign | Saved signature offered; "Delete saved signature" removes it |
@@ -187,6 +187,28 @@ tool must stay locked and show the Premium screen (no purchase button).
 | K8 | Large vault (500 MB+) | Completes; note the time; no plaintext in `cache/` during the run |
 | K9 | US phone: OCR a document with "EXP 08/09/2031" | Suggested expiry 9 Aug 2031 (month first) |
 
+## 12. Premium and Google Play Billing (Phase 6)
+
+Needs the Play Console setup in docs/BILLING.md: an internal-testing build **with the Play
+licence key**, installed from the Play Store, on a phone signed in with a licence-tester account
+(test cards; no real charge).
+
+| # | Step | Expected |
+|---|---|---|
+| P1 | Settings → DocSafe Premium | Monthly and Yearly with Play's prices for your country (₹ in India; $ / £ on US/UK accounts), "Save N%", trial if configured |
+| P2 | PDF Tools → Merge PDFs | Premium screen "Merge PDFs is a Premium feature" |
+| P3 | Choose Yearly → Start free trial / Continue → Play sheet → test card "always approves" | "Welcome to Premium!", Merge continues to the picker; Settings shows "Active" |
+| P4 | Force-stop, reopen, unlock | Still Premium (from Play, nothing cached) |
+| P5 | Play sheet → back (cancel) | No message, still locked |
+| P6 | Test card "slow, approves after a few minutes" | "Payment pending"; tools stay locked; Premium unlocks by itself after approval (bring the app to the front) |
+| P7 | Test card "declines" | "The purchase couldn't be completed" |
+| P8 | Uninstall, reinstall, set up, Premium → Restore purchases | "Premium restored." |
+| P9 | Manage subscription → cancel in Play | Premium stays until the end of the period; screen says auto-renew is off |
+| P10 | Play Console → refund + revoke the test order; reopen the app | Premium off |
+| P11 | Airplane mode with an active subscription | Note whether Play still answers from its cache (Premium should stay on) |
+| P12 | 4th active reminder, OCR "Save for search", Annotate & Sign with Premium | Allowed |
+| P13 | `adb logcat \| grep DocSafe` during P3–P10 | Only "billing: … (code)" lines; no tokens or order ids |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -198,6 +220,7 @@ tool must stay locked and show the Premium screen (no purchase button).
 | Backups (§6) | | | |
 | Preview (§7) | | | |
 | PDF tools (§8) | | | |
+| Premium / billing (§12) | | | |
 | Annotate & Sign (§9) | | | |
 | OCR & reminders (§10) | | | |
 | Backup & language (§11) | | | |

@@ -249,10 +249,9 @@ Write text, place a signature, draw, highlight or **cover** (white-out) parts of
 - **Saved signature** (optional, opt-in checkbox): stored as normalised stroke coordinates in the
   encrypted database (`app_settings` key `signature.v1`), removable from the signature pad, wiped by
   Erase all data. Never exported or logged.
-- **Premium gate.** There is no billing yet (Phase 6), so release and profile builds keep the
-  tool locked and show a Premium screen with the planned prices and "subscriptions open in an
-  upcoming update" — no buy button. Debug builds have a developer switch in Settings
-  (`kDebugMode`, in memory only) for testing. The gate is a product gate, not a security boundary.
+- **Premium gate.** Unlocked only by a verified Google Play subscription (§12d). Debug builds
+  also have a developer switch in Settings (`kDebugMode`, in memory only) for testing. The gate
+  is a product gate, not a security boundary.
 
 ## 12b. OCR and reminders (Phase 5)
 
@@ -285,7 +284,7 @@ documents beyond the time itself — the time can reveal that *some* reminder ex
   the Reminders tab shows a banner with a shortcut to the system settings.
 - Changing reminders, expiry dates, trash/restore re-syncs the schedule while unlocked;
   Erase all data deletes the schedule file and cancels the alarm.
-- Free plan: 3 active reminders (today or later); more needs Premium (locked until billing).
+- Free plan: 3 active reminders (today or later); more needs Premium (§12d).
 
 ## 12c. Encrypted backup file (Option A)
 
@@ -316,6 +315,24 @@ has **no network permission**; uploading, if any, is done by the app the user ch
 - **Limitations:** no automatic/scheduled backup yet (needs the Drive API = network permission;
   deliberately not done). A backup file is only as safe as its password; the file name and size
   are visible to wherever it is stored.
+
+## 12d. Google Play Billing (Phase 6)
+
+Details and Play Console steps: docs/BILLING.md.
+
+- Premium = subscription `docsafe_premium` (base plans `monthly`, `yearly`). Play Billing
+  Library talks to the Play Store app over IPC; no INTERNET permission (CI audit).
+- No server: Premium is granted only for a PURCHASED purchase whose Google Play RSA signature
+  (SHA1withRSA over the purchase JSON) verifies with the Play licence key compiled into the
+  build. Without a key the build cannot unlock Premium. Rule + verification are pure JVM code
+  (`PlayPurchases.kt`) with unit tests.
+- Verified purchases are acknowledged; expired, refunded and on-hold subscriptions are dropped
+  by Play itself. Entitlement is re-checked on unlock, on resume, after purchase and on restore;
+  it is never cached on disk.
+- Purchase tokens, signatures and order ids stay in Kotlin; Dart receives booleans only. Logs
+  contain billing response codes only.
+- Limitation: client-side verification can be defeated on a rooted/patched device. This only
+  unlocks paid features; it never weakens document encryption.
 
 ## 13. Known limitations
 

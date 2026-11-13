@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../data/repositories/reminder_repository.dart';
 import '../localization/gen/app_localizations.dart';
@@ -26,6 +29,7 @@ class _AppShellState extends ConsumerState<AppShell>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _openLaunchTarget();
+    _refreshPremium();
   }
 
   @override
@@ -36,8 +40,15 @@ class _AppShellState extends ConsumerState<AppShell>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _openLaunchTarget();
+    if (state == AppLifecycleState.resumed) {
+      _openLaunchTarget();
+      // Picks up purchases completed or cancelled in Google Play meanwhile.
+      _refreshPremium();
+    }
   }
+
+  void _refreshPremium() =>
+      unawaited(ref.read(premiumProvider.notifier).refresh());
 
   Future<void> _openLaunchTarget() async {
     try {

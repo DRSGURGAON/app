@@ -7,12 +7,14 @@ import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/localization/locale_controller.dart';
 import '../../app/router/app_router.dart';
+import '../../app/theme/brand.dart';
 import '../../app/widgets/states.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
 import '../../core/security/security_service.dart';
 import '../../data/repositories/document_repository.dart';
+import '../premium/premium_screen.dart';
 import '../security/biometric_text.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -28,6 +30,7 @@ class SettingsScreen extends ConsumerWidget {
     final bioAvailable =
         status?.biometricAvailability == BiometricAvailability.available;
     final scheme = Theme.of(context).colorScheme;
+    final premium = ref.watch(premiumProvider);
 
     String autoLockLabel(int s) => switch (s) {
       0 => l.autoLockImmediately,
@@ -40,6 +43,22 @@ class SettingsScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l.navSettings)),
       body: ListView(
         children: [
+          ListTile(
+            key: const Key('settings-premium'),
+            leading: const Icon(Icons.workspace_premium, color: Brand.gold),
+            title: Text(l.settingsPremium),
+            subtitle: Text(
+              premium.active
+                  ? l.settingsPremiumActive
+                  : premium.pending
+                  ? l.settingsPremiumPending
+                  : l.settingsPremiumInactive,
+            ),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context, rootNavigator: true).push(
+              MaterialPageRoute<void>(builder: (_) => const PremiumScreen()),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.translate),
             title: Text(l.languageLabel),
@@ -165,9 +184,8 @@ class SettingsScreen extends ConsumerWidget {
               secondary: const Icon(Icons.developer_mode_outlined),
               title: Text(l.settingsDevUnlockPremium),
               value: ref.watch(premiumUnlockedProvider),
-              onChanged: (v) => ref
-                  .read(premiumUnlockedProvider.notifier)
-                  .setDebugUnlocked(v),
+              onChanged: (v) =>
+                  ref.read(premiumProvider.notifier).setDebugUnlocked(v),
             ),
           ],
           const SizedBox(height: 24),

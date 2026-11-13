@@ -43,18 +43,16 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 |---|---|---|---|
 | Edit pages: rotate, reorder, remove | Free | PDFium (pdfrx) | Implemented, tested (host + emulator) |
 | Images to PDF (JPEG/PNG from the vault) | Free | Native streaming writer | Implemented, tested (host + emulator) |
-| Merge PDFs | Premium | PDFium | Implemented, tested |
-| Split: extract pages / every page separately | Premium | PDFium | Implemented, tested |
-| Compress (three presets, one or many PDFs = batch) | Premium | Android PdfRenderer -> JPEG pages | Implemented, tested; result discarded if not smaller |
+| Merge PDFs | Premium | PDFium | Implemented, tested; gated (Phase 6) |
+| Split: extract pages / every page separately | Premium | PDFium | Implemented, tested; gated (Phase 6) |
+| Compress (three presets, one or many PDFs = batch) | Premium | Android PdfRenderer -> JPEG pages | Implemented, tested; result discarded if not smaller; gated (Phase 6) |
 
-| **Annotate & Sign** — text, signature (optional saved signature), draw, highlight, cover; undo; long-press delete | Premium (**locked**) | dart:ui overlay → native PdfRenderer flatten → PDFium reassembly | Implemented, tested (host + emulator); physical device pending |
+| **Annotate & Sign** — text, signature (optional saved signature), draw, highlight, cover; undo; long-press delete | Premium | dart:ui overlay → native PdfRenderer flatten → PDFium reassembly | Implemented, tested (host + emulator); physical device pending |
 
-Annotate & Sign has its own icon (pen) and colour in PDF Tools and on the document page. It is
-**locked** in release builds until billing exists (Phase 6): the Premium screen shows ₹49/month and
-₹299/year with "subscriptions open in an upcoming update" and no purchase button; debug builds have
-a developer switch in Settings. Identity-category documents cannot be annotated, a legal warning
+Annotate & Sign has its own icon (pen) and colour in PDF Tools and on the document page. It needs
+Premium (Phase 6, below). Identity-category documents cannot be annotated, a legal warning
 must be acknowledged before saving, and the result is a separate "(annotated)" copy — see
-docs/SECURITY.md §12a. Merge, split and compress are labelled Premium but **not yet gated**. Every tool saves a
+docs/SECURITY.md §12a. Every tool saves a
 NEW encrypted document; originals are kept (edit pages can optionally move the original to
 Recently deleted). Not supported: editing text inside PDFs, opening password-protected PDFs.
 
@@ -64,11 +62,10 @@ Recently deleted). Not supported: editing text inside PDFs, opening password-pro
 |---|---|---|
 | Read text (OCR) on the device — ML Kit, bundled Hindi/Devanagari + English model, images and first 20 PDF pages | Free | Implemented; host-tested with a fake, emulator-tested with the real model |
 | Category and expiry-date suggestions from the text, applied only after the user taps Apply | Free | Implemented, tested |
-| Save recognised text for search (Aadhaar/PAN masked) + "Inside documents" search | Premium (**locked**) | Implemented, tested |
+| Save recognised text for search (Aadhaar/PAN masked) + "Inside documents" search | Premium | Implemented, tested |
 | Reminders tab: upcoming reminders, upcoming expiry dates, expired documents | Free | Implemented, tested |
-| Expiry reminders (30/7/1/0 days before) and custom-date reminders; generic local notifications at 09:00 | Free: 3 active; Premium: unlimited (**locked**) | Implemented; scheduler instrumented-tested on the emulator |
+| Expiry reminders (30/7/1/0 days before) and custom-date reminders; generic local notifications at 09:00 | Free: 3 active; Premium: unlimited | Implemented; scheduler instrumented-tested on the emulator |
 
-Premium is locked in release builds until billing (Phase 6); debug builds have a developer switch.
 
 **Global readiness + encrypted backup** (first markets: India, US, UK):
 
@@ -78,7 +75,18 @@ Premium is locked in release builds until billing (Phase 6); debug builds have a
 | OCR masking also for US SSN and UK National Insurance numbers; US/UK category keywords; US month-first and month-name expiry dates | Implemented, tested |
 | Encrypted backup file (.dsbackup) with a separate backup password, saved via the system dialog (Drive, USB, any folder); restore on the same or a new phone | Implemented; format JVM-tested, vault round trip instrumented-tested; system dialogs **need a device run** |
 
-Not started: Phase 6 (billing), 7–8.
+**Phase 6 — DocSafe Premium (Google Play Billing):** implemented; real purchases **not yet
+tested** (needs the Play Console internal-testing setup in docs/BILLING.md).
+
+| Area | State |
+|---|---|
+| Subscription `docsafe_premium`, monthly + yearly base plans; prices, currency and free trial come from Google Play | Implemented; host-tested with a fake Play |
+| Premium screen: plans, Save N%, buy, pending payment, restore purchases, manage subscription; Settings row with status | Implemented, tested (English + Hindi 320x480) |
+| Offline signature check with the Play licence key (no server), acknowledge, re-check on unlock/resume | Implemented; verification JVM-tested; native bridge emulator-tested without a key |
+| Merge, Split, Compress, Annotate & Sign, OCR search, >3 reminders gated; tool continues after purchase | Implemented, tested |
+
+Builds without `-PdocsafePlayLicenseKey` (all CI builds) cannot sell Premium. Debug builds keep a
+developer switch. Not started: Phase 7–8.
 Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings.
 
 ## Repository layout

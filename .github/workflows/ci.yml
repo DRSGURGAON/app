@@ -61,6 +61,7 @@ jobs:
       - name: Generated code is up to date
         run: |
           dart run pigeon --input pigeons/security_api.dart
+          dart run pigeon --input pigeons/billing_api.dart
           dart run build_runner build --delete-conflicting-outputs
           flutter gen-l10n
           dart format lib

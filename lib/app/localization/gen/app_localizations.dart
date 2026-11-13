@@ -1679,7 +1679,7 @@ abstract class AppLocalizations {
   /// No description provided for @toolsPremiumNote.
   ///
   /// In en, this message translates to:
-  /// **'Merge, split and compress are open to everyone in this test version. Annotate & Sign needs Premium, and subscriptions arrive in a later update.'**
+  /// **'Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.'**
   String get toolsPremiumNote;
 
   /// No description provided for @toolsPrivacyNote.
@@ -2144,24 +2144,6 @@ abstract class AppLocalizations {
   /// **'Premium includes'**
   String get premiumIncludes;
 
-  /// No description provided for @premiumMonthly.
-  ///
-  /// In en, this message translates to:
-  /// **'₹49 / month'**
-  String get premiumMonthly;
-
-  /// No description provided for @premiumYearly.
-  ///
-  /// In en, this message translates to:
-  /// **'₹299 / year'**
-  String get premiumYearly;
-
-  /// No description provided for @premiumComingSoon.
-  ///
-  /// In en, this message translates to:
-  /// **'Subscriptions open in an upcoming update. No payment can be made in this version.'**
-  String get premiumComingSoon;
-
   /// No description provided for @premiumLockedBadge.
   ///
   /// In en, this message translates to:
@@ -2617,6 +2599,222 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 document in the backup could not be restored.} other{{count} documents in the backup could not be restored.}}'**
   String restoreMissing(int count);
+
+  /// No description provided for @premiumPdfTools.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge, split and compress PDFs'**
+  String get premiumPdfTools;
+
+  /// No description provided for @premiumPdfToolsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Combine files, pull out pages and shrink PDFs, all on this phone.'**
+  String get premiumPdfToolsDesc;
+
+  /// No description provided for @premiumOcrSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search inside documents'**
+  String get premiumOcrSearch;
+
+  /// No description provided for @premiumOcrSearchDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the recognised text so search finds words inside your documents.'**
+  String get premiumOcrSearchDesc;
+
+  /// No description provided for @premiumReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlimited reminders'**
+  String get premiumReminders;
+
+  /// No description provided for @premiumRemindersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'The free plan has {count} active reminders.'**
+  String premiumRemindersDesc(int count);
+
+  /// No description provided for @premiumChoosePlan.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a plan'**
+  String get premiumChoosePlan;
+
+  /// No description provided for @premiumMonthlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get premiumMonthlyLabel;
+
+  /// No description provided for @premiumYearlyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Yearly'**
+  String get premiumYearlyLabel;
+
+  /// No description provided for @premiumPerMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / month'**
+  String premiumPerMonth(String price);
+
+  /// No description provided for @premiumPerYear.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} / year'**
+  String premiumPerYear(String price);
+
+  /// No description provided for @premiumSave.
+  ///
+  /// In en, this message translates to:
+  /// **'Save {percent}%'**
+  String premiumSave(int percent);
+
+  /// No description provided for @premiumFreeTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}-day free trial'**
+  String premiumFreeTrial(int days);
+
+  /// No description provided for @premiumContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue'**
+  String get premiumContinue;
+
+  /// No description provided for @premiumStartTrial.
+  ///
+  /// In en, this message translates to:
+  /// **'Start free trial'**
+  String get premiumStartTrial;
+
+  /// No description provided for @premiumRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore purchases'**
+  String get premiumRestore;
+
+  /// No description provided for @premiumManage.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage subscription'**
+  String get premiumManage;
+
+  /// No description provided for @premiumLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'Billed through Google Play to your Google account. The subscription renews automatically until you cancel. Cancel anytime in Google Play, under Subscriptions.'**
+  String get premiumLegal;
+
+  /// No description provided for @premiumPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'DocSafe has no server and never sees your payment details. Your documents stay on this phone.'**
+  String get premiumPrivacy;
+
+  /// No description provided for @premiumActiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium is active'**
+  String get premiumActiveTitle;
+
+  /// No description provided for @premiumActiveBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for supporting DocSafe.'**
+  String get premiumActiveBody;
+
+  /// No description provided for @premiumEndsNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-renew is off. Premium stays on until the end of the period you paid for.'**
+  String get premiumEndsNote;
+
+  /// No description provided for @premiumPendingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment pending'**
+  String get premiumPendingTitle;
+
+  /// No description provided for @premiumPendingBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium unlocks as soon as Google Play confirms your payment.'**
+  String get premiumPendingBody;
+
+  /// No description provided for @premiumUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Play isn\'t available on this phone, so Premium can\'t be bought here.'**
+  String get premiumUnavailable;
+
+  /// No description provided for @premiumNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Purchases aren\'t enabled in this build of DocSafe.'**
+  String get premiumNotConfigured;
+
+  /// No description provided for @premiumNoPlans.
+  ///
+  /// In en, this message translates to:
+  /// **'Plans couldn\'t be loaded from Google Play. Check your connection and try again.'**
+  String get premiumNoPlans;
+
+  /// No description provided for @premiumTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get premiumTryAgain;
+
+  /// No description provided for @premiumWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to Premium!'**
+  String get premiumWelcome;
+
+  /// No description provided for @premiumPurchaseFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The purchase couldn\'t be completed. Please try again.'**
+  String get premiumPurchaseFailed;
+
+  /// No description provided for @premiumRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium restored.'**
+  String get premiumRestored;
+
+  /// No description provided for @premiumNothingToRestore.
+  ///
+  /// In en, this message translates to:
+  /// **'No active Premium subscription was found for this Google account.'**
+  String get premiumNothingToRestore;
+
+  /// No description provided for @settingsPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'DocSafe Premium'**
+  String get settingsPremium;
+
+  /// No description provided for @settingsPremiumActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get settingsPremiumActive;
+
+  /// No description provided for @settingsPremiumPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment pending'**
+  String get settingsPremiumPending;
+
+  /// No description provided for @settingsPremiumInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'See plans'**
+  String get settingsPremiumInactive;
 }
 
 class _AppLocalizationsDelegate

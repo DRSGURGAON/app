@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:docsafe/app/localization/gen/app_localizations_en.dart';
 import 'package:docsafe/app/localization/gen/app_localizations_hi.dart';
 import 'package:docsafe/core/security/security_service.dart';
+import 'package:docsafe/core/entitlement/entitlement.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -135,6 +136,7 @@ void main() {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
+    unlockPremium(app);
     final a = await importDoc(tester, fake, engine, 'First.pdf', pages: 1);
     final b = await importDoc(tester, fake, engine, 'Second.pdf', pages: 2);
     await goTab(tester, en.navTools);
@@ -188,6 +190,7 @@ void main() {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
+    unlockPremium(app);
     await importDoc(tester, fake, engine, 'Form.pdf', pages: 3);
     await tester.tap(find.text('Form'));
     await settle(tester);
@@ -209,6 +212,7 @@ void main() {
     final fake = await unlockedFake();
     final engine = FakePdfEngine();
     final app = await pumpApp(tester, fake, pdfEngine: engine);
+    unlockPremium(app);
     final big = await importDoc(tester, fake, engine, 'Big.pdf', size: 80000);
     final small = await importDoc(tester, fake, engine, 'Small.pdf', size: 50);
     fake.compressedSize[big] = 20000;
@@ -261,6 +265,7 @@ void main() {
       pdfEngine: engine,
       size: const Size(800, 1200),
     );
+    unlockPremium(app);
     await importDoc(
       tester,
       fake,
@@ -290,3 +295,7 @@ void main() {
     await app.dispose();
   });
 }
+
+/// Merge, split and compress are Premium: unlock via the debug switch.
+void unlockPremium(TestApp app) =>
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);

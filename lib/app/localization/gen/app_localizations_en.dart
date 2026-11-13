@@ -916,7 +916,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'Merge, split and compress are open to everyone in this test version. Annotate & Sign needs Premium, and subscriptions arrive in a later update.';
+      'Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.';
 
   @override
   String get toolsPrivacyNote =>
@@ -1185,16 +1185,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumIncludes => 'Premium includes';
-
-  @override
-  String get premiumMonthly => '₹49 / month';
-
-  @override
-  String get premiumYearly => '₹299 / year';
-
-  @override
-  String get premiumComingSoon =>
-      'Subscriptions open in an upcoming update. No payment can be made in this version.';
 
   @override
   String get premiumLockedBadge => 'Locked';
@@ -1490,4 +1480,133 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get premiumPdfTools => 'Merge, split and compress PDFs';
+
+  @override
+  String get premiumPdfToolsDesc =>
+      'Combine files, pull out pages and shrink PDFs, all on this phone.';
+
+  @override
+  String get premiumOcrSearch => 'Search inside documents';
+
+  @override
+  String get premiumOcrSearchDesc =>
+      'Keep the recognised text so search finds words inside your documents.';
+
+  @override
+  String get premiumReminders => 'Unlimited reminders';
+
+  @override
+  String premiumRemindersDesc(int count) {
+    return 'The free plan has $count active reminders.';
+  }
+
+  @override
+  String get premiumChoosePlan => 'Choose a plan';
+
+  @override
+  String get premiumMonthlyLabel => 'Monthly';
+
+  @override
+  String get premiumYearlyLabel => 'Yearly';
+
+  @override
+  String premiumPerMonth(String price) {
+    return '$price / month';
+  }
+
+  @override
+  String premiumPerYear(String price) {
+    return '$price / year';
+  }
+
+  @override
+  String premiumSave(int percent) {
+    return 'Save $percent%';
+  }
+
+  @override
+  String premiumFreeTrial(int days) {
+    return '$days-day free trial';
+  }
+
+  @override
+  String get premiumContinue => 'Continue';
+
+  @override
+  String get premiumStartTrial => 'Start free trial';
+
+  @override
+  String get premiumRestore => 'Restore purchases';
+
+  @override
+  String get premiumManage => 'Manage subscription';
+
+  @override
+  String get premiumLegal =>
+      'Billed through Google Play to your Google account. The subscription renews automatically until you cancel. Cancel anytime in Google Play, under Subscriptions.';
+
+  @override
+  String get premiumPrivacy =>
+      'DocSafe has no server and never sees your payment details. Your documents stay on this phone.';
+
+  @override
+  String get premiumActiveTitle => 'Premium is active';
+
+  @override
+  String get premiumActiveBody => 'Thank you for supporting DocSafe.';
+
+  @override
+  String get premiumEndsNote =>
+      'Auto-renew is off. Premium stays on until the end of the period you paid for.';
+
+  @override
+  String get premiumPendingTitle => 'Payment pending';
+
+  @override
+  String get premiumPendingBody =>
+      'Premium unlocks as soon as Google Play confirms your payment.';
+
+  @override
+  String get premiumUnavailable =>
+      'Google Play isn\'t available on this phone, so Premium can\'t be bought here.';
+
+  @override
+  String get premiumNotConfigured =>
+      'Purchases aren\'t enabled in this build of DocSafe.';
+
+  @override
+  String get premiumNoPlans =>
+      'Plans couldn\'t be loaded from Google Play. Check your connection and try again.';
+
+  @override
+  String get premiumTryAgain => 'Try again';
+
+  @override
+  String get premiumWelcome => 'Welcome to Premium!';
+
+  @override
+  String get premiumPurchaseFailed =>
+      'The purchase couldn\'t be completed. Please try again.';
+
+  @override
+  String get premiumRestored => 'Premium restored.';
+
+  @override
+  String get premiumNothingToRestore =>
+      'No active Premium subscription was found for this Google account.';
+
+  @override
+  String get settingsPremium => 'DocSafe Premium';
+
+  @override
+  String get settingsPremiumActive => 'Active';
+
+  @override
+  String get settingsPremiumPending => 'Payment pending';
+
+  @override
+  String get settingsPremiumInactive => 'See plans';
 }

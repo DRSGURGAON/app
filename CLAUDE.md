@@ -3,20 +3,22 @@
 Privacy-first Android document vault (Flutter + Kotlin). Follows the phone language (Hindi on Hindi phones, else English); first markets India, US, UK.
 Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what is verified.
 
-- Phases: 0–4 done (CI green); Annotate & Sign added (Premium, LOCKED in release builds until
-  Phase 6 billing; debug-only developer switch). Physical-device checks (docs/DEVICE_TESTING.md)
-  still pending. Merge/split/compress are labelled Premium but not gated until Phase 6.
+- Phases: 0–6 done in code (CI green); physical-device checks (docs/DEVICE_TESTING.md) still pending.
+  Phase 6: Google Play Billing, subscription `docsafe_premium` (monthly/yearly), offline signature
+  check with the Play licence key (build-time `-PdocsafePlayLicenseKey`, never committed); no server;
+  Premium gates Merge/Split/Compress, Annotate & Sign, OCR search, >3 reminders (docs/BILLING.md).
+  Real purchases untested until the owner sets up Play Console internal testing. Debug-only developer switch.
   Annotate rules: identity category refused, acknowledgement before save, always a new copy.
   Phase 5 (OCR + reminders) implemented: OCR text only stored after user action, masked; notifications
   generic; only reminder times leave the encrypted DB. Encrypted backup file (.dsbackup, backup
-  password, PBKDF2 600k) via SAF; no network permission. Do not start Phase 6 until the user approves.
+  password, PBKDF2 600k) via SAF; no network permission. Do not start Phase 7 until the user approves.
 - On-device tests drive the Hindi UI: their ProviderContainers override `hindiPhone`
   (integration_test/support/fixtures.dart) because the app follows the phone language.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge (documented exceptions, in-process memory
   only: `importPdfBytes` output, `flattenPages` overlay PNGs, `recognizeText` text, backup metadata JSON);
   hardcode user-facing strings (use ARB files); add network/analytics/ads SDKs; claim untested
   features work.
-- Regenerate after edits: `dart run pigeon --input pigeons/security_api.dart`,
+- Regenerate after edits: `dart run pigeon --input pigeons/security_api.dart` (and `pigeons/billing_api.dart`),
   `dart run build_runner build --delete-conflicting-outputs`, `flutter gen-l10n`, then `dart format lib`.
 - Checks: `dart format --set-exit-if-changed lib test integration_test pigeons`, `flutter analyze`,
   `flutter test`, `cd native/docsafe-crypto && ./gradlew test`.
