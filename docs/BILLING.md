@@ -71,6 +71,14 @@ build" and nothing can be bought. Debug builds keep the in-memory developer swit
 6. Install the internal-testing build from the Play Store on a phone signed in as a tester
    and run the checks in docs/DEVICE_TESTING.md §12.
 
+## Verified so far (CI run 35)
+
+- Kotlin billing code compiles with Play Billing Library 8.0.0; release APK permissions:
+  USE_BIOMETRIC, POST_NOTIFICATIONS, RECEIVE_BOOT_COMPLETED, USE_FINGERPRINT,
+  com.android.vending.BILLING, ACCESS_NETWORK_STATE — **no INTERNET**. arm64 release APK 48.7 MB.
+- Emulator (API 34, google_apis, no key): `BILLING availability=notConfigured plans=0 active=false`;
+  purchase refused as unavailable.
+
 ## Known limitations
 
 - Client-side verification only. A rooted device with a patched Play Store or app could
