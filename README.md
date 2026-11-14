@@ -96,7 +96,7 @@ developer switch.
 | Hindi/English: 454 messages in both languages; test fails on a missing, untranslated or hard-coded string | Tested |
 | Accessibility: 48 dp tap targets, labelled controls, text contrast on every main screen (EN + HI); TalkBack-friendly PIN pad and headings; layouts at 200 % font (language/auto-lock move under their labels, headings wrap) | Tested (Flutter accessibility guidelines); TalkBack walk-through on a phone pending |
 | Error states: every list shows a clear message with **Try again**; Reminders never shows "no reminders" when they could not be read | Tested |
-| Performance: indexed queries; 3000 documents list/search/sort/stats in < 60 ms on host; 2000-document scroll frame timings and release cold start measured on the emulator | Measured (see CI log `PERF` / `COLDSTART`) |
+| Performance: indexed queries; 3000 documents list/search/sort/stats in < 60 ms on host. Emulator (API 34, x86_64, CI run 39) with 2000 documents: list 75 ms, sort by title 36 ms, search 8 ms; vault scroll 579 frames, build avg 5.3 ms (p90 11.9), raster avg 10.2 ms (p90 16.8); release cold start 1.27–1.62 s (5 runs, first launch) | Measured on emulator; real low-end phone pending |
 
 **Phase 8 — Release preparation:** everything that can be prepared in the repository is ready;
 the owner does the Play Console steps (docs/RELEASE.md).
