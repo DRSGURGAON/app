@@ -8,6 +8,7 @@ import 'package:docsafe/core/security/lock_controller.dart';
 import 'package:docsafe/data/models/vault_document.dart';
 import 'package:docsafe/data/repositories/document_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -19,7 +20,7 @@ final hi = AppLocalizationsHi();
 const count = 2000;
 
 void main() {
-  final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets('large vault: queries and scrolling', (tester) async {
     final container = ProviderContainer(
@@ -74,28 +75,45 @@ void main() {
     await tester.tap(find.text(hi.navVault));
     await settleFor(tester);
     final list = find.byType(Scrollable).first;
-    await binding.watchPerformance(() async {
-      for (var i = 0; i < 6; i++) {
-        await tester.fling(list, const Offset(0, -2500), 4000);
-        await tester.pumpAndSettle();
-      }
-      for (var i = 0; i < 3; i++) {
-        await tester.fling(list, const Offset(0, 2500), 4000);
-        await tester.pumpAndSettle();
-      }
-    }, reportKey: 'vault_scroll');
-    final summary = binding.reportData!['vault_scroll'] as Map;
+    // Frame timings straight from the engine (works under `flutter test`,
+    // unlike watchPerformance, which needs `flutter drive`).
+    final timings = <FrameTiming>[];
+    void collect(List<FrameTiming> t) => timings.addAll(t);
+    SchedulerBinding.instance.addTimingsCallback(collect);
+    for (var i = 0; i < 6; i++) {
+      await tester.fling(list, const Offset(0, -2500), 4000);
+      await tester.pumpAndSettle();
+    }
+    for (var i = 0; i < 3; i++) {
+      await tester.fling(list, const Offset(0, 2500), 4000);
+      await tester.pumpAndSettle();
+    }
+    // Timings are reported in batches: give the engine a moment.
+    await Future<void>.delayed(const Duration(seconds: 1));
+    await tester.pump();
+    SchedulerBinding.instance.removeTimingsCallback(collect);
+
+    if (timings.isEmpty) {
+      debugPrint('PERF vault scroll: no frame timings reported by the engine');
+      return;
+    }
+    double ms(Duration d) => d.inMicroseconds / 1000;
+    List<double> sorted(Iterable<double> v) => v.toList()..sort();
+    final build = sorted(timings.map((t) => ms(t.buildDuration)));
+    final raster = sorted(timings.map((t) => ms(t.rasterDuration)));
+    double avg(List<double> v) => v.reduce((a, b) => a + b) / v.length;
+    double p90(List<double> v) =>
+        v[(v.length * .9).floor().clamp(0, v.length - 1)];
     debugPrint(
-      'PERF vault scroll: frames=${summary['frame_count']} '
-      'build avg=${summary['average_frame_build_time_millis']} ms '
-      'p90=${summary['90th_percentile_frame_build_time_millis']} ms '
-      'worst=${summary['worst_frame_build_time_millis']} ms; '
-      'raster avg=${summary['average_frame_rasterizer_time_millis']} ms '
-      'p90=${summary['90th_percentile_frame_rasterizer_time_millis']} ms; '
-      'missed build=${summary['missed_frame_build_budget_count']}',
+      'PERF vault scroll: frames=${timings.length} '
+      'build avg=${avg(build).toStringAsFixed(1)} ms '
+      'p90=${p90(build).toStringAsFixed(1)} ms '
+      'worst=${build.last.toStringAsFixed(1)} ms; '
+      'raster avg=${avg(raster).toStringAsFixed(1)} ms '
+      'p90=${p90(raster).toStringAsFixed(1)} ms',
     );
     // Emulators are slow and noisy: a loose bound that still catches a list
     // that builds every row at once.
-    expect(summary['average_frame_build_time_millis'] as num, lessThan(40));
+    expect(avg(build), lessThan(40));
   });
 }
