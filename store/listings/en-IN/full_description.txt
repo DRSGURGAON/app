@@ -1,0 +1,35 @@
+DocSafe keeps your important documents — ID cards, licences, insurance policies, bills, certificates and marksheets — encrypted on your own phone, ready when you need them.
+
+PRIVATE BY DESIGN
+• Everything stays on your phone. No account, no sign-in, no DocSafe servers.
+• DocSafe has no internet permission, so it cannot upload your files.
+• No ads, no analytics, no tracking.
+
+STRONG PROTECTION
+• Every document is encrypted with its own key (AES-256-GCM), protected by the Android Keystore.
+• Names, tags and notes are kept in an encrypted database.
+• PIN lock with optional fingerprint or face unlock, and auto-lock.
+• Screenshots and the recent-apps preview are blocked inside the app.
+
+ORGANISED AND QUICK TO FIND
+• Categories, folders, tags, favourites and fast search.
+• Issue and expiry dates with reminders before a document expires. Reminder notifications never show the document name.
+• Scan paper documents into clean PDFs with the camera.
+• Read text from a document on the phone (OCR, Hindi and English) to suggest the category and expiry date.
+
+PDF TOOLS, ON THE PHONE
+• Free: edit pages (rotate, reorder, remove) and turn images into a PDF.
+• Premium: merge, split and compress PDFs; Annotate & Sign (add text, your signature, highlights or cover parts of a page). Results are always saved as a new copy.
+
+YOUR BACKUP, YOUR CHOICE
+• Create an encrypted backup file protected by a password only you know, and save it wherever you like — Google Drive, a USB drive or a folder. Restore it on the same or a new phone.
+
+HINDI AND ENGLISH
+• DocSafe follows your phone's language and can be switched anytime.
+
+DOCSAFE PREMIUM
+Monthly or yearly subscription through Google Play: merge, split and compress PDFs, Annotate & Sign, search inside documents, and unlimited reminders. Prices are shown in the app before you buy. Cancel anytime in Google Play.
+
+PLEASE NOTE
+• DocSafe is a private storage app. It is not DigiLocker, is not affiliated with any government, and does not verify documents.
+• Your keys never leave the phone. If you lose the phone, reset it or forget your PIN, documents stored only in DocSafe cannot be recovered — keep an encrypted backup.

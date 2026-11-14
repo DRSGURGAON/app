@@ -23,6 +23,13 @@ import '../../test/helpers/pump_app.dart';
 
 final outDir = Platform.environment['SHOTS_DIR'] ?? 'build/shots';
 
+/// SHOTS_SMALL=1: small phone; SHOTS_STORE=1: Google Play size (1080x1920).
+Size shotSize() => Platform.environment['SHOTS_STORE'] == '1'
+    ? const Size(1080, 1920)
+    : Platform.environment['SHOTS_SMALL'] == '1'
+    ? const Size(800, 1200)
+    : const Size(1080, 2400);
+
 Future<void> loadFont(String family, List<String> paths) async {
   final loader = FontLoader(family);
   for (final p in paths) {
@@ -149,7 +156,6 @@ void main() {
   testWidgets('screens', (tester) async {
     await loadFonts();
     final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
-    final small = Platform.environment['SHOTS_SMALL'] == '1';
     final t = lang == 'hi' ? hi : en;
     final fake = await unlockedFake(lang: lang);
     final engine = FakePdfEngine();
@@ -157,7 +163,7 @@ void main() {
       tester,
       fake,
       pdfEngine: engine,
-      size: small ? const Size(800, 1200) : const Size(1080, 2400),
+      size: shotSize(),
     );
     app.container.read(premiumProvider.notifier).setDebugUnlocked(false);
     await seed(
@@ -202,14 +208,9 @@ void main() {
 
   testWidgets('first run and lock', (tester) async {
     await loadFonts();
-    final small = Platform.environment['SHOTS_SMALL'] == '1';
     final fake = FakeSecurityService()
       ..language = Platform.environment['SHOTS_LANG'] ?? 'en';
-    final app = await pumpApp(
-      tester,
-      fake,
-      size: small ? const Size(800, 1200) : const Size(1080, 2400),
-    );
+    final app = await pumpApp(tester, fake, size: shotSize());
     await shot(tester, '10-onboarding');
     await app.dispose();
 
@@ -217,7 +218,7 @@ void main() {
       lang: Platform.environment['SHOTS_LANG'] ?? 'en',
     );
     await locked.lock();
-    final app2 = await pumpApp(tester, locked);
+    final app2 = await pumpApp(tester, locked, size: shotSize());
     await shot(tester, '11-lock');
     await app2.dispose();
   });
@@ -225,7 +226,6 @@ void main() {
   testWidgets('premium', (tester) async {
     await loadFonts();
     final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
-    final small = Platform.environment['SHOTS_SMALL'] == '1';
     final t = lang == 'hi' ? hi : en;
     final billing = FakeBillingService(
       offers: FakeBillingService.defaultPlans(yearlyTrial: 'P7D'),
@@ -234,7 +234,7 @@ void main() {
       tester,
       await unlockedFake(lang: lang),
       billing: billing,
-      size: small ? const Size(800, 1200) : const Size(1080, 2400),
+      size: shotSize(),
     );
     await goTab(tester, t.navSettings);
     await tester.tap(find.byKey(const Key('settings-premium')));

@@ -1,0 +1,5 @@
+First release of DocSafe:
+• Encrypted document vault with PIN and fingerprint lock
+• Scanner, PDF tools, OCR in Hindi and English
+• Expiry reminders, encrypted backup and restore
+• DocSafe Premium through Google Play

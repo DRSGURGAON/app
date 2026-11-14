@@ -1612,4 +1612,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get actionTryAgain => 'Try again';
+
+  @override
+  String get aboutSection => 'About';
+
+  @override
+  String get privacyPolicy => 'Privacy policy';
+
+  @override
+  String get openSourceLicences => 'Open-source licences';
+
+  @override
+  String aboutVersion(String version) {
+    return 'Version $version';
+  }
 }

@@ -98,7 +98,20 @@ developer switch.
 | Error states: every list shows a clear message with **Try again**; Reminders never shows "no reminders" when they could not be read | Tested |
 | Performance: indexed queries; 3000 documents list/search/sort/stats in < 60 ms on host; 2000-document scroll frame timings and release cold start measured on the emulator | Measured (see CI log `PERF` / `COLDSTART`) |
 
-Not started: Phase 8.
+**Phase 8 — Release preparation:** everything that can be prepared in the repository is ready;
+the owner does the Play Console steps (docs/RELEASE.md).
+
+| Item | Where | State |
+|---|---|---|
+| Release build signed with the owner's upload key (`android/key.properties`, never committed; `-PdocsafeRequireUploadKey=true` refuses a debug-signed bundle); version 1.0.0 | android/app/build.gradle.kts, docs/RELEASE.md | Ready; not built with a real key (owner's key) |
+| App icon (adaptive + monochrome), splash | Phase D3 | Done |
+| Play Store screenshots (8 per language: en-IN, en-GB, en-US, hi-IN), feature graphic, 512 icon | store/ (regenerate: tool/store/compose_store_assets.py) | Done |
+| Short and full descriptions, release notes (4 locales; length and claim checks in tests) | store/listings, store/release_notes | Done |
+| Privacy policy (English + Hindi, also inside the app: Settings → Privacy & security → Privacy policy); open-source licences page | assets/legal, docs/PRIVACY_POLICY.md | Done; owner must host it and enter the URL |
+| Data safety answers, permissions, content rating, target audience | docs/PLAY_DATA_SAFETY.md, docs/RELEASE.md | Done |
+| Release testing checklist | docs/RELEASE_CHECKLIST.md | Done; physical-device runs pending |
+
+Nothing has been published.
 Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings.
 
 ## Repository layout

@@ -1613,4 +1613,18 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get actionTryAgain => 'फिर कोशिश करें';
+
+  @override
+  String get aboutSection => 'जानकारी';
+
+  @override
+  String get privacyPolicy => 'गोपनीयता नीति';
+
+  @override
+  String get openSourceLicences => 'ओपन-सोर्स लाइसेंस';
+
+  @override
+  String aboutVersion(String version) {
+    return 'संस्करण $version';
+  }
 }

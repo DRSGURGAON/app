@@ -1,7 +1,7 @@
 name: docsafe
 description: "DocSafe – privacy-first encrypted document vault for Android."
 publish_to: 'none'
-version: 0.1.0+1
+version: 1.0.0+1
 
 environment:
   sdk: ^3.13.7
@@ -46,6 +46,7 @@ flutter:
   generate: true
   assets:
     - assets/fonts/OFL.txt
+    - assets/legal/
   # Brand typeface (Latin) with Noto Sans Devanagari for Hindi; both SIL OFL 1.1,
   # bundled so the app never downloads fonts.
   fonts:

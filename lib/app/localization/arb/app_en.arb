@@ -826,5 +826,16 @@
       }
     }
   },
-  "actionTryAgain": "Try again"
+  "actionTryAgain": "Try again",
+  "aboutSection": "About",
+  "privacyPolicy": "Privacy policy",
+  "openSourceLicences": "Open-source licences",
+  "aboutVersion": "Version {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }

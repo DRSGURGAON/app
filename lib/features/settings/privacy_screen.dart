@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/app_info.dart';
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/widgets/states.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_service.dart';
+import 'privacy_policy_screen.dart';
 
 /// Plain-language explanation of what DocSafe protects and what it does not.
 class PrivacyScreen extends ConsumerWidget {
@@ -76,6 +79,35 @@ class PrivacyScreen extends ConsumerWidget {
             Icons.info_outline,
             l.onboardingNotDigiLocker,
             color: theme.colorScheme.onSurfaceVariant,
+          ),
+          SectionHeader(title: l.aboutSection),
+          ListTile(
+            key: const Key('privacy-policy'),
+            leading: const Icon(Icons.policy_outlined),
+            title: Text(l.privacyPolicy),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                builder: (_) => const PrivacyPolicyScreen(),
+              ),
+            ),
+          ),
+          ListTile(
+            key: const Key('licences'),
+            leading: const Icon(Icons.article_outlined),
+            title: Text(l.openSourceLicences),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => showLicensePage(
+              context: context,
+              applicationName: l.appName,
+              applicationVersion: appVersion,
+            ),
+          ),
+          ListTile(
+            key: const Key('app-version'),
+            leading: const Icon(Icons.verified_outlined),
+            title: Text(l.appName),
+            subtitle: Text(l.aboutVersion(appVersion)),
           ),
         ],
       ),

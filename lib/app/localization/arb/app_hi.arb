@@ -826,5 +826,16 @@
       }
     }
   },
-  "actionTryAgain": "फिर कोशिश करें"
+  "actionTryAgain": "फिर कोशिश करें",
+  "aboutSection": "जानकारी",
+  "privacyPolicy": "गोपनीयता नीति",
+  "openSourceLicences": "ओपन-सोर्स लाइसेंस",
+  "aboutVersion": "संस्करण {version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  }
 }
