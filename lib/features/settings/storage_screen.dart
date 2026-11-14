@@ -26,29 +26,32 @@ class StorageScreen extends ConsumerWidget {
       appBar: AppBar(title: Text(l.settingsStorage)),
       body: stats.when(
         loading: () => const LoadingState(),
-        error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+        error: (e, _) => ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref.invalidate(vaultStatsProvider),
+        ),
         data: (s) => ListView(
           children: [
             ListTile(
               leading: const Icon(Icons.description_outlined),
               title: Text(l.storageDocuments),
-              trailing: Text(l.documentCount(s.documentCount)),
+              subtitle: Text(l.documentCount(s.documentCount)),
             ),
             ListTile(
               leading: const Icon(Icons.pie_chart_outline),
               title: Text(l.storageUsed),
-              trailing: Text(formatBytes(s.totalBytes, locale)),
+              subtitle: Text(formatBytes(s.totalBytes, locale)),
             ),
             ListTile(
               leading: const Icon(Icons.restore_from_trash_outlined),
               title: Text(l.storageInTrash),
-              trailing: Text(l.documentCount(s.trashCount)),
+              subtitle: Text(l.documentCount(s.trashCount)),
             ),
             if (device != null)
               ListTile(
                 leading: const Icon(Icons.sd_storage_outlined),
                 title: Text(l.storageFree),
-                trailing: Text(formatBytes(device.availableBytes, locale)),
+                subtitle: Text(formatBytes(device.availableBytes, locale)),
               ),
             Padding(
               padding: const EdgeInsets.all(16),

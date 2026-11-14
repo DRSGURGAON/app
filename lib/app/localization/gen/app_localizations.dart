@@ -2815,6 +2815,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'See plans'**
   String get settingsPremiumInactive;
+
+  /// No description provided for @actionTryAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get actionTryAgain;
 }
 
 class _AppLocalizationsDelegate

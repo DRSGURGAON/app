@@ -825,5 +825,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "actionTryAgain": "फिर कोशिश करें"
 }

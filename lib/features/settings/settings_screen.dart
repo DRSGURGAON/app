@@ -31,13 +31,37 @@ class SettingsScreen extends ConsumerWidget {
         status?.biometricAvailability == BiometricAvailability.available;
     final scheme = Theme.of(context).colorScheme;
     final premium = ref.watch(premiumProvider);
-
+    final largeText = MediaQuery.textScalerOf(context).scale(10) > 13;
     String autoLockLabel(int s) => switch (s) {
       0 => l.autoLockImmediately,
       30 => l.autoLock30s,
       60 => l.autoLock1m,
       _ => l.autoLock5m,
     };
+
+    final autoLockPicker = DropdownButton<int>(
+      // Under the label (large fonts) it may use the full width.
+      isExpanded: largeText,
+      value: autoLock.inSeconds,
+      underline: const SizedBox.shrink(),
+      items: [
+        for (final s in autoLockChoices)
+          DropdownMenuItem(value: s, child: Text(autoLockLabel(s))),
+      ],
+      onChanged: (s) {
+        if (s != null) ref.read(autoLockTimeoutProvider.notifier).set(s);
+      },
+    );
+    final languageSwitch = SegmentedButton<String>(
+      showSelectedIcon: false,
+      segments: [
+        ButtonSegment(value: 'hi', label: Text(l.languageHindi)),
+        ButtonSegment(value: 'en', label: Text(l.languageEnglish)),
+      ],
+      selected: {locale.languageCode},
+      onSelectionChanged: (s) =>
+          ref.read(localeControllerProvider.notifier).setLanguage(s.first),
+    );
 
     return Scaffold(
       appBar: AppBar(title: Text(l.navSettings)),
@@ -59,20 +83,20 @@ class SettingsScreen extends ConsumerWidget {
               MaterialPageRoute<void>(builder: (_) => const PremiumScreen()),
             ),
           ),
+          // With large fonts the language switch moves under the label.
           ListTile(
             leading: const Icon(Icons.translate),
             title: Text(l.languageLabel),
-            trailing: SegmentedButton<String>(
-              showSelectedIcon: false,
-              segments: [
-                ButtonSegment(value: 'hi', label: Text(l.languageHindi)),
-                ButtonSegment(value: 'en', label: Text(l.languageEnglish)),
-              ],
-              selected: {locale.languageCode},
-              onSelectionChanged: (s) => ref
-                  .read(localeControllerProvider.notifier)
-                  .setLanguage(s.first),
-            ),
+            subtitle: largeText
+                ? Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: languageSwitch,
+                    ),
+                  )
+                : null,
+            trailing: largeText ? null : languageSwitch,
           ),
           _Header(l.settingsSecuritySection),
           SwitchListTile(
@@ -117,19 +141,8 @@ class SettingsScreen extends ConsumerWidget {
           ListTile(
             leading: const Icon(Icons.timer_outlined),
             title: Text(l.settingsAutoLock),
-            trailing: DropdownButton<int>(
-              value: autoLock.inSeconds,
-              underline: const SizedBox.shrink(),
-              items: [
-                for (final s in autoLockChoices)
-                  DropdownMenuItem(value: s, child: Text(autoLockLabel(s))),
-              ],
-              onChanged: (s) {
-                if (s != null) {
-                  ref.read(autoLockTimeoutProvider.notifier).set(s);
-                }
-              },
-            ),
+            subtitle: largeText ? autoLockPicker : null,
+            trailing: largeText ? null : autoLockPicker,
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),

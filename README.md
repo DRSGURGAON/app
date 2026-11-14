@@ -86,7 +86,19 @@ tested** (needs the Play Console internal-testing setup in docs/BILLING.md).
 | Merge, Split, Compress, Annotate & Sign, OCR search, >3 reminders gated; tool continues after purchase | Implemented, tested |
 
 Builds without `-PdocsafePlayLicenseKey` (all CI builds) cannot sell Premium. Debug builds keep a
-developer switch. Not started: Phase 7–8.
+developer switch.
+
+**Phase 7 — UI polish and QA:** done on emulator/host; physical-device checks pending
+(docs/DEVICE_TESTING.md §13).
+
+| Area | State |
+|---|---|
+| Hindi/English: 454 messages in both languages; test fails on a missing, untranslated or hard-coded string | Tested |
+| Accessibility: 48 dp tap targets, labelled controls, text contrast on every main screen (EN + HI); TalkBack-friendly PIN pad and headings; layouts at 200 % font (language/auto-lock move under their labels, headings wrap) | Tested (Flutter accessibility guidelines); TalkBack walk-through on a phone pending |
+| Error states: every list shows a clear message with **Try again**; Reminders never shows "no reminders" when they could not be read | Tested |
+| Performance: indexed queries; 3000 documents list/search/sort/stats in < 60 ms on host; 2000-document scroll frame timings and release cold start measured on the emulator | Measured (see CI log `PERF` / `COLDSTART`) |
+
+Not started: Phase 8.
 Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings.
 
 ## Repository layout

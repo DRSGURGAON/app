@@ -115,7 +115,10 @@ class HomeScreen extends ConsumerWidget {
           SliverToBoxAdapter(
             child: categories.when(
               loading: () => const SizedBox(height: 48),
-              error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+              error: (e, _) => ErrorState(
+                message: errorMessageFor(l, e),
+                onRetry: () => ref.invalidate(categoriesProvider),
+              ),
               data: (cats) => Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
                 child: Wrap(
@@ -238,19 +241,25 @@ Future<void> createFolder(BuildContext context, WidgetRef ref) async {
 
 IconData categoryIcon(String? key) => CategoryStyle.of(key).icon;
 
-class _PreviewList extends StatelessWidget {
+class _PreviewList extends ConsumerWidget {
   const _PreviewList({required this.docs, required this.emptyText});
 
   final AsyncValue<List<VaultDocument>> docs;
   final String emptyText;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     return docs.when(
       loading: () => const SliverToBoxAdapter(child: SizedBox(height: 56)),
-      error: (e, _) =>
-          SliverToBoxAdapter(child: ErrorState(message: errorMessageFor(l, e))),
+      error: (e, _) => SliverToBoxAdapter(
+        child: ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref
+            ..invalidate(documentsProvider)
+            ..invalidate(expiringDocumentsProvider),
+        ),
+      ),
       data: (items) => items.isEmpty
           ? SliverToBoxAdapter(
               child: Padding(

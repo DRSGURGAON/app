@@ -56,7 +56,10 @@ class TrashScreen extends ConsumerWidget {
           trash.when(
             loading: () => const SliverFillRemaining(child: LoadingState()),
             error: (e, _) => SliverFillRemaining(
-              child: ErrorState(message: errorMessageFor(l, e)),
+              child: ErrorState(
+                message: errorMessageFor(l, e),
+                onRetry: () => ref.invalidate(trashProvider),
+              ),
             ),
             data: (items) => items.isEmpty
                 ? SliverFillRemaining(

@@ -33,6 +33,9 @@ flutter test integration_test/ocr_reminders_test.dart -d "$DEVICE"
 echo "== 3e. Google Play Billing bridge (no licence key, app not on Play)"
 flutter test integration_test/billing_test.dart -d "$DEVICE"
 
+echo "== 3f. Large vault performance (2000 documents)"
+flutter test integration_test/perf_test.dart -d "$DEVICE"
+
 echo "== 4. True process restart"
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
 flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall
@@ -48,6 +51,19 @@ adb_ reboot
 wait_boot
 if adb_ shell pidof "$APP" >/dev/null 2>&1; then echo "note: app process started after boot"; fi
 flutter test integration_test/restart/stage_b_test.dart -d "$DEVICE" --no-uninstall
+
+echo "== 6. Cold start of the release build (am start -W, 5 runs; first launch shows onboarding)"
+adb_ uninstall "$APP" >/dev/null 2>&1 || true
+ABI=$(adb_ shell getprop ro.product.cpu.abi | tr -d '\r')
+case "$ABI" in x86_64) PLATFORM=android-x64 ;; arm64-v8a) PLATFORM=android-arm64 ;; *) PLATFORM=android-arm ;; esac
+flutter build apk --release --target-platform "$PLATFORM" >/dev/null
+adb_ install -r build/app/outputs/flutter-apk/app-release.apk >/dev/null
+for i in 1 2 3 4 5; do
+  adb_ shell am force-stop "$APP"
+  sleep 2
+  adb_ shell am start -W -n "$APP/.MainActivity" | grep -E "TotalTime" | sed "s/^/COLDSTART run $i: /"
+done
+adb_ shell am force-stop "$APP"
 
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
 echo "== all device tests passed"

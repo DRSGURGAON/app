@@ -209,6 +209,19 @@ licence key**, installed from the Play Store, on a phone signed in with a licenc
 | P12 | 4th active reminder, OCR "Save for search", Annotate & Sign with Premium | Allowed |
 | P13 | `adb logcat \| grep DocSafe` during P3–P10 | Only "billing: … (code)" lines; no tokens or order ids |
 
+## 13. Accessibility, large text and performance (Phase 7)
+
+| # | Step | Expected |
+|---|---|---|
+| Q1 | Settings → Accessibility → TalkBack on; walk Home, Vault, a document, PDF Tools, Reminders, Settings, Premium, lock screen | Every button and icon is announced with a name (Hindi on a Hindi phone); PIN keys read as digits; headings announced as headings |
+| Q2 | Font size **largest** + Display size **largest**, in Hindi and English | No cut-off or overlapping text; Settings language and auto-lock move under their labels |
+| Q3 | Low-end phone (2–3 GB RAM, Android 8–10) with 300+ documents | Vault scrolls smoothly; search answers while typing; note cold-start time |
+| Q4 | Airplane mode, then open every tab | Everything works (DocSafe is offline); Premium: note whether Google Play still answers from its own cache (DocSafe caches nothing) |
+| Q5 | Fill the phone's storage, then import a large PDF | "Not enough storage" message, nothing half-saved |
+| Q6 | Rotate to landscape on each main screen (phone and tablet) | Layout still usable, no overflow |
+| Q7 | Dark mode on / off | Same DocSafe look, readable |
+| Q8 | Switch language Hindi ↔ English on every screen | No English left on Hindi screens (except names, PDF, Premium price from Google) |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -221,6 +234,7 @@ licence key**, installed from the Play Store, on a phone signed in with a licenc
 | Preview (§7) | | | |
 | PDF tools (§8) | | | |
 | Premium / billing (§12) | | | |
+| Accessibility / performance (§13) | | | |
 | Annotate & Sign (§9) | | | |
 | OCR & reminders (§10) | | | |
 | Backup & language (§11) | | | |

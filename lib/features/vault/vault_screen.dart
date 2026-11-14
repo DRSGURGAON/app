@@ -75,7 +75,10 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
           SliverToBoxAdapter(
             child: folders.when(
               loading: () => const SizedBox(height: 56),
-              error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+              error: (e, _) => ErrorState(
+                message: errorMessageFor(l, e),
+                onRetry: () => ref.invalidate(foldersProvider),
+              ),
               data: (list) => list.isEmpty
                   ? Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 4),

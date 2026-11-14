@@ -1610,4 +1610,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get settingsPremiumInactive => 'प्लान देखें';
+
+  @override
+  String get actionTryAgain => 'फिर कोशिश करें';
 }

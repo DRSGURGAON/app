@@ -6,6 +6,7 @@ import '../../app/localization/display_names.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../app/router/app_router.dart';
 import '../../app/widgets/states.dart';
+import '../vault/widgets/document_list.dart' show errorMessageFor;
 import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../data/repositories/reminder_repository.dart';
@@ -51,9 +52,27 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     final l = AppLocalizations.of(context);
     final locale = Localizations.localeOf(context).toLanguageTag();
     final theme = Theme.of(context);
-    final reminders = ref.watch(remindersProvider).value ?? const [];
-    final upcoming = ref.watch(upcomingExpiryProvider).value ?? const [];
-    final expired = ref.watch(expiredDocumentsProvider).value ?? const [];
+    final remindersAsync = ref.watch(remindersProvider);
+    final upcomingAsync = ref.watch(upcomingExpiryProvider);
+    final expiredAsync = ref.watch(expiredDocumentsProvider);
+    final loadError =
+        remindersAsync.error ?? upcomingAsync.error ?? expiredAsync.error;
+    if (loadError != null) {
+      // Never show "no reminders" when they could not be read.
+      return Scaffold(
+        appBar: AppBar(title: Text(l.remindersTitle)),
+        body: ErrorState(
+          message: errorMessageFor(l, loadError),
+          onRetry: () => ref
+            ..invalidate(remindersProvider)
+            ..invalidate(upcomingExpiryProvider)
+            ..invalidate(expiredDocumentsProvider),
+        ),
+      );
+    }
+    final reminders = remindersAsync.value ?? const [];
+    final upcoming = upcomingAsync.value ?? const [];
+    final expired = expiredAsync.value ?? const [];
     final notificationsOn =
         ref.watch(notificationsEnabledProvider).value ?? true;
     final premium = ref.watch(premiumUnlockedProvider);

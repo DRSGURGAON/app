@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../localization/gen/app_localizations.dart';
+
 /// Shared empty / error / loading states so every screen looks consistent.
 class EmptyState extends StatelessWidget {
   const EmptyState({
@@ -73,20 +75,37 @@ class EmptyState extends StatelessWidget {
 }
 
 class ErrorState extends StatelessWidget {
-  const ErrorState({super.key, required this.message});
+  const ErrorState({super.key, required this.message, this.onRetry});
   final String message;
+
+  /// Shows a "Try again" button when set.
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) => Center(
     child: Padding(
       padding: const EdgeInsets.all(32),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline, color: Theme.of(context).colorScheme.error),
-          const SizedBox(height: 12),
-          Text(message, textAlign: TextAlign.center),
-        ],
+      child: Semantics(
+        liveRegion: true,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              color: Theme.of(context).colorScheme.error,
+            ),
+            const SizedBox(height: 12),
+            Text(message, textAlign: TextAlign.center),
+            if (onRetry != null) ...[
+              const SizedBox(height: 8),
+              TextButton.icon(
+                onPressed: onRetry,
+                icon: const Icon(Icons.refresh),
+                label: Text(AppLocalizations.of(context).actionTryAgain),
+              ),
+            ],
+          ],
+        ),
       ),
     ),
   );
@@ -110,21 +129,24 @@ class SectionHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.fromLTRB(16, 20, 8, 8),
-    child: Row(
+    // Wrap: with large fonts the trailing action moves under the title
+    // instead of overflowing.
+    child: Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      runSpacing: 4,
       children: [
-        Expanded(
-          child: Semantics(
-            header: true,
-            // Spaced capitals in a muted tone, like a label above a group.
-            child: Text(
-              title.toUpperCase(),
-              semanticsLabel: title,
-              style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                // Tracking breaks Devanagari conjuncts: only for Latin script.
-                letterSpacing: _devanagari.hasMatch(title) ? 0 : 1.8,
-                fontWeight: FontWeight.w700,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
+        Semantics(
+          header: true,
+          // Spaced capitals in a muted tone, like a label above a group.
+          child: Text(
+            title.toUpperCase(),
+            semanticsLabel: title,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              // Tracking breaks Devanagari conjuncts: only for Latin script.
+              letterSpacing: _devanagari.hasMatch(title) ? 0 : 1.8,
+              fontWeight: FontWeight.w700,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),
         ),

@@ -35,7 +35,10 @@ class DocumentDetailsScreen extends ConsumerWidget {
       loading: () => Scaffold(appBar: AppBar(), body: const LoadingState()),
       error: (e, _) => Scaffold(
         appBar: AppBar(),
-        body: ErrorState(message: errorMessageFor(l, e)),
+        body: ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref.invalidate(documentDetailsProvider(documentId)),
+        ),
       ),
       data: (d) => d == null
           ? Scaffold(

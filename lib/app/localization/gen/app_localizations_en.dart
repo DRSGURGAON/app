@@ -1609,4 +1609,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settingsPremiumInactive => 'See plans';
+
+  @override
+  String get actionTryAgain => 'Try again';
 }

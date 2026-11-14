@@ -316,21 +316,25 @@ class _FeatureCarouselState extends State<_FeatureCarousel> {
                 button: true,
                 selected: i == _page,
                 label: widget.items[i].$2,
+                // 48x48 dp touch target around the small visual dot.
                 child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
                   onTap: () => _go(i),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 3,
-                      vertical: 8,
-                    ),
-                    width: i == _page ? 22 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(
-                        alpha: i == _page ? .9 : .3,
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Center(
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        width: i == _page ? 22 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(
+                            alpha: i == _page ? .9 : .3,
+                          ),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
                       ),
-                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),

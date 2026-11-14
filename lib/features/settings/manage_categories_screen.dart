@@ -35,7 +35,10 @@ class ManageCategoriesScreen extends ConsumerWidget {
       ),
       body: cats.when(
         loading: () => const LoadingState(),
-        error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+        error: (e, _) => ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref.invalidate(categoriesProvider),
+        ),
         data: (list) => ListView(
           padding: const EdgeInsets.only(bottom: 96),
           children: [

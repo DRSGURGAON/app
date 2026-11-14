@@ -60,7 +60,10 @@ class _DocumentPickerScreenState extends ConsumerState<DocumentPickerScreen> {
       appBar: AppBar(title: Text(widget.title)),
       body: docs.when(
         loading: () => const LoadingState(),
-        error: (e, _) => ErrorState(message: errorMessageFor(l, e)),
+        error: (e, _) => ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref.invalidate(documentsProvider),
+        ),
         data: (all) {
           final items = all.where(_matches).toList();
           if (items.isEmpty) {

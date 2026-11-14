@@ -11,7 +11,7 @@ Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what 
   Annotate rules: identity category refused, acknowledgement before save, always a new copy.
   Phase 5 (OCR + reminders) implemented: OCR text only stored after user action, masked; notifications
   generic; only reminder times leave the encrypted DB. Encrypted backup file (.dsbackup, backup
-  password, PBKDF2 600k) via SAF; no network permission. Do not start Phase 7 until the user approves.
+  password, PBKDF2 600k) via SAF; no network permission. Phase 7 (QA) done: a11y/l10n/error-state/perf tests in test/a11y, test/l10n, test/perf. Do not start Phase 8 until the user approves.
 - On-device tests drive the Hindi UI: their ProviderContainers override `hindiPhone`
   (integration_test/support/fixtures.dart) because the app follows the phone language.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge (documented exceptions, in-process memory

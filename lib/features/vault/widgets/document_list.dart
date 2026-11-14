@@ -7,6 +7,7 @@ import '../../../app/widgets/states.dart';
 import '../../../core/database/database_opener.dart';
 import '../../../core/security/security_failure.dart';
 import '../../../data/models/vault_document.dart';
+import '../../../data/repositories/document_repository.dart';
 import 'document_tile.dart';
 
 /// Message for an error coming out of a repository/provider.
@@ -17,7 +18,7 @@ String errorMessageFor(AppLocalizations l, Object e) => switch (e) {
 };
 
 /// Sliver list of documents for an AsyncValue, with empty and error states.
-class DocumentSliverList extends StatelessWidget {
+class DocumentSliverList extends ConsumerWidget {
   const DocumentSliverList({
     super.key,
     required this.docs,
@@ -28,7 +29,7 @@ class DocumentSliverList extends StatelessWidget {
   final Widget empty;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     return docs.when(
       loading: () => const SliverFillRemaining(
@@ -37,7 +38,10 @@ class DocumentSliverList extends StatelessWidget {
       ),
       error: (e, _) => SliverFillRemaining(
         hasScrollBody: false,
-        child: ErrorState(message: errorMessageFor(l, e)),
+        child: ErrorState(
+          message: errorMessageFor(l, e),
+          onRetry: () => ref.invalidate(documentsProvider),
+        ),
       ),
       data: (items) => items.isEmpty
           ? SliverFillRemaining(hasScrollBody: false, child: empty)
