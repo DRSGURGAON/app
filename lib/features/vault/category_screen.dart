@@ -11,6 +11,7 @@ import '../dashboard/home_screen.dart' show categoryIcon;
 import 'vault_screen.dart';
 import 'widgets/document_list.dart';
 import 'widgets/import_flow.dart';
+import 'widgets/selection.dart';
 
 class CategoryScreen extends ConsumerWidget {
   const CategoryScreen({super.key, required this.categoryId});
@@ -28,10 +29,10 @@ class CategoryScreen extends ConsumerWidget {
     final docs = ref.watch(
       documentsProvider(DocumentQuery(categoryId: categoryId, sort: sort)),
     );
-    return Scaffold(
+    return SelectableScaffold(
       appBar: AppBar(
         title: Text(category == null ? '' : l.categoryName(category)),
-        actions: const [SortMenuButton()],
+        actions: const [SortMenuButton(), SelectButton()],
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showImportSheet(context, ref, categoryId: categoryId),

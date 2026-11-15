@@ -11,9 +11,22 @@ import '../../../data/repositories/category_repository.dart';
 import '../../../data/repositories/text_rules.dart';
 
 class DocumentTile extends ConsumerWidget {
-  const DocumentTile({super.key, required this.doc, this.today, this.trailing});
+  const DocumentTile({
+    super.key,
+    required this.doc,
+    this.today,
+    this.trailing,
+    this.selected,
+    this.onTap,
+    this.onLongPress,
+  });
 
   final VaultDocument doc;
+
+  /// Non-null while the list is in selection mode.
+  final bool? selected;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   /// Injected for tests; defaults to the current date.
   final DateTime? today;
@@ -40,11 +53,15 @@ class DocumentTile extends ConsumerWidget {
       l.documentTypeLabel(doc),
       formatBytes(doc.sizeBytes, locale),
     ].join(' · ');
-    return Card(
-      color: scheme.surfaceContainerLowest,
+    final selecting = selected != null;
+    final card = Card(
+      color: selected == true
+          ? scheme.secondaryContainer
+          : scheme.surfaceContainerLowest,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () => context.push(Routes.details(doc.id)),
+        onTap: onTap ?? () => context.push(Routes.details(doc.id)),
+        onLongPress: onLongPress,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(12, 12, 8, 12),
           child: Row(
@@ -104,7 +121,17 @@ class DocumentTile extends ConsumerWidget {
                   ],
                 ),
               ),
-              if (trailing != null)
+              if (selecting)
+                Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: Icon(
+                    selected!
+                        ? Icons.check_circle_rounded
+                        : Icons.radio_button_unchecked,
+                    color: selected! ? scheme.primary : scheme.outline,
+                  ),
+                )
+              else if (trailing != null)
                 trailing!
               else
                 Icon(Icons.chevron_right, color: scheme.outline),
@@ -113,6 +140,7 @@ class DocumentTile extends ConsumerWidget {
         ),
       ),
     );
+    return selecting ? Semantics(selected: selected, child: card) : card;
   }
 }
 

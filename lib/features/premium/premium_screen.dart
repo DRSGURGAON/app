@@ -173,6 +173,16 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
               body: l.premiumOcrSearchDesc,
             ),
             _Benefit(
+              icon: Icons.tune,
+              title: l.premiumFilters,
+              body: l.premiumFiltersDesc,
+            ),
+            _Benefit(
+              icon: Icons.checklist_rounded,
+              title: l.premiumBatch,
+              body: l.premiumBatchDesc,
+            ),
+            _Benefit(
               icon: Icons.notifications_active_outlined,
               title: l.premiumReminders,
               body: l.premiumRemindersDesc(freeActiveReminderLimit),

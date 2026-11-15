@@ -41,6 +41,8 @@ void main() {
     const sameOnPurpose = {
       'appName',
       'documentPdf',
+      'filterTypePdf',
+      'filterAddedRange',
       'languageEnglish',
       'languageHindi',
     };

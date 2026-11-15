@@ -11,6 +11,7 @@ import '../../data/repositories/folder_repository.dart';
 import 'vault_screen.dart';
 import 'widgets/document_list.dart';
 import 'widgets/import_flow.dart';
+import 'widgets/selection.dart';
 
 class FolderScreen extends ConsumerWidget {
   const FolderScreen({super.key, required this.folderId});
@@ -28,11 +29,12 @@ class FolderScreen extends ConsumerWidget {
     );
     final name = folder.value?.name ?? '';
 
-    return Scaffold(
+    return SelectableScaffold(
       appBar: AppBar(
         title: Text(name, maxLines: 1, overflow: TextOverflow.ellipsis),
         actions: [
           const SortMenuButton(),
+          const SelectButton(),
           PopupMenuButton<String>(
             onSelected: (v) async {
               final repo = await ref.read(folderRepositoryProvider.future);

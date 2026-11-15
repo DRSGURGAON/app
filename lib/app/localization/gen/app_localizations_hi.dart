@@ -1760,4 +1760,176 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get editTextEdited => 'बदला गया';
+
+  @override
+  String get filterTitle => 'फ़िल्टर';
+
+  @override
+  String filterActive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count फ़िल्टर लगे हैं',
+      one: '1 फ़िल्टर लगा है',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterType => 'प्रकार';
+
+  @override
+  String get filterTypeAll => 'सभी';
+
+  @override
+  String get filterTypePdf => 'PDF';
+
+  @override
+  String get filterTypeImage => 'इमेज';
+
+  @override
+  String get filterExpiry => 'समाप्ति';
+
+  @override
+  String get filterAny => 'कोई भी';
+
+  @override
+  String get filterExpiryExpired => 'समाप्त हो चुके';
+
+  @override
+  String get filterExpirySoon => '30 दिन में समाप्त होंगे';
+
+  @override
+  String get filterExpiryHas => 'समाप्ति तारीख वाले';
+
+  @override
+  String get filterExpiryNone => 'बिना समाप्ति तारीख';
+
+  @override
+  String get filterAdded => 'जोड़ने की तारीख';
+
+  @override
+  String get filterAddedAny => 'कभी भी';
+
+  @override
+  String get filterAdded7 => 'पिछले 7 दिन';
+
+  @override
+  String get filterAdded30 => 'पिछले 30 दिन';
+
+  @override
+  String get filterAddedYear => 'इस साल';
+
+  @override
+  String get filterAddedCustom => 'तारीखें चुनें…';
+
+  @override
+  String filterAddedRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String filterAddedSince(String date) {
+    return '$date से';
+  }
+
+  @override
+  String filterAddedUntil(String date) {
+    return '$date तक';
+  }
+
+  @override
+  String get filterTag => 'टैग';
+
+  @override
+  String filterTagValue(String tag) {
+    return 'टैग: $tag';
+  }
+
+  @override
+  String get filterNoTags =>
+      'अभी कोई टैग नहीं। दस्तावेज़ के विवरण पेज पर टैग जोड़ें।';
+
+  @override
+  String get filterClearAll => 'सब हटाएँ';
+
+  @override
+  String get filterApply => 'नतीजे दिखाएँ';
+
+  @override
+  String get filterNoResults => 'इन फ़िल्टर से कोई दस्तावेज़ नहीं मिला।';
+
+  @override
+  String get premiumFilters => 'एडवांस फ़िल्टर';
+
+  @override
+  String get premiumFiltersDesc =>
+      'प्रकार, समाप्ति, जोड़ने की तारीख, श्रेणी और टैग से दस्तावेज़ खोजें';
+
+  @override
+  String get premiumBatch => 'एक साथ कई दस्तावेज़';
+
+  @override
+  String get premiumBatchDesc =>
+      'कई दस्तावेज़ चुनकर एक साथ पसंदीदा बनाएँ, फ़ोल्डर बदलें, श्रेणी बदलें, एक्सपोर्ट करें या हटाएँ';
+
+  @override
+  String get selectDocuments => 'दस्तावेज़ चुनें';
+
+  @override
+  String selectionCount(int count) {
+    return '$count चुने गए';
+  }
+
+  @override
+  String get selectAll => 'सभी चुनें';
+
+  @override
+  String get selectionCancel => 'चयन रद्द करें';
+
+  @override
+  String get batchFavourite => 'पसंदीदा';
+
+  @override
+  String get batchUnfavourite => 'पसंदीदा से हटाएँ';
+
+  @override
+  String get batchMove => 'फ़ोल्डर';
+
+  @override
+  String get batchCategory => 'श्रेणी';
+
+  @override
+  String get batchExport => 'एक्सपोर्ट';
+
+  @override
+  String get batchDelete => 'हटाएँ';
+
+  @override
+  String batchMoveTitle(int count) {
+    return '$count दस्तावेज़ यहाँ ले जाएँ';
+  }
+
+  @override
+  String batchCategoryTitle(int count) {
+    return '$count दस्तावेज़ों की श्रेणी';
+  }
+
+  @override
+  String get batchDeleteTitle => 'हाल ही में हटाए गए में भेजें?';
+
+  @override
+  String batchDeleteBody(int count) {
+    return '$count दस्तावेज़ \'हाल ही में हटाए गए\' में चले जाएँगे। 30 दिन तक इन्हें वापस ला सकते हैं।';
+  }
+
+  @override
+  String batchUpdated(int count) {
+    return '$count दस्तावेज़ अपडेट हुए';
+  }
+
+  @override
+  String batchDeleted(int count) {
+    return '$count दस्तावेज़ \'हाल ही में हटाए गए\' में भेजे गए';
+  }
 }

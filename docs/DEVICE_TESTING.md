@@ -240,6 +240,22 @@ utility PDF, one scanned PDF.
 | T9 | Signed PDF (e.g. an e-signed form) | Warning before saving |
 | T10 | Type Hindi | "Only English…", Apply disabled |
 
+## 15. Advanced filters and batch actions (Premium)
+
+| # | Step | Expected |
+|---|---|---|
+| F1 | Without Premium: Vault → filter button; long-press a document | Premium screen for "Advanced filters" / "Batch actions"; nothing filtered or selected |
+| F2 | Premium: filter Images, then PDF + "Expiring in 30 days" | Only matching documents; badge shows the count; chips under "All documents" |
+| F3 | Remove one chip; "Clear all" | List updates at once; everything back |
+| F4 | Date added → Choose dates… | Android date-range picker; only documents added in that range |
+| F5 | Search with no text, only a tag filter | Documents with that tag |
+| F6 | Long-press a document, tap two more, Select all | Count in the title bar; ticks on the tiles |
+| F7 | Favourite / Move / Category on several | All updated; snackbar "N documents updated" |
+| F8 | Export several | Folder picker once; all files in the new folder |
+| F9 | Delete several → confirm | All in Recently deleted; restorable |
+| F10 | Back button while selecting | Selection ends; screen stays |
+| F11 | Smallest phone, Hindi, 200 % font | Sheet scrolls, bottom bar labels readable, nothing cut off |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

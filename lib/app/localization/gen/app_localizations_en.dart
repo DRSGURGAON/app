@@ -1757,4 +1757,206 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editTextEdited => 'Edited';
+
+  @override
+  String get filterTitle => 'Filters';
+
+  @override
+  String filterActive(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count filters on',
+      one: '1 filter on',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterType => 'Type';
+
+  @override
+  String get filterTypeAll => 'All';
+
+  @override
+  String get filterTypePdf => 'PDF';
+
+  @override
+  String get filterTypeImage => 'Images';
+
+  @override
+  String get filterExpiry => 'Expiry';
+
+  @override
+  String get filterAny => 'Any';
+
+  @override
+  String get filterExpiryExpired => 'Expired';
+
+  @override
+  String get filterExpirySoon => 'Expiring in 30 days';
+
+  @override
+  String get filterExpiryHas => 'Has an expiry date';
+
+  @override
+  String get filterExpiryNone => 'No expiry date';
+
+  @override
+  String get filterAdded => 'Date added';
+
+  @override
+  String get filterAddedAny => 'Any time';
+
+  @override
+  String get filterAdded7 => 'Last 7 days';
+
+  @override
+  String get filterAdded30 => 'Last 30 days';
+
+  @override
+  String get filterAddedYear => 'This year';
+
+  @override
+  String get filterAddedCustom => 'Choose dates…';
+
+  @override
+  String filterAddedRange(String from, String to) {
+    return '$from – $to';
+  }
+
+  @override
+  String filterAddedSince(String date) {
+    return 'Since $date';
+  }
+
+  @override
+  String filterAddedUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get filterTag => 'Tag';
+
+  @override
+  String filterTagValue(String tag) {
+    return 'Tag: $tag';
+  }
+
+  @override
+  String get filterNoTags =>
+      'No tags yet. Add tags on a document\'s details page.';
+
+  @override
+  String get filterClearAll => 'Clear all';
+
+  @override
+  String get filterApply => 'Show results';
+
+  @override
+  String get filterNoResults => 'No documents match these filters.';
+
+  @override
+  String get premiumFilters => 'Advanced filters';
+
+  @override
+  String get premiumFiltersDesc =>
+      'Find documents by type, expiry, date added, category and tag';
+
+  @override
+  String get premiumBatch => 'Batch actions';
+
+  @override
+  String get premiumBatchDesc =>
+      'Select many documents to favourite, move, categorise, export or delete at once';
+
+  @override
+  String get selectDocuments => 'Select documents';
+
+  @override
+  String selectionCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get selectAll => 'Select all';
+
+  @override
+  String get selectionCancel => 'Cancel selection';
+
+  @override
+  String get batchFavourite => 'Favourite';
+
+  @override
+  String get batchUnfavourite => 'Unfavourite';
+
+  @override
+  String get batchMove => 'Move';
+
+  @override
+  String get batchCategory => 'Category';
+
+  @override
+  String get batchExport => 'Export';
+
+  @override
+  String get batchDelete => 'Delete';
+
+  @override
+  String batchMoveTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '1 document',
+    );
+    return 'Move $_temp0 to';
+  }
+
+  @override
+  String batchCategoryTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '1 document',
+    );
+    return 'Category for $_temp0';
+  }
+
+  @override
+  String get batchDeleteTitle => 'Move to Recently deleted?';
+
+  @override
+  String batchDeleteBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents',
+      one: '1 document',
+    );
+    return '$_temp0 will move to Recently deleted. You can restore them for 30 days.';
+  }
+
+  @override
+  String batchUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents updated',
+      one: '1 document updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String batchDeleted(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count documents moved to Recently deleted',
+      one: '1 document moved to Recently deleted',
+    );
+    return '$_temp0';
+  }
 }

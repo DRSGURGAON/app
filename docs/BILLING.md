@@ -9,6 +9,8 @@
 | Edit text (English PDFs) | — | Yes |
 | Annotate & Sign | — | Yes |
 | Save recognised text for search ("Inside documents") | — | Yes |
+| Advanced filters (type, expiry, date added, category, tag) | — | Yes |
+| Batch actions (select many: favourite, move, category, export, delete) | — | Yes |
 | Active reminders | 3 | Unlimited |
 
 Locked tools show the Premium screen; after a successful purchase the tool continues.

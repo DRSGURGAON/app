@@ -9,6 +9,7 @@ import '../../../core/security/security_failure.dart';
 import '../../../data/models/vault_document.dart';
 import '../../../data/repositories/document_repository.dart';
 import 'document_tile.dart';
+import 'selection.dart';
 
 /// Message for an error coming out of a repository/provider.
 String errorMessageFor(AppLocalizations l, Object e) => switch (e) {
@@ -31,6 +32,7 @@ class DocumentSliverList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
+    final selection = SelectionScope.maybeOf(context);
     return docs.when(
       loading: () => const SliverFillRemaining(
         hasScrollBody: false,
@@ -43,16 +45,31 @@ class DocumentSliverList extends ConsumerWidget {
           onRetry: () => ref.invalidate(documentsProvider),
         ),
       ),
-      data: (items) => items.isEmpty
-          ? SliverFillRemaining(hasScrollBody: false, child: empty)
-          : SliverPadding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
-              sliver: SliverList.separated(
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 8),
-                itemBuilder: (_, i) => DocumentTile(doc: items[i]),
-              ),
-            ),
+      data: (items) {
+        selection?.updateVisible(items);
+        return items.isEmpty
+            ? SliverFillRemaining(hasScrollBody: false, child: empty)
+            : SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+                sliver: SliverList.separated(
+                  itemCount: items.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) {
+                    final d = items[i];
+                    if (selection == null) return DocumentTile(doc: d);
+                    final selecting = selection.active;
+                    return DocumentTile(
+                      doc: d,
+                      selected: selecting ? selection.contains(d.id) : null,
+                      onTap: selecting ? () => selection.toggle(d.id) : null,
+                      onLongPress: selecting
+                          ? () => selection.toggle(d.id)
+                          : () => startSelection(context, ref, selection, d.id),
+                    );
+                  },
+                ),
+              );
+      },
     );
   }
 }

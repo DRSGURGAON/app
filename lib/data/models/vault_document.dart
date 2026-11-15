@@ -89,6 +89,58 @@ class ImportSucceeded extends ImportOutcome {
 
 enum DocumentSort { newest, oldest, titleAsc, titleDesc, largest }
 
+enum TypeFilter { any, pdf, image }
+
+enum ExpiryFilter { any, expired, within30Days, hasExpiry, noExpiry }
+
+/// Advanced filters (Premium). Empty by default; combined with AND.
+class DocumentFilters {
+  const DocumentFilters({
+    this.type = TypeFilter.any,
+    this.expiry = ExpiryFilter.any,
+    this.addedFrom,
+    this.addedTo,
+    this.categoryId,
+    this.tag,
+  });
+
+  final TypeFilter type;
+  final ExpiryFilter expiry;
+
+  /// Added on or after this calendar day (local time).
+  final DateTime? addedFrom;
+
+  /// Added on or before this calendar day (local time, whole day included).
+  final DateTime? addedTo;
+  final int? categoryId;
+
+  /// Exact tag (case-insensitive).
+  final String? tag;
+
+  bool get isEmpty => activeCount == 0;
+
+  int get activeCount =>
+      (type == TypeFilter.any ? 0 : 1) +
+      (expiry == ExpiryFilter.any ? 0 : 1) +
+      (addedFrom == null && addedTo == null ? 0 : 1) +
+      (categoryId == null ? 0 : 1) +
+      (tag == null ? 0 : 1);
+
+  @override
+  bool operator ==(Object other) =>
+      other is DocumentFilters &&
+      other.type == type &&
+      other.expiry == expiry &&
+      other.addedFrom == addedFrom &&
+      other.addedTo == addedTo &&
+      other.categoryId == categoryId &&
+      other.tag == tag;
+
+  @override
+  int get hashCode =>
+      Object.hash(type, expiry, addedFrom, addedTo, categoryId, tag);
+}
+
 /// Filter for document lists. Trash is always excluded.
 class DocumentQuery {
   const DocumentQuery({
@@ -100,6 +152,7 @@ class DocumentQuery {
     this.includeRecognizedText = false,
     this.sort = DocumentSort.newest,
     this.limit,
+    this.filters = const DocumentFilters(),
   });
 
   final int? folderId;
@@ -117,6 +170,7 @@ class DocumentQuery {
   final bool includeRecognizedText;
   final DocumentSort sort;
   final int? limit;
+  final DocumentFilters filters;
 
   @override
   bool operator ==(Object other) =>
@@ -128,6 +182,7 @@ class DocumentQuery {
       other.includeRecognizedText == includeRecognizedText &&
       other.sort == sort &&
       other.limit == limit &&
+      other.filters == filters &&
       other.matchingCategoryIds.length == matchingCategoryIds.length &&
       other.matchingCategoryIds.containsAll(matchingCategoryIds);
 
@@ -140,6 +195,7 @@ class DocumentQuery {
     includeRecognizedText,
     sort,
     limit,
+    filters,
     Object.hashAllUnordered(matchingCategoryIds),
   );
 }

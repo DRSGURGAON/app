@@ -928,5 +928,132 @@
         "type": "String"
       }
     }
+  },
+  "filterTitle": "Filters",
+  "filterActive": "{count, plural, =1{1 filter on} other{{count} filters on}}",
+  "@filterActive": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "filterType": "Type",
+  "filterTypeAll": "All",
+  "filterTypePdf": "PDF",
+  "filterTypeImage": "Images",
+  "filterExpiry": "Expiry",
+  "filterAny": "Any",
+  "filterExpiryExpired": "Expired",
+  "filterExpirySoon": "Expiring in 30 days",
+  "filterExpiryHas": "Has an expiry date",
+  "filterExpiryNone": "No expiry date",
+  "filterAdded": "Date added",
+  "filterAddedAny": "Any time",
+  "filterAdded7": "Last 7 days",
+  "filterAdded30": "Last 30 days",
+  "filterAddedYear": "This year",
+  "filterAddedCustom": "Choose dates…",
+  "filterAddedRange": "{from} – {to}",
+  "@filterAddedRange": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "filterAddedSince": "Since {date}",
+  "@filterAddedSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterAddedUntil": "Until {date}",
+  "@filterAddedUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "filterTag": "Tag",
+  "filterTagValue": "Tag: {tag}",
+  "@filterTagValue": {
+    "placeholders": {
+      "tag": {
+        "type": "String"
+      }
+    }
+  },
+  "filterNoTags": "No tags yet. Add tags on a document's details page.",
+  "filterClearAll": "Clear all",
+  "filterApply": "Show results",
+  "filterNoResults": "No documents match these filters.",
+  "premiumFilters": "Advanced filters",
+  "premiumFiltersDesc": "Find documents by type, expiry, date added, category and tag",
+  "premiumBatch": "Batch actions",
+  "premiumBatchDesc": "Select many documents to favourite, move, categorise, export or delete at once",
+  "selectDocuments": "Select documents",
+  "selectionCount": "{count} selected",
+  "@selectionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectAll": "Select all",
+  "selectionCancel": "Cancel selection",
+  "batchFavourite": "Favourite",
+  "batchUnfavourite": "Unfavourite",
+  "batchMove": "Move",
+  "batchCategory": "Category",
+  "batchExport": "Export",
+  "batchDelete": "Delete",
+  "batchMoveTitle": "Move {count, plural, =1{1 document} other{{count} documents}} to",
+  "@batchMoveTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchCategoryTitle": "Category for {count, plural, =1{1 document} other{{count} documents}}",
+  "@batchCategoryTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchDeleteTitle": "Move to Recently deleted?",
+  "batchDeleteBody": "{count, plural, =1{1 document} other{{count} documents}} will move to Recently deleted. You can restore them for 30 days.",
+  "@batchDeleteBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchUpdated": "{count, plural, =1{1 document updated} other{{count} documents updated}}",
+  "@batchUpdated": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchDeleted": "{count, plural, =1{1 document moved to Recently deleted} other{{count} documents moved to Recently deleted}}",
+  "@batchDeleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

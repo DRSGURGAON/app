@@ -147,3 +147,44 @@ Future<bool> showConfirmDialog(
   );
   return r ?? false;
 }
+
+/// Bottom sheet with one choice per option. Returns the picked value wrapped
+/// in a record (so null can be a choice), or null if dismissed.
+Future<(T,)?> pickOption<T>(
+  BuildContext context, {
+  required String title,
+  required T current,
+  required List<(T, String)> options,
+}) {
+  return showModalBottomSheet<(T,)>(
+    context: context,
+    showDragHandle: true,
+    isScrollControlled: true,
+    builder: (context) => SafeArea(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * .7,
+        ),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+              child: Text(
+                title,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            for (final (value, label) in options)
+              ListTile(
+                title: Text(label),
+                trailing: value == current ? const Icon(Icons.check) : null,
+                selected: value == current,
+                onTap: () => Navigator.pop(context, (value,)),
+              ),
+          ],
+        ),
+      ),
+    ),
+  );
+}

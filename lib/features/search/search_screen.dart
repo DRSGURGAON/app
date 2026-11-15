@@ -12,6 +12,8 @@ import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/document_repository.dart';
 import '../premium/premium_screen.dart';
 import '../vault/widgets/document_list.dart';
+import '../vault/widgets/filters.dart';
+import '../vault/widgets/selection.dart';
 
 /// Free search over titles, tags and (localised) category names.
 /// Search inside recognised (OCR) text is Premium.
@@ -27,6 +29,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
   Timer? _debounce;
   String _query = '';
   bool _insideText = true;
+  DocumentFilters _filters = const DocumentFilters();
 
   @override
   void dispose() {
@@ -47,13 +50,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
     final l = AppLocalizations.of(context);
     final categories = ref.watch(categoriesProvider).value ?? const [];
     final premium = ref.watch(premiumUnlockedProvider);
+    final filters = effectiveFilters(ref, _filters);
     final lower = _query.toLowerCase();
     final matchingCategories = {
       for (final c in categories)
         if (lower.isNotEmpty && l.categoryName(c).toLowerCase().contains(lower))
           c.id,
     };
-    return Scaffold(
+    return SelectableScaffold(
       appBar: AppBar(
         titleSpacing: 0,
         title: TextField(
@@ -80,9 +84,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 _onChanged('');
               },
             ),
+          FilterButton(
+            filters: _filters,
+            onChanged: (f) => setState(() => _filters = f),
+          ),
+          const SelectButton(),
         ],
       ),
-      body: _query.isEmpty
+      body: _query.isEmpty && filters.isEmpty
           ? EmptyState(icon: Icons.search, title: l.searchEmptyQuery)
           : CustomScrollView(
               slivers: [
@@ -91,33 +100,43 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                     child: Align(
                       alignment: AlignmentDirectional.centerStart,
-                      child: FilterChip(
-                        key: const Key('search-inside-text'),
-                        avatar: premium
-                            ? null
-                            : const Icon(Icons.lock_outline, size: 18),
-                        label: Text(l.searchInsideText),
-                        selected: premium && _insideText,
-                        onSelected: (v) {
-                          if (!premium) {
-                            Navigator.of(context).push(
-                              MaterialPageRoute<void>(
-                                builder: (_) =>
-                                    PremiumScreen(feature: l.ocrSearchFeature),
-                              ),
-                            );
-                            return;
-                          }
-                          setState(() => _insideText = v);
-                        },
-                      ),
+                      child: _query.isEmpty
+                          ? null
+                          : FilterChip(
+                              key: const Key('search-inside-text'),
+                              avatar: premium
+                                  ? null
+                                  : const Icon(Icons.lock_outline, size: 18),
+                              label: Text(l.searchInsideText),
+                              selected: premium && _insideText,
+                              onSelected: (v) {
+                                if (!premium) {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => PremiumScreen(
+                                        feature: l.ocrSearchFeature,
+                                      ),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                setState(() => _insideText = v);
+                              },
+                            ),
                     ),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: ActiveFilterChips(
+                    filters: _filters,
+                    onChanged: (f) => setState(() => _filters = f),
                   ),
                 ),
                 DocumentSliverList(
                   docs: ref.watch(
                     documentsProvider(
                       DocumentQuery(
+                        filters: filters,
                         text: _query,
                         matchingCategoryIds: matchingCategories,
                         includeRecognizedText: premium && _insideText,
@@ -126,7 +145,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                   ),
                   empty: EmptyState(
                     icon: Icons.search_off,
-                    title: l.searchNoResults(_query),
+                    title: _query.isEmpty
+                        ? l.filterNoResults
+                        : l.searchNoResults(_query),
                   ),
                 ),
               ],

@@ -3055,6 +3055,288 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Edited'**
   String get editTextEdited;
+
+  /// No description provided for @filterTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Filters'**
+  String get filterTitle;
+
+  /// No description provided for @filterActive.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 filter on} other{{count} filters on}}'**
+  String filterActive(int count);
+
+  /// No description provided for @filterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get filterType;
+
+  /// No description provided for @filterTypeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterTypeAll;
+
+  /// No description provided for @filterTypePdf.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF'**
+  String get filterTypePdf;
+
+  /// No description provided for @filterTypeImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Images'**
+  String get filterTypeImage;
+
+  /// No description provided for @filterExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiry'**
+  String get filterExpiry;
+
+  /// No description provided for @filterAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any'**
+  String get filterAny;
+
+  /// No description provided for @filterExpiryExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get filterExpiryExpired;
+
+  /// No description provided for @filterExpirySoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Expiring in 30 days'**
+  String get filterExpirySoon;
+
+  /// No description provided for @filterExpiryHas.
+  ///
+  /// In en, this message translates to:
+  /// **'Has an expiry date'**
+  String get filterExpiryHas;
+
+  /// No description provided for @filterExpiryNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiry date'**
+  String get filterExpiryNone;
+
+  /// No description provided for @filterAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Date added'**
+  String get filterAdded;
+
+  /// No description provided for @filterAddedAny.
+  ///
+  /// In en, this message translates to:
+  /// **'Any time'**
+  String get filterAddedAny;
+
+  /// No description provided for @filterAdded7.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get filterAdded7;
+
+  /// No description provided for @filterAdded30.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 30 days'**
+  String get filterAdded30;
+
+  /// No description provided for @filterAddedYear.
+  ///
+  /// In en, this message translates to:
+  /// **'This year'**
+  String get filterAddedYear;
+
+  /// No description provided for @filterAddedCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose dates…'**
+  String get filterAddedCustom;
+
+  /// No description provided for @filterAddedRange.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} – {to}'**
+  String filterAddedRange(String from, String to);
+
+  /// No description provided for @filterAddedSince.
+  ///
+  /// In en, this message translates to:
+  /// **'Since {date}'**
+  String filterAddedSince(String date);
+
+  /// No description provided for @filterAddedUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Until {date}'**
+  String filterAddedUntil(String date);
+
+  /// No description provided for @filterTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get filterTag;
+
+  /// No description provided for @filterTagValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag: {tag}'**
+  String filterTagValue(String tag);
+
+  /// No description provided for @filterNoTags.
+  ///
+  /// In en, this message translates to:
+  /// **'No tags yet. Add tags on a document\'s details page.'**
+  String get filterNoTags;
+
+  /// No description provided for @filterClearAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear all'**
+  String get filterClearAll;
+
+  /// No description provided for @filterApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Show results'**
+  String get filterApply;
+
+  /// No description provided for @filterNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No documents match these filters.'**
+  String get filterNoResults;
+
+  /// No description provided for @premiumFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced filters'**
+  String get premiumFilters;
+
+  /// No description provided for @premiumFiltersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Find documents by type, expiry, date added, category and tag'**
+  String get premiumFiltersDesc;
+
+  /// No description provided for @premiumBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch actions'**
+  String get premiumBatch;
+
+  /// No description provided for @premiumBatchDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Select many documents to favourite, move, categorise, export or delete at once'**
+  String get premiumBatchDesc;
+
+  /// No description provided for @selectDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Select documents'**
+  String get selectDocuments;
+
+  /// No description provided for @selectionCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String selectionCount(int count);
+
+  /// No description provided for @selectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get selectAll;
+
+  /// No description provided for @selectionCancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel selection'**
+  String get selectionCancel;
+
+  /// No description provided for @batchFavourite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite'**
+  String get batchFavourite;
+
+  /// No description provided for @batchUnfavourite.
+  ///
+  /// In en, this message translates to:
+  /// **'Unfavourite'**
+  String get batchUnfavourite;
+
+  /// No description provided for @batchMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Move'**
+  String get batchMove;
+
+  /// No description provided for @batchCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get batchCategory;
+
+  /// No description provided for @batchExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get batchExport;
+
+  /// No description provided for @batchDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get batchDelete;
+
+  /// No description provided for @batchMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move {count, plural, =1{1 document} other{{count} documents}} to'**
+  String batchMoveTitle(int count);
+
+  /// No description provided for @batchCategoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Category for {count, plural, =1{1 document} other{{count} documents}}'**
+  String batchCategoryTitle(int count);
+
+  /// No description provided for @batchDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to Recently deleted?'**
+  String get batchDeleteTitle;
+
+  /// No description provided for @batchDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 document} other{{count} documents}} will move to Recently deleted. You can restore them for 30 days.'**
+  String batchDeleteBody(int count);
+
+  /// No description provided for @batchUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 document updated} other{{count} documents updated}}'**
+  String batchUpdated(int count);
+
+  /// No description provided for @batchDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 document moved to Recently deleted} other{{count} documents moved to Recently deleted}}'**
+  String batchDeleted(int count);
 }
 
 class _AppLocalizationsDelegate

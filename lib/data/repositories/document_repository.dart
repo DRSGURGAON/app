@@ -98,6 +98,69 @@ class DocumentRepository {
     return e;
   }
 
+  void _applyFilters(
+    JoinedSelectStatement<HasResultSet, dynamic> s,
+    DocumentFilters f,
+  ) {
+    switch (f.type) {
+      case TypeFilter.any:
+        break;
+      case TypeFilter.pdf:
+        s.where(_db.documents.mimeType.equals('application/pdf'));
+      case TypeFilter.image:
+        s.where(_db.documents.mimeType.like('image/%'));
+    }
+    final expiry = _db.documentMetadata.expiryDate;
+    final today = _clock();
+    final todayIso = isoDate(today);
+    switch (f.expiry) {
+      case ExpiryFilter.any:
+        break;
+      case ExpiryFilter.expired:
+        s.where(expiry.isSmallerThanValue(todayIso));
+      case ExpiryFilter.within30Days:
+        s.where(
+          expiry.isBiggerOrEqualValue(todayIso) &
+              expiry.isSmallerOrEqualValue(
+                isoDate(today.add(const Duration(days: 30))),
+              ),
+        );
+      case ExpiryFilter.hasExpiry:
+        s.where(expiry.isNotNull());
+      case ExpiryFilter.noExpiry:
+        s.where(expiry.isNull());
+    }
+    if (f.addedFrom case final from?) {
+      s.where(
+        _db.documents.createdAt.isBiggerOrEqualValue(
+          DateTime(from.year, from.month, from.day),
+        ),
+      );
+    }
+    if (f.addedTo case final to?) {
+      s.where(
+        _db.documents.createdAt.isSmallerThanValue(
+          DateTime(to.year, to.month, to.day + 1),
+        ),
+      );
+    }
+    if (f.categoryId case final c?) {
+      s.where(_db.documents.categoryId.equals(c));
+    }
+    if (f.tag case final tag?) {
+      s.where(
+        existsQuery(
+          _db.select(_db.documentTags).join([
+            innerJoin(_db.tags, _db.tags.id.equalsExp(_db.documentTags.tagId)),
+          ])..where(
+            _db.documentTags.documentId.equalsExp(_db.documents.id) &
+                _db.tags.normalized.equals(tag.trim().toLowerCase()),
+          ),
+        ),
+      );
+    }
+  }
+
   Stream<List<VaultDocument>> watch(DocumentQuery q) {
     final s = _base()..where(_db.recentlyDeleted.documentId.isNull());
     if (q.folderId != null) s.where(_db.documents.folderId.equals(q.folderId!));
@@ -105,6 +168,7 @@ class DocumentRepository {
       s.where(_db.documents.categoryId.equals(q.categoryId!));
     }
     if (q.favouritesOnly) s.where(_db.documents.isFavourite.equals(true));
+    _applyFilters(s, q.filters);
     final text = q.text?.trim();
     if (text != null && text.isNotEmpty) {
       s.where(
@@ -493,6 +557,41 @@ class DocumentRepository {
   Future<void> moveToFolder(int id, int? folderId) =>
       _touch(id, DocumentsCompanion(folderId: Value(folderId)));
 
+  // ------------------------------------------------------------- batch
+
+  /// Applies [change] to every document in [ids] in one transaction.
+  Future<void> _touchMany(Iterable<int> ids, DocumentsCompanion change) =>
+      _db.transaction(() async {
+        for (final id in ids) {
+          await _touch(id, change);
+        }
+      });
+
+  Future<void> setFavouriteMany(Iterable<int> ids, bool favourite) =>
+      _touchMany(ids, DocumentsCompanion(isFavourite: Value(favourite)));
+
+  Future<void> setCategoryMany(Iterable<int> ids, int? categoryId) =>
+      _touchMany(ids, DocumentsCompanion(categoryId: Value(categoryId)));
+
+  Future<void> moveToFolderMany(Iterable<int> ids, int? folderId) =>
+      _touchMany(ids, DocumentsCompanion(folderId: Value(folderId)));
+
+  /// Moves every document in [ids] to Recently deleted in one transaction.
+  Future<void> moveToTrashMany(Iterable<int> ids) => _db.transaction(() async {
+    for (final id in ids) {
+      await moveToTrash(id);
+    }
+  });
+
+  /// Exports [docs] into a new folder the user picks. Null = cancelled.
+  Future<ExportSummary?> exportMany(
+    String folderName,
+    List<VaultDocument> docs,
+  ) => _security.exportAllToFolder(folderName, [
+    for (final d in docs)
+      ExportItem(fileId: d.fileId, fileName: d.title, mimeType: d.mimeType),
+  ]);
+
   /// Replaces the document's tags. Tags are de-duplicated case-insensitively;
   /// tags no longer used by any document are removed.
   Future<void> setTags(int documentId, Iterable<String> rawTags) async {
@@ -642,13 +741,8 @@ class DocumentRepository {
       _security.exportDocument(doc.fileId, doc.title, doc.mimeType);
 
   /// Exports every non-deleted document into a new folder the user picks.
-  Future<ExportSummary?> exportAll(String folderName) async {
-    final docs = await watchAll().first;
-    return _security.exportAllToFolder(folderName, [
-      for (final d in docs)
-        ExportItem(fileId: d.fileId, fileName: d.title, mimeType: d.mimeType),
-    ]);
-  }
+  Future<ExportSummary?> exportAll(String folderName) async =>
+      exportMany(folderName, await watchAll().first);
 
   /// Removes encrypted containers that have no database row (e.g. the app was
   /// killed between encrypting and recording an import). Returns the count.

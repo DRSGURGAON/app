@@ -90,8 +90,8 @@ void main() {
     expect(find.text(en.premiumFreeTrial(7)), findsOneWidget);
     expect(find.text(en.premiumStartTrial), findsOneWidget);
 
-    await tester.tap(find.byKey(const Key('plan-monthly')));
-    await settle(tester);
+    // Two more benefits push the plans down: scroll to them first.
+    await tapKey(tester, 'plan-monthly');
     expect(find.text(en.premiumContinue), findsOneWidget);
     await tapKey(tester, 'premium-buy');
     expect(billing.purchases, ['monthly']);

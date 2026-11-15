@@ -20,6 +20,8 @@ by the Android Keystore. There is no account, no server, no cloud upload, no ana
 | Vault, folder and category views; sort; favourites filter | Implemented, widget-tested |
 | Document details: rename, favourite, category, folder, tags, issue/expiry dates, notes | Implemented, repository- and widget-tested |
 | Search by title, tag and (localised) category name | Implemented, tested |
+| Advanced filters (Premium): type, expiry (expired / 30 days / has / none), date added (presets or range), category, tag; on Vault and Search, removable chips | Implemented, repository + widget tested |
+| Batch actions (Premium): long-press or Select → favourite, move to folder, set category, export to a folder, move to Recently deleted; one DB transaction per action | Implemented, repository + widget tested |
 | Recently deleted (30-day retention), restore, delete permanently, empty | Implemented, tested |
 | Export one document (system "save as") / export all to a chosen folder — unencrypted, with warning | Implemented; native path **needs a device run** |
 | Settings: language, biometric, change PIN, auto-lock time, privacy & security, storage usage, manage categories | Implemented, tested |
@@ -95,7 +97,7 @@ tested** (needs the Play Console internal-testing setup in docs/BILLING.md).
 | Subscription `docsafe_premium`, monthly + yearly base plans; prices, currency and free trial come from Google Play | Implemented; host-tested with a fake Play |
 | Premium screen: plans, Save N%, buy, pending payment, restore purchases, manage subscription; Settings row with status | Implemented, tested (English + Hindi 320x480) |
 | Offline signature check with the Play licence key (no server), acknowledge, re-check on unlock/resume | Implemented; verification JVM-tested; native bridge emulator-tested without a key |
-| Merge, Split, Compress, Annotate & Sign, OCR search, >3 reminders gated; tool continues after purchase | Implemented, tested |
+| Merge, Split, Compress, Annotate & Sign, OCR search, advanced filters, batch actions, >3 reminders gated; tool continues after purchase | Implemented, tested |
 
 Builds without `-PdocsafePlayLicenseKey` (all CI builds) cannot sell Premium. Debug builds keep a
 developer switch.

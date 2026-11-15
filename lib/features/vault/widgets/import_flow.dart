@@ -71,9 +71,11 @@ Future<void> showImportSheet(
   final kind = await showModalBottomSheet<Object>(
     context: context,
     showDragHandle: true,
+    // Scrolls on very small or landscape screens instead of overflowing.
+    isScrollControlled: true,
     builder: (context) => SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
+      child: ListView(
+        shrinkWrap: true,
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),

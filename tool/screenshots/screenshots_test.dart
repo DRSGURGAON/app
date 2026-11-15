@@ -286,4 +286,52 @@ void main() {
     await shot(tester, '33-edit-save');
     await app.dispose();
   });
+
+  testWidgets('filters and batch', (tester) async {
+    await loadFonts();
+    final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final t = lang == 'hi' ? hi : en;
+    final fake = await unlockedFake(lang: lang);
+    final engine = FakePdfEngine();
+    final app = await pumpApp(
+      tester,
+      fake,
+      pdfEngine: engine,
+      size: shotSize(),
+    );
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
+    await seed(
+      app,
+      fake,
+      engine,
+      importLabel: lang == 'hi' ? hi.homeImportPdf : '',
+    );
+    await tester.pump(const Duration(seconds: 10));
+    await settle(tester);
+    await goTab(tester, t.navVault);
+    await tester.tap(find.byKey(const Key('filter-button')));
+    await settle(tester);
+    await tester.tap(find.text(t.filterTypePdf));
+    await tester.tap(find.text(t.filterExpirySoon));
+    await shot(tester, '40-filter-sheet');
+    await tester.tap(find.byKey(const Key('filter-apply')));
+    await shot(tester, '41-filtered');
+    await tester.tap(find.byKey(const Key('filter-chips-clear')));
+    await settle(tester);
+    await tester.tap(find.byKey(const Key('select-button')));
+    await settle(tester);
+    for (final title in ['Driving Licence', 'Aadhaar Card']) {
+      await tester.scrollUntilVisible(
+        find.text(title),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text(title));
+      await settle(tester);
+    }
+    await shot(tester, '42-selection');
+    await tester.tap(find.byKey(const Key('batch-category')));
+    await shot(tester, '43-batch-category');
+    await app.dispose();
+  });
 }

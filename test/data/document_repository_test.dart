@@ -120,6 +120,143 @@ void main() {
       expect(await titles(const DocumentQuery(favouritesOnly: true)), ['A']);
     });
 
+    test('advanced filters: type, expiry, added date, category, tag', () async {
+      // now = 2026-06-01 10:00; each add moves the clock one minute.
+      final pdf = await add('Passport.pdf', categoryId: 1);
+      final img = await add('RC.jpg', mime: 'image/jpeg', categoryId: 3);
+      final old = await add('Old.pdf');
+      final none = await add('Notes.pdf');
+      await repo.saveMetadata(pdf.id, expiryDate: '2026-06-20'); // in 19 days
+      await repo.saveMetadata(img.id, expiryDate: '2026-05-31'); // expired
+      await repo.saveMetadata(old.id, expiryDate: '2027-01-01'); // later
+      await repo.setTags(img.id, ['Car', 'Family']);
+      await repo.setTags(none.id, ['car']);
+      Future<List<String>> f(DocumentFilters x) =>
+          titles(DocumentQuery(filters: x, sort: DocumentSort.titleAsc));
+
+      expect(await f(const DocumentFilters()), [
+        'Notes',
+        'Old',
+        'Passport',
+        'RC',
+      ]);
+      expect(await f(const DocumentFilters(type: TypeFilter.image)), ['RC']);
+      expect(await f(const DocumentFilters(type: TypeFilter.pdf)), [
+        'Notes',
+        'Old',
+        'Passport',
+      ]);
+      expect(await f(const DocumentFilters(expiry: ExpiryFilter.expired)), [
+        'RC',
+      ]);
+      expect(
+        await f(const DocumentFilters(expiry: ExpiryFilter.within30Days)),
+        ['Passport'],
+      );
+      expect(await f(const DocumentFilters(expiry: ExpiryFilter.hasExpiry)), [
+        'Old',
+        'Passport',
+        'RC',
+      ]);
+      expect(await f(const DocumentFilters(expiry: ExpiryFilter.noExpiry)), [
+        'Notes',
+      ]);
+      expect(await f(const DocumentFilters(categoryId: 3)), ['RC']);
+      expect(await f(const DocumentFilters(tag: 'CAR')), ['Notes', 'RC']);
+      expect(await f(const DocumentFilters(tag: 'family')), ['RC']);
+      // Combined with AND, and with free text.
+      expect(await f(const DocumentFilters(tag: 'car', type: TypeFilter.pdf)), [
+        'Notes',
+      ]);
+      expect(
+        await titles(
+          const DocumentQuery(
+            text: 'r',
+            filters: DocumentFilters(type: TypeFilter.pdf),
+            sort: DocumentSort.titleAsc,
+          ),
+        ),
+        ['Notes', 'Passport'],
+      );
+      expect(
+        await titles(
+          const DocumentQuery(
+            text: 'pass',
+            filters: DocumentFilters(type: TypeFilter.image),
+          ),
+        ),
+        isEmpty,
+      );
+
+      // Added dates are whole local days.
+      now = DateTime(2026, 6, 5, 23, 59);
+      final later = await add('Later.pdf'); // 2026-06-06 00:00
+      expect(later.createdAt.day, 6);
+      expect(await f(DocumentFilters(addedFrom: DateTime(2026, 6, 6))), [
+        'Later',
+      ]);
+      expect(await f(DocumentFilters(addedTo: DateTime(2026, 6, 1))), [
+        'Notes',
+        'Old',
+        'Passport',
+        'RC',
+      ]);
+      expect(
+        await f(
+          DocumentFilters(
+            addedFrom: DateTime(2026, 6, 2),
+            addedTo: DateTime(2026, 6, 5),
+          ),
+        ),
+        isEmpty,
+      );
+      expect(
+        const DocumentFilters(tag: 'a', type: TypeFilter.pdf).activeCount,
+        2,
+      );
+    });
+
+    test('batch: favourite, category, folder, trash, export', () async {
+      final a = await add('A.pdf');
+      final b = await add('B.pdf');
+      final c = await add('C.pdf');
+      final f = await FolderRepository(db).create('Family');
+      await repo.setFavouriteMany([a.id, b.id], true);
+      await repo.setCategoryMany([a.id, b.id], 4);
+      await repo.moveToFolderMany([b.id, c.id], f);
+      expect(await titles(const DocumentQuery(favouritesOnly: true)), [
+        'B',
+        'A',
+      ]);
+      expect(await titles(const DocumentQuery(categoryId: 4)), ['B', 'A']);
+      expect(await titles(DocumentQuery(folderId: f)), ['C', 'B']);
+      await repo.moveToFolderMany([b.id], null);
+      expect((await repo.byId(b.id))!.folderId, isNull);
+
+      final summary = await repo.exportMany('DocSafe export', [a, c]);
+      expect(summary!.exported, 2);
+      expect(fake.lastExportAll!.map((e) => e.fileName), ['A', 'C']);
+
+      await repo.moveToTrashMany([a.id, c.id]);
+      expect(await titles(), ['B']);
+      expect((await repo.watchTrash().first).map((d) => d.title).toSet(), {
+        'A',
+        'C',
+      });
+      // A missing document fails the whole batch; nothing is half-applied.
+      await expectLater(
+        repo.setFavouriteMany([b.id, 99999], true),
+        throwsStateError,
+      );
+      expect((await repo.byId(b.id))!.isFavourite, isTrue);
+      await repo.setFavouriteMany([b.id], false);
+      await expectLater(
+        repo.setFavouriteMany([b.id, 99999], true),
+        throwsStateError,
+      );
+      expect((await repo.byId(b.id))!.isFavourite, isFalse);
+    });
+
     test('sorting', () async {
       await add('b.pdf', size: 10);
       await add('a.pdf', size: 30);

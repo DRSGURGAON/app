@@ -11,7 +11,9 @@ import '../../data/repositories/document_repository.dart';
 import '../../data/repositories/folder_repository.dart';
 import '../dashboard/home_screen.dart' show createFolder;
 import 'widgets/document_list.dart';
+import 'widgets/filters.dart';
 import 'widgets/import_flow.dart';
+import 'widgets/selection.dart';
 
 /// Sort order and favourites filter shared by vault, folder and category views.
 final vaultSortProvider = NotifierProvider<VaultSortController, DocumentSort>(
@@ -34,16 +36,22 @@ class VaultScreen extends ConsumerStatefulWidget {
 
 class _VaultScreenState extends ConsumerState<VaultScreen> {
   bool _favouritesOnly = false;
+  DocumentFilters _filters = const DocumentFilters();
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final sort = ref.watch(vaultSortProvider);
-    final query = DocumentQuery(sort: sort, favouritesOnly: _favouritesOnly);
+    final filters = effectiveFilters(ref, _filters);
+    final query = DocumentQuery(
+      sort: sort,
+      favouritesOnly: _favouritesOnly,
+      filters: filters,
+    );
     final docs = ref.watch(documentsProvider(query));
     final folders = ref.watch(foldersProvider);
 
-    return Scaffold(
+    return SelectableScaffold(
       appBar: AppBar(
         title: Text(l.vaultTitle),
         actions: [
@@ -52,7 +60,12 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
             icon: const Icon(Icons.search),
             onPressed: () => context.push(Routes.search),
           ),
+          FilterButton(
+            filters: _filters,
+            onChanged: (f) => setState(() => _filters = f),
+          ),
           const SortMenuButton(),
+          const SelectButton(),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -109,13 +122,24 @@ class _VaultScreenState extends ConsumerState<VaultScreen> {
               ),
             ),
           ),
+          SliverToBoxAdapter(
+            child: ActiveFilterChips(
+              filters: _filters,
+              onChanged: (f) => setState(() => _filters = f),
+            ),
+          ),
           DocumentSliverList(
             docs: docs,
-            empty: EmptyState(
-              icon: Icons.folder_open_outlined,
-              title: l.vaultEmptyTitle,
-              body: l.vaultEmptyBody,
-            ),
+            empty: filters.isEmpty && !_favouritesOnly
+                ? EmptyState(
+                    icon: Icons.folder_open_outlined,
+                    title: l.vaultEmptyTitle,
+                    body: l.vaultEmptyBody,
+                  )
+                : EmptyState(
+                    icon: Icons.filter_alt_off_outlined,
+                    title: l.filterNoResults,
+                  ),
           ),
         ],
       ),
