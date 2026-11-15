@@ -20,6 +20,9 @@ class VaultSession private constructor(context: Context) {
     private val securityDir = File(appContext.noBackupFilesDir, "security")
     private val keysDir = File(appContext.noBackupFilesDir, "keys")
 
+    /** Fonts the user added for editing PDF text (not secret, but erased with everything). */
+    val fontsDir = File(appContext.noBackupFilesDir, "fonts")
+
     val keyWrapper: KeyWrapper = AesGcmKeyWrapper { KeystoreKeys.kek() }
     private val macFactory = HmacSha256Factory { KeystoreKeys.hmac() }
 
@@ -99,6 +102,7 @@ class VaultSession private constructor(context: Context) {
             SecureFiles.bestEffortWipe(File(db.path + suffix))
         }
         SecureFiles.wipeDirectory(keysDir)
+        SecureFiles.wipeDirectory(fontsDir)
         biometric.clear()
         pinManager.clear()
         KeystoreKeys.deleteAll()

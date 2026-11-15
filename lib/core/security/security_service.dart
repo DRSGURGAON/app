@@ -87,6 +87,13 @@ abstract interface class SecurityService {
   Future<RestoreResult> restoreBackup(String token, Uint8List password);
   Future<String?> getLanguage();
   Future<void> setLanguage(String languageCode);
+
+  /// Picks a .ttf/.otf font and stores it for PDF text editing; returns the
+  /// stored file name or null if cancelled.
+  Future<String?> importFontFile();
+
+  /// Folder with the fonts the user added.
+  Future<String> userFontsDirectory();
 }
 
 class PigeonSecurityService implements SecurityService {
@@ -274,6 +281,12 @@ class PigeonSecurityService implements SecurityService {
   @override
   Future<RestoreResult> restoreBackup(String token, Uint8List password) =>
       _guard(() => _api.restoreBackup(token, password));
+
+  @override
+  Future<String?> importFontFile() => _guard(_api.importFontFile);
+
+  @override
+  Future<String> userFontsDirectory() => _guard(_api.userFontsDirectory);
 
   @override
   Future<String?> getLanguage() => _guard(_api.getLanguage);

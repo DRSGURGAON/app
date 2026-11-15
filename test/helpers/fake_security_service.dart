@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:docsafe/core/security/security_failure.dart';
@@ -199,6 +200,9 @@ class FakeSecurityService implements SecurityService {
     return f;
   }
 
+  /// Real plaintext for files that tests need to read back (PDF text edit).
+  final fileContents = <String, Uint8List>{};
+
   @override
   Future<String> decryptToTemp(String fileId, String extension) async {
     _requireUnlocked();
@@ -207,6 +211,8 @@ class FakeSecurityService implements SecurityService {
     }
     final path = '/tmp/fake-$fileId.$extension';
     tempFiles.add(path);
+    final content = fileContents[fileId];
+    if (content != null) File(path).writeAsBytesSync(content);
     return path;
   }
 
@@ -371,7 +377,9 @@ class FakeSecurityService implements SecurityService {
       throw const SecurityFailure(SecurityErrorCode.invalidInput);
     }
     importedPdfSizes.add(bytes.length);
-    return _generated(bytes.length);
+    final f = _generated(bytes.length);
+    fileContents[f.fileId] = bytes;
+    return f;
   }
 
   @override
@@ -516,6 +524,23 @@ class FakeSecurityService implements SecurityService {
       skipped: 0,
     );
   }
+
+  /// Font file the next importFontFile "picks" (name, bytes); null cancels.
+  (String, Uint8List)? nextFontImport;
+  late final Directory fontsDir = Directory.systemTemp.createTempSync('fonts');
+
+  @override
+  Future<String?> importFontFile() async {
+    _requireUnlocked();
+    final next = nextFontImport;
+    nextFontImport = null;
+    if (next == null) return null;
+    File('${fontsDir.path}/${next.$1}').writeAsBytesSync(next.$2);
+    return next.$1;
+  }
+
+  @override
+  Future<String> userFontsDirectory() async => fontsDir.path;
 
   @override
   Future<String?> getLanguage() async => language;

@@ -409,6 +409,45 @@ class SecurityHostApiImpl(
         }
     }
 
+    override suspend fun importFontFile(): String? = guard {
+        session.requireUnlocked()
+        val uri = documentUi.openDocument(
+            arrayOf("font/ttf", "font/otf", "font/sfnt", "application/x-font-ttf", "application/x-font-otf", "application/octet-stream"),
+        ) ?: return@guard null
+        io {
+            val maxBytes = 20 * 1024 * 1024
+            val bytes = appContext.contentResolver.openInputStream(uri)?.use { input ->
+                val out = java.io.ByteArrayOutputStream()
+                val buf = ByteArray(64 * 1024)
+                while (true) {
+                    val n = input.read(buf)
+                    if (n < 0) break
+                    out.write(buf, 0, n)
+                    if (out.size() > maxBytes) throw InvalidInputException("Font too large")
+                }
+                out.toByteArray()
+            } ?: throw VaultIoException("Cannot open font")
+            if (bytes.size < 12) throw InvalidInputException("Not a font")
+            val tag = java.nio.ByteBuffer.wrap(bytes, 0, 4).int
+            val ext = when (tag) {
+                0x00010000, 0x74727565 -> "ttf"
+                0x4F54544F -> "otf"
+                else -> throw InvalidInputException("Not a font")
+            }
+            val display = appContext.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.DISPLAY_NAME), null, null, null)
+                ?.use { c -> if (c.moveToFirst()) c.getString(0) else null } ?: "font"
+            val base = display.substringBeforeLast('.').replace(Regex("[^A-Za-z0-9 ._-]"), "_").take(60).ifBlank { "font" }
+            session.fontsDir.mkdirs()
+            var file = java.io.File(session.fontsDir, "$base.$ext")
+            var n = 2
+            while (file.exists()) file = java.io.File(session.fontsDir, "$base-${n++}.$ext")
+            file.writeBytes(bytes)
+            file.name
+        }
+    }
+
+    override fun userFontsDirectory(): String = session.fontsDir.also { it.mkdirs() }.absolutePath
+
     override suspend fun pickBackupFile(): String? = guard {
         session.requireUnlocked()
         val uri = documentUi.openDocument(arrayOf("*/*")) ?: return@guard null

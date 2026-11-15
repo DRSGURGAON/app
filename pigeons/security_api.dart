@@ -420,6 +420,16 @@ abstract class SecurityHostApi {
   @async
   RestoreResult restoreBackup(String token, Uint8List password);
 
+  /// Lets the user pick a TrueType/OpenType font file and copies it into
+  /// DocSafe's private fonts folder (used only when editing PDF text).
+  /// Returns the stored file name, or null if cancelled. Errors:
+  /// INVALID_INPUT (not a font, or larger than 20 MB). Requires unlock.
+  @async
+  String? importFontFile();
+
+  /// Absolute path of the private folder holding user-added fonts.
+  String userFontsDirectory();
+
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   String? getLanguage();
 

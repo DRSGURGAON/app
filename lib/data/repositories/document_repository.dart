@@ -324,6 +324,79 @@ class DocumentRepository {
     categoryId: categoryId,
   )).documents;
 
+  /// Puts [file] in place of [doc]'s content, keeping its title, category,
+  /// folder, tags, dates, notes and reminders. The previous content becomes a
+  /// separate document titled [previousTitle] in Recently deleted (restorable
+  /// for 30 days). Saved text for search is dropped because it no longer
+  /// matches. If anything fails, [file] is deleted and nothing changes.
+  Future<VaultDocument> replaceContent(
+    VaultDocument doc,
+    ImportedFile file, {
+    required String previousTitle,
+  }) async {
+    try {
+      final now = _clock();
+      await _db.transaction(() async {
+        await _db
+            .into(_db.encryptedFiles)
+            .insert(
+              EncryptedFilesCompanion.insert(
+                id: file.fileId,
+                formatVersion: 1,
+                plaintextBytes: file.plaintextBytes,
+                ciphertextBytes: file.ciphertextBytes,
+                fingerprint: Value(file.fingerprint),
+                createdAt: now,
+              ),
+            );
+        final n =
+            await (_db.update(
+              _db.documents,
+            )..where((t) => t.id.equals(doc.id))).write(
+              DocumentsCompanion(
+                fileId: Value(file.fileId),
+                mimeType: Value(file.mimeType),
+                updatedAt: Value(now),
+              ),
+            );
+        if (n != 1) throw StateError('Document not found');
+        final previous = await _db
+            .into(_db.documents)
+            .insert(
+              DocumentsCompanion.insert(
+                title: cleanTitle(previousTitle),
+                mimeType: doc.mimeType,
+                fileId: doc.fileId,
+                createdAt: now,
+                updatedAt: now,
+                folderId: Value(doc.folderId),
+                categoryId: Value(doc.categoryId),
+              ),
+            );
+        await _db
+            .into(_db.recentlyDeleted)
+            .insert(
+              RecentlyDeletedCompanion.insert(
+                documentId: Value(previous),
+                deletedAt: now,
+              ),
+            );
+        await (_db.delete(
+          _db.documentTexts,
+        )..where((t) => t.documentId.equals(doc.id))).go();
+      });
+      return (await byId(doc.id))!;
+    } catch (e) {
+      AppLogger.event('replace_failed');
+      try {
+        await _security.deleteEncryptedFile(file.fileId);
+      } catch (_) {
+        // The orphan sweep removes it on the next unlock.
+      }
+      rethrow;
+    }
+  }
+
   /// Records encrypted containers as documents in one transaction. If it
   /// fails, every container is deleted so nothing is orphaned.
   Future<({List<VaultDocument> documents, bool anyDuplicate})> _recordAll(

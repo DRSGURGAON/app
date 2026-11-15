@@ -1386,6 +1386,15 @@ interface SecurityHostApi {
    * (wrong password or damaged header), BACKUP_INVALID, INTEGRITY, LOW_STORAGE.
    */
   suspend fun restoreBackup(token: String, password: ByteArray): RestoreResult
+  /**
+   * Lets the user pick a TrueType/OpenType font file and copies it into
+   * DocSafe's private fonts folder (used only when editing PDF text).
+   * Returns the stored file name, or null if cancelled. Errors:
+   * INVALID_INPUT (not a font, or larger than 20 MB). Requires unlock.
+   */
+  suspend fun importFontFile(): String?
+  /** Absolute path of the private folder holding user-added fonts. */
+  fun userFontsDirectory(): String
   /** Non-sensitive UI language preference, readable before unlock ("hi"/"en"). */
   fun getLanguage(): String?
   fun setLanguage(languageCode: String)
@@ -2103,6 +2112,38 @@ interface SecurityHostApi {
               }
               reply.reply(wrapped)
             }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.importFontFile$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.importFontFile())
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.userFontsDirectory$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.userFontsDirectory())
+            } catch (exception: Throwable) {
+              SecurityApiPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
           }
         } else {
           channel.setMessageHandler(null)

@@ -2013,6 +2013,49 @@ class SecurityHostApi {
     return pigeonVar_replyValue! as RestoreResult;
   }
 
+  /// Lets the user pick a TrueType/OpenType font file and copies it into
+  /// DocSafe's private fonts folder (used only when editing PDF text).
+  /// Returns the stored file name, or null if cancelled. Errors:
+  /// INVALID_INPUT (not a font, or larger than 20 MB). Requires unlock.
+  Future<String?> importFontFile() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.importFontFile$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as String?;
+  }
+
+  /// Absolute path of the private folder holding user-added fonts.
+  Future<String> userFontsDirectory() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.userFontsDirectory$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as String;
+  }
+
   /// Non-sensitive UI language preference, readable before unlock ("hi"/"en").
   Future<String?> getLanguage() async {
     final pigeonVar_channelName =
