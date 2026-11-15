@@ -170,6 +170,8 @@ class _OrderedDocumentsScreenState
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   TextField(
+                    // Keyboards must not learn document names, notes or passwords.
+                    enableIMEPersonalizedLearning: false,
                     controller: _title,
                     maxLength: maxTitleLength,
                     enableSuggestions: false,

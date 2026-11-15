@@ -78,6 +78,8 @@ class _TextInputDialogState extends State<_TextInputDialog> {
     return AlertDialog(
       title: Text(widget.title),
       content: TextField(
+        // Keyboards must not learn document names, notes or passwords.
+        enableIMEPersonalizedLearning: false,
         controller: _c,
         autofocus: true,
         maxLength: widget.maxLength,

@@ -349,9 +349,18 @@ Details and Play Console steps: docs/BILLING.md.
   font from the user's fonts, the phone's fonts or DocSafe's bundled OFL fonts is embedded.
   User-added fonts are stored unencrypted (not personal data) in a private no-backup folder and
   wiped by Erase all data. The editor never silently substitutes: a badge shows which font is
-  used.
+  used. Before the document's own font is offered, every character it claims is written into
+  a throwaway copy and read back; characters its encoding cannot write (e.g. custom encodings)
+  are excluded, so they use a bundled or phone font instead of producing wrong letters.
 - Refused: Identity-category documents (as Annotate & Sign); digitally signed PDFs need an
   explicit "Edit anyway" (signatures become invalid); legal acknowledgement before saving.
+
+## 12f. Keyboard
+
+- Every text field sets `enableIMEPersonalizedLearning: false` (Android
+  `IME_FLAG_NO_PERSONALIZED_LEARNING`), so keyboards are asked not to learn document names,
+  notes or backup passwords. A guard test fails if a new field misses it. It is a request to
+  the keyboard; a malicious third-party keyboard can still read what is typed.
 
 ## 13. Known limitations
 

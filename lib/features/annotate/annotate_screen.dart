@@ -591,6 +591,8 @@ class _TextDialogState extends State<_TextDialog> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             key: const Key('annotate-text-field'),
             controller: _controller,
             autofocus: true,

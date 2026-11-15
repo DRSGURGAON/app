@@ -508,6 +508,8 @@ class _EditSheetState extends ConsumerState<_EditSheet> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             key: const Key('edit-text-field'),
             controller: _controller,
             autofocus: true,

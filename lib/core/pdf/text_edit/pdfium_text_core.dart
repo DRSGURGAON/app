@@ -188,6 +188,7 @@ PdfTextModel analyzePdf(PDFium p, Uint8List bytes) {
     final runs = <TextRun>[];
     final fonts = <String, PdfFontInfo>{};
     final usedRunes = <String, Set<int>>{};
+    final firstUse = <String, (int, int)>{};
     final pageCount = p.FPDF_GetPageCount(doc.handle);
     for (var pi = 0; pi < pageCount; pi++) {
       final page = p.FPDF_LoadPage(doc.handle, pi);
@@ -197,6 +198,7 @@ PdfTextModel analyzePdf(PDFium p, Uint8List bytes) {
       final objs = _textObjects(p, page, tp);
       for (final o in objs) {
         usedRunes.putIfAbsent(o.fontKey, () => {}).addAll(o.text.runes);
+        firstUse.putIfAbsent(o.fontKey, () => (pi, o.index));
         if (!fonts.containsKey(o.fontKey)) {
           fonts[o.fontKey] = _fontInfo(p, o.font, o.fontKey);
         }
@@ -215,7 +217,10 @@ PdfTextModel analyzePdf(PDFium p, Uint8List bytes) {
           italic: e.value.italic,
           serif: e.value.serif,
           monospace: e.value.monospace,
-          runes: {...e.value.runes, ...?usedRunes[e.key]},
+          runes: _encodableRunes(p, doc.handle, firstUse[e.key], {
+            ...e.value.runes,
+            ...?usedRunes[e.key],
+          }),
         ),
     };
     return PdfTextModel(
@@ -226,6 +231,56 @@ PdfTextModel analyzePdf(PDFium p, Uint8List bytes) {
     );
   } finally {
     doc.close();
+  }
+}
+
+/// Keeps only the characters the font can really write back.
+///
+/// A font's character list can promise more than its encoding delivers (a
+/// simple font with a custom encoding, a subset whose cmap lists missing
+/// glyphs). Write every candidate character into one of the font's own text
+/// objects of this throwaway copy and read it back: a character that does not
+/// come back unchanged is dropped, so the original font is never offered for
+/// it and DocSafe's own font is used instead.
+Set<int> _encodableRunes(
+  PDFium p,
+  FPDF_DOCUMENT doc,
+  (int, int)? at,
+  Set<int> runes,
+) {
+  if (at == null) return const {};
+  final probe = [
+    for (final r in runes.toList()..sort())
+      if (r > 0x20 && r != 0xA0 && String.fromCharCode(r).trim().isNotEmpty) r,
+  ];
+  if (probe.isEmpty) return runes;
+  final page = p.FPDF_LoadPage(doc, at.$1);
+  if (page.address == 0) return const {};
+  try {
+    final o = p.FPDFPage_GetObject(page, at.$2);
+    final text = String.fromCharCodes(probe);
+    final wide = _wide(text);
+    try {
+      if (p.FPDFText_SetText(o, wide.cast()) != 1) return const {};
+    } finally {
+      calloc.free(wide);
+    }
+    final tp = p.FPDFText_LoadPage(page);
+    final back = _objText(
+      p,
+      o,
+      tp,
+    ).replaceAll(RegExp(r'\s'), '').runes.toList();
+    p.FPDFText_ClosePage(tp);
+    if (back.length != probe.length) return const {};
+    return {
+      for (final r in runes)
+        if (!probe.contains(r)) r,
+      for (var i = 0; i < probe.length; i++)
+        if (back[i] == probe[i]) probe[i],
+    };
+  } finally {
+    p.FPDF_ClosePage(page);
   }
 }
 

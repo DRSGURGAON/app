@@ -189,6 +189,8 @@ class _EraseScreenState extends ConsumerState<EraseScreen> {
           Text(l.eraseBody, style: theme.textTheme.bodyLarge),
           const SizedBox(height: 24),
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             controller: _word,
             autocorrect: false,
             enableSuggestions: false,

@@ -57,6 +57,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       appBar: AppBar(
         titleSpacing: 0,
         title: TextField(
+          // Keyboards must not learn document names, notes or passwords.
+          enableIMEPersonalizedLearning: false,
           controller: _controller,
           autofocus: true,
           enableSuggestions: false,

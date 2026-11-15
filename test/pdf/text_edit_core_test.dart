@@ -312,4 +312,55 @@ void main() {
     expect(sans.info.runes, isNot(contains('क'.runes.first)));
     expect(FontFileInfo.parse(Uint8List.fromList([1, 2, 3, 4])), isNull);
   });
+  test('a font whose encoding cannot write a letter never offers it', () {
+    // Helvetica with a custom encoding: the codes for a, b, c draw x, y, z.
+    // The font's character list promises a-z, but writing "a" with it cannot
+    // give back "a", so the original font must not be offered for it.
+    final m = analyzePdf(p, simplePdf('/Differences [97 /x /y /z]', '(abc)'));
+    final r = run(m, 'xyz');
+    final runes = m.fonts[r.fontKey]!.runes;
+    expect(runes, isNot(contains('a'.runes.first)));
+    expect(
+      chooseFont(m.fonts[r.fontKey]!, 'cab', library).kind,
+      isNot(FontMatchKind.original),
+    );
+    // Without the custom encoding every letter writes back as itself.
+    final plain = analyzePdf(p, simplePdf('/WinAnsiEncoding', '(abc)'));
+    final pr = run(plain, 'abc');
+    expect(plain.fonts[pr.fontKey]!.runes, containsAll('abcxyzABC019'.runes));
+    expect(
+      chooseFont(plain.fonts[pr.fontKey]!, 'cab', library).kind,
+      FontMatchKind.original,
+    );
+  });
+}
+
+/// A one-page PDF with [text] in non-embedded Helvetica using [encoding].
+Uint8List simplePdf(String encoding, String text) {
+  final content = 'BT /F1 24 Tf 72 700 Td $text Tj ET';
+  final objs = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] '
+        '/Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>',
+    '<< /Length ${content.length} >>\nstream\n$content\nendstream',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica '
+        '/Encoding ${encoding.startsWith('/D') ? '<< /Type /Encoding $encoding >>' : encoding} >>',
+  ];
+  final b = StringBuffer('%PDF-1.4\n');
+  final offsets = <int>[];
+  for (var i = 0; i < objs.length; i++) {
+    offsets.add(b.length);
+    b.write('${i + 1} 0 obj\n${objs[i]}\nendobj\n');
+  }
+  final xref = b.length;
+  b.write('xref\n0 ${objs.length + 1}\n0000000000 65535 f \n');
+  for (final o in offsets) {
+    b.write('${o.toString().padLeft(10, '0')} 00000 n \n');
+  }
+  b.write(
+    'trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\n'
+    'startxref\n$xref\n%%EOF\n',
+  );
+  return Uint8List.fromList(b.toString().codeUnits);
 }

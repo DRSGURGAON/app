@@ -123,6 +123,8 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
           Text(l.scanPageCount(pageCount), style: theme.textTheme.titleMedium),
           const SizedBox(height: 16),
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             controller: _title,
             maxLength: maxTitleLength,
             enableSuggestions: false,
@@ -200,6 +202,8 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
           ),
           const SizedBox(height: 16),
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             controller: _tags,
             enableSuggestions: false,
             autocorrect: false,

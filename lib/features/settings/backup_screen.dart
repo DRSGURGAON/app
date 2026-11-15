@@ -235,6 +235,8 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             key: const Key('backup-password-1'),
             controller: _first,
             obscureText: !_show,
@@ -247,6 +249,8 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
             onChanged: (_) => setState(() {}),
           ),
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             key: const Key('backup-password-2'),
             controller: _second,
             obscureText: !_show,
@@ -317,6 +321,8 @@ class _EnterPasswordDialogState extends State<_EnterPasswordDialog> {
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
+            // Keyboards must not learn document names, notes or passwords.
+            enableIMEPersonalizedLearning: false,
             key: const Key('restore-password'),
             controller: _controller,
             obscureText: !_show,
