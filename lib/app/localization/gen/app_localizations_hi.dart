@@ -916,7 +916,7 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'जोड़ना, अलग करना, छोटा करना और \'लिखें और साइन करें\' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।';
+      'टेक्स्ट बदलना, जोड़ना, अलग करना, छोटा करना और \'लिखें और साइन करें\' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।';
 
   @override
   String get toolsPrivacyNote =>
@@ -1627,4 +1627,137 @@ class AppLocalizationsHi extends AppLocalizations {
   String aboutVersion(String version) {
     return 'संस्करण $version';
   }
+
+  @override
+  String get toolEditText => 'टेक्स्ट बदलें';
+
+  @override
+  String get toolEditTextDesc =>
+      'अंग्रेज़ी PDF के शब्द बदलें, दस्तावेज़ के अपने फ़ॉन्ट में';
+
+  @override
+  String get editTextHint =>
+      'बदलने के लिए किसी लाइन पर टैप करें। केवल अंग्रेज़ी टेक्स्ट।';
+
+  @override
+  String get editTextNoText =>
+      'इस पेज पर बदलने लायक टेक्स्ट नहीं है। यह स्कैन की गई इमेज हो सकती है — इसके लिए \'लिखें और साइन करें\' इस्तेमाल करें।';
+
+  @override
+  String get editTextFieldLabel => 'टेक्स्ट';
+
+  @override
+  String get editTextApply => 'लागू करें';
+
+  @override
+  String get editTextFit => 'लाइन में फ़िट करें';
+
+  @override
+  String get editTextFitHelp =>
+      'अगर टेक्स्ट अगले टेक्स्ट से टकराए तो उसे थोड़ा सँकरा कर देता है।';
+
+  @override
+  String get fontOriginal => 'मूल फ़ॉन्ट';
+
+  @override
+  String fontSameFamily(String name) {
+    return 'वही फ़ॉन्ट: $name';
+  }
+
+  @override
+  String fontMetricMatch(String name) {
+    return 'सबसे मिलता-जुलता: $name';
+  }
+
+  @override
+  String fontMetricMatchHelp(String original) {
+    return 'चौड़ाई $original जैसी ही; अक्षर थोड़े अलग दिखते हैं। बिल्कुल मिलान के लिए मूल फ़ॉन्ट जोड़ें।';
+  }
+
+  @override
+  String fontSimilar(String name) {
+    return 'अलग फ़ॉन्ट: $name';
+  }
+
+  @override
+  String fontMissing(String chars) {
+    return 'किसी उपलब्ध फ़ॉन्ट में नहीं है: $chars';
+  }
+
+  @override
+  String get editTextNotEnglish =>
+      'केवल अंग्रेज़ी अक्षर, अंक और आम चिह्न लिखे जा सकते हैं।';
+
+  @override
+  String get editTextTooLong =>
+      'नया टेक्स्ट इस लाइन के लिए बहुत लंबा है। उसे छोटा करें या \'लाइन में फ़िट करें\' चालू करें।';
+
+  @override
+  String get editTextFonts => 'फ़ॉन्ट';
+
+  @override
+  String get editTextAddFont => 'फ़ॉन्ट जोड़ें (.ttf या .otf)';
+
+  @override
+  String get editTextFontsHelp =>
+      'दस्तावेज़ में इस्तेमाल हुआ असली फ़ॉन्ट जोड़ें (जैसे अपने कंप्यूटर से), ताकि बदलाव बिल्कुल मेल खाएँ। केवल वही फ़ॉन्ट जोड़ें जिनके इस्तेमाल का आपको अधिकार है।';
+
+  @override
+  String editTextFontAdded(String name) {
+    return 'फ़ॉन्ट जोड़ा गया: $name';
+  }
+
+  @override
+  String get editTextFontInvalid =>
+      'यह फ़ाइल ऐसा फ़ॉन्ट नहीं है जिसे DocSafe इस्तेमाल कर सके।';
+
+  @override
+  String get editTextNoUserFonts => 'अभी कोई फ़ॉन्ट नहीं जोड़ा गया।';
+
+  @override
+  String get editTextDeleteFont => 'फ़ॉन्ट हटाएँ';
+
+  @override
+  String get editTextSaveTitle => 'बदलाव सहेजें';
+
+  @override
+  String get editTextSaveInPlace => 'इसी दस्तावेज़ में सहेजें';
+
+  @override
+  String get editTextSaveInPlaceHelp =>
+      'पिछला संस्करण 30 दिन तक \'हाल ही में हटाए गए\' में रहेगा।';
+
+  @override
+  String get editTextSaveAsCopy => 'कॉपी के रूप में सहेजें';
+
+  @override
+  String get editTextAckBody =>
+      'इसे केवल अपने दस्तावेज़ों पर इस्तेमाल करें। आधिकारिक या सरकारी दस्तावेज़, प्रमाणपत्र या किसी और का दस्तावेज़ बदलना ग़ैर-कानूनी हो सकता है।';
+
+  @override
+  String get editTextSigned =>
+      'यह PDF डिजिटल रूप से साइन किया हुआ है। बदलने पर साइन अमान्य हो जाएगा।';
+
+  @override
+  String get editTextSignedContinue => 'फिर भी बदलें';
+
+  @override
+  String get editTextSaved => 'बदलाव सहेजे गए';
+
+  @override
+  String editTextPreviousTitle(String title) {
+    return '$title (बदलाव से पहले)';
+  }
+
+  @override
+  String editTextCopyTitle(String title) {
+    return '$title (बदला गया)';
+  }
+
+  @override
+  String get editTextIdentityBlocked =>
+      'पहचान श्रेणी के दस्तावेज़ (आधार, PAN, पासपोर्ट, वोटर ID आदि) बदले नहीं जा सकते। आधिकारिक दस्तावेज़ बदलना समर्थित नहीं है।';
+
+  @override
+  String get editTextEdited => 'बदला गया';
 }

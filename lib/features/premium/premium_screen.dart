@@ -153,6 +153,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
             Text(l.premiumIncludes, style: theme.textTheme.titleMedium),
             const SizedBox(height: 4),
             _Benefit(
+              icon: Icons.text_fields,
+              title: l.toolEditText,
+              body: l.toolEditTextDesc,
+            ),
+            _Benefit(
               icon: Icons.draw_outlined,
               title: l.toolAnnotate,
               body: l.toolAnnotateDesc,

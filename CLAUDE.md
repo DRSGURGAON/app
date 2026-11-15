@@ -12,6 +12,10 @@ Read docs/SECURITY.md before touching security code; docs/TESTING.md lists what 
   Phase 5 (OCR + reminders) implemented: OCR text only stored after user action, masked; notifications
   generic; only reminder times leave the encrypted DB. Encrypted backup file (.dsbackup, backup
   password, PBKDF2 600k) via SAF; no network permission. Phase 7 (QA) done: a11y/l10n/error-state/perf tests in test/a11y, test/l10n, test/perf. Phase 8 (release prep) done in repo: signing via key.properties (never commit keys), store/ assets, docs/RELEASE*.md, PLAY_DATA_SAFETY.md, in-app privacy policy (assets/legal; keep docs/PRIVACY_POLICY.md identical). Never publish or upload anything.
+- Edit text (Premium): lib/core/pdf/text_edit (PDFium edit API on pdfrx's worker via
+  PdfrxEntryFunctions.compute — never call PDFium from other isolates), fonts in assets/pdf_fonts
+  (tool/fonts/build_pdf_fonts.py; renamed OFL subsets), fixtures test/fixtures/pdf
+  (tool/fixtures/make_text_edit_pdfs.py; device copy integration_test/support/text_edit_fixtures.dart).
 - On-device tests drive the Hindi UI: their ProviderContainers override `hindiPhone`
   (integration_test/support/fixtures.dart) because the app follows the phone language.
 - Never: log titles/paths/PINs/keys/contents; send plaintext bytes over the Pigeon bridge (documented exceptions, in-process memory

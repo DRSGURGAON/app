@@ -144,7 +144,16 @@ class ApplyResult {
 }
 
 class RenderedPage {
-  const RenderedPage(this.width, this.height, this.bgra);
+  const RenderedPage(
+    this.width,
+    this.height,
+    this.bgra, {
+    this.overflow = const [],
+  });
   final int width, height;
   final Uint8List bgra;
+
+  /// For the edits on this page (in the order given): true when the text
+  /// still runs past its line after fitting.
+  final List<bool> overflow;
 }

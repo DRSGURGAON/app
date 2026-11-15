@@ -6,6 +6,7 @@
 |---|---|---|
 | Edit pages, Images to PDF, OCR read + suggestions, backup, everything else | Yes | Yes |
 | Merge, Split, Compress PDFs | — | Yes |
+| Edit text (English PDFs) | — | Yes |
 | Annotate & Sign | — | Yes |
 | Save recognised text for search ("Inside documents") | — | Yes |
 | Active reminders | 3 | Unlimited |

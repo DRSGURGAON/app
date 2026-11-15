@@ -162,6 +162,11 @@ void main() {
     expect(fake.tempFiles, isEmpty);
     // Details of the new copy, with the provenance note.
     expect(find.text(en.annotatedTitle('Form')), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(en.annotatedNote('Form')),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(en.annotatedNote('Form')), findsOneWidget);
     await app.dispose();
   });

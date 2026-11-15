@@ -415,7 +415,7 @@
   "toolCompress": "PDF छोटा करें",
   "toolCompressDesc": "फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ",
   "premiumBadge": "प्रीमियम",
-  "toolsPremiumNote": "जोड़ना, अलग करना, छोटा करना और 'लिखें और साइन करें' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।",
+  "toolsPremiumNote": "टेक्स्ट बदलना, जोड़ना, अलग करना, छोटा करना और 'लिखें और साइन करें' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।",
   "toolsPrivacyNote": "सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।",
   "pickPdf": "एक PDF चुनें",
   "pickPdfs": "PDF चुनें",
@@ -834,6 +834,97 @@
   "@aboutVersion": {
     "placeholders": {
       "version": {
+        "type": "String"
+      }
+    }
+  },
+  "toolEditText": "टेक्स्ट बदलें",
+  "toolEditTextDesc": "अंग्रेज़ी PDF के शब्द बदलें, दस्तावेज़ के अपने फ़ॉन्ट में",
+  "editTextHint": "बदलने के लिए किसी लाइन पर टैप करें। केवल अंग्रेज़ी टेक्स्ट।",
+  "editTextNoText": "इस पेज पर बदलने लायक टेक्स्ट नहीं है। यह स्कैन की गई इमेज हो सकती है — इसके लिए 'लिखें और साइन करें' इस्तेमाल करें।",
+  "editTextFieldLabel": "टेक्स्ट",
+  "editTextApply": "लागू करें",
+  "editTextFit": "लाइन में फ़िट करें",
+  "editTextFitHelp": "अगर टेक्स्ट अगले टेक्स्ट से टकराए तो उसे थोड़ा सँकरा कर देता है।",
+  "fontOriginal": "मूल फ़ॉन्ट",
+  "fontSameFamily": "वही फ़ॉन्ट: {name}",
+  "fontMetricMatch": "सबसे मिलता-जुलता: {name}",
+  "fontMetricMatchHelp": "चौड़ाई {original} जैसी ही; अक्षर थोड़े अलग दिखते हैं। बिल्कुल मिलान के लिए मूल फ़ॉन्ट जोड़ें।",
+  "fontSimilar": "अलग फ़ॉन्ट: {name}",
+  "fontMissing": "किसी उपलब्ध फ़ॉन्ट में नहीं है: {chars}",
+  "editTextNotEnglish": "केवल अंग्रेज़ी अक्षर, अंक और आम चिह्न लिखे जा सकते हैं।",
+  "editTextTooLong": "नया टेक्स्ट इस लाइन के लिए बहुत लंबा है। उसे छोटा करें या 'लाइन में फ़िट करें' चालू करें।",
+  "editTextFonts": "फ़ॉन्ट",
+  "editTextAddFont": "फ़ॉन्ट जोड़ें (.ttf या .otf)",
+  "editTextFontsHelp": "दस्तावेज़ में इस्तेमाल हुआ असली फ़ॉन्ट जोड़ें (जैसे अपने कंप्यूटर से), ताकि बदलाव बिल्कुल मेल खाएँ। केवल वही फ़ॉन्ट जोड़ें जिनके इस्तेमाल का आपको अधिकार है।",
+  "editTextFontAdded": "फ़ॉन्ट जोड़ा गया: {name}",
+  "editTextFontInvalid": "यह फ़ाइल ऐसा फ़ॉन्ट नहीं है जिसे DocSafe इस्तेमाल कर सके।",
+  "editTextNoUserFonts": "अभी कोई फ़ॉन्ट नहीं जोड़ा गया।",
+  "editTextDeleteFont": "फ़ॉन्ट हटाएँ",
+  "editTextSaveTitle": "बदलाव सहेजें",
+  "editTextSaveInPlace": "इसी दस्तावेज़ में सहेजें",
+  "editTextSaveInPlaceHelp": "पिछला संस्करण 30 दिन तक 'हाल ही में हटाए गए' में रहेगा।",
+  "editTextSaveAsCopy": "कॉपी के रूप में सहेजें",
+  "editTextAckBody": "इसे केवल अपने दस्तावेज़ों पर इस्तेमाल करें। आधिकारिक या सरकारी दस्तावेज़, प्रमाणपत्र या किसी और का दस्तावेज़ बदलना ग़ैर-कानूनी हो सकता है।",
+  "editTextSigned": "यह PDF डिजिटल रूप से साइन किया हुआ है। बदलने पर साइन अमान्य हो जाएगा।",
+  "editTextSignedContinue": "फिर भी बदलें",
+  "editTextSaved": "बदलाव सहेजे गए",
+  "editTextPreviousTitle": "{title} (बदलाव से पहले)",
+  "editTextCopyTitle": "{title} (बदला गया)",
+  "editTextIdentityBlocked": "पहचान श्रेणी के दस्तावेज़ (आधार, PAN, पासपोर्ट, वोटर ID आदि) बदले नहीं जा सकते। आधिकारिक दस्तावेज़ बदलना समर्थित नहीं है।",
+  "editTextEdited": "बदला गया",
+  "@fontSameFamily": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMetricMatch": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontSimilar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMissing": {
+    "placeholders": {
+      "chars": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextFontAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextPreviousTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextCopyTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMetricMatchHelp": {
+    "placeholders": {
+      "original": {
         "type": "String"
       }
     }

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:docsafe/app/router/app_router.dart';
 import 'package:docsafe/core/entitlement/entitlement.dart';
 import 'package:docsafe/data/repositories/document_repository.dart';
 import 'package:docsafe/data/repositories/reminder_repository.dart';
@@ -16,6 +17,8 @@ import '../../test/features/pdf_tools_flow_test.dart'
     show en, hi, goTab, importDoc, unlockedFake;
 import '../../test/features/reminders_ocr_flow_test.dart'
     show pumpUntil, docIdByTitle;
+import '../../test/features/edit_text_flow_test.dart'
+    show pumpEditor, addPdf, runStartingWith, typeEdit;
 import '../../test/helpers/fake_billing_service.dart';
 import '../../test/helpers/fake_pdf_engine.dart';
 import '../../test/helpers/fake_security_service.dart';
@@ -245,6 +248,42 @@ void main() {
     await settle(tester);
     await tester.drag(find.byType(Scrollable).last, const Offset(0, 2000));
     await shot(tester, '22-premium-active');
+    await app.dispose();
+  });
+
+  testWidgets('edit text', (tester) async {
+    await loadFonts();
+    final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final fake = await unlockedFake(lang: lang);
+    final app = await pumpEditor(tester, fake, lang: lang, size: shotSize());
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
+    final doc = await addPdf(
+      tester,
+      app,
+      fake,
+      'letter_libreoffice.pdf',
+      'Offer Letter.pdf',
+    );
+    app.container.read(routerProvider).go(Routes.details(doc.id));
+    await settle(tester);
+    await scrollAndTap(tester, find.byKey(const Key('details-edit-text')));
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 500)),
+    );
+    await shot(tester, '30-edit-text');
+    await tester.tap(runStartingWith(tester, 'Dear Rahul Sharma'));
+    await settle(tester);
+    await typeEdit(tester, 'Dear Vikram Joshi,');
+    await shot(tester, '31-edit-sheet');
+    await tester.tap(find.byKey(const Key('edit-text-apply')));
+    await settle(tester);
+    await tester.runAsync(
+      () => Future<void>.delayed(const Duration(milliseconds: 500)),
+    );
+    await shot(tester, '32-edit-applied');
+    await tester.tap(find.byKey(const Key('edit-text-save')));
+    await settle(tester);
+    await shot(tester, '33-edit-save');
     await app.dispose();
   });
 }

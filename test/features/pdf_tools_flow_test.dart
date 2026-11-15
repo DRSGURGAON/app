@@ -87,7 +87,7 @@ void main() {
     ]) {
       expect(find.text(t), findsOneWidget);
     }
-    expect(find.text(en.premiumBadge), findsNWidgets(4));
+    expect(find.text(en.premiumBadge), findsNWidgets(5));
     await tester.scrollUntilVisible(find.text(en.toolsPremiumNote), 200);
     expect(find.text(en.toolsPremiumNote), findsOneWidget);
     await app.dispose();

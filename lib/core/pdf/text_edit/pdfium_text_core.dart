@@ -499,7 +499,11 @@ RenderedPage renderPage(
 ) {
   final doc = _Doc(p, bytes);
   try {
-    _applyTo(doc, edits.where((e) => e.page == pageIndex).toList(), fonts);
+    final overflow = _applyTo(
+      doc,
+      edits.where((e) => e.page == pageIndex).toList(),
+      fonts,
+    );
     final page = p.FPDF_LoadPage(doc.handle, pageIndex);
     final pw = p.FPDF_GetPageWidthF(page);
     final ph = p.FPDF_GetPageHeightF(page);
@@ -518,7 +522,7 @@ RenderedPage renderPage(
     }
     p.FPDFBitmap_Destroy(bmp);
     p.FPDF_ClosePage(page);
-    return RenderedPage(w, h, out);
+    return RenderedPage(w, h, out, overflow: overflow);
   } finally {
     doc.close();
   }

@@ -6,7 +6,9 @@ import '../../app/widgets/brand_mark.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../data/models/vault_document.dart';
 import '../../data/services/pdf_tools_service.dart';
+import '../../data/services/pdf_text_edit_service.dart';
 import '../annotate/annotate_screen.dart';
+import '../edit_text/edit_text_screen.dart';
 import '../premium/premium_screen.dart';
 import 'compress_screen.dart';
 import 'document_picker_screen.dart';
@@ -138,6 +140,39 @@ abstract final class PdfToolFlows {
     await _push(context, AnnotateScreen(document: d));
   }
 
+  /// Edit text: Premium; identity documents are refused.
+  static Future<void> editText(
+    BuildContext context, {
+    VaultDocument? doc,
+  }) async {
+    final l = AppLocalizations.of(context);
+    final container = ProviderScope.containerOf(context, listen: false);
+    if (!await _premiumOk(context, l.toolEditText) || !context.mounted) return;
+    final d = doc ?? await _pickOne(context, l.pickPdf);
+    if (d == null || !context.mounted) return;
+    final service = await container.read(pdfTextEditServiceProvider.future);
+    final allowed = await service.canEdit(d);
+    if (!context.mounted) return;
+    if (!allowed) {
+      await showDialog<void>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          icon: const Icon(Icons.badge_outlined),
+          title: Text(l.annotateIdentityBlockedTitle),
+          content: Text(l.editTextIdentityBlocked),
+          actions: [
+            FilledButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text(l.previewClose),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+    await _push(context, EditTextScreen(document: d));
+  }
+
   static Future<VaultDocument?> _pickOne(
     BuildContext context,
     String title,
@@ -201,6 +236,16 @@ class PdfToolsScreen extends ConsumerWidget {
             premium: true,
             locked: !premium,
             onTap: () => PdfToolFlows.compress(context),
+          ),
+          _Tool(
+            key: const Key('tool-edit-text'),
+            icon: Icons.text_fields,
+            title: l.toolEditText,
+            body: l.toolEditTextDesc,
+            premium: true,
+            locked: !premium,
+            highlight: true,
+            onTap: () => PdfToolFlows.editText(context),
           ),
           _Tool(
             key: const Key('tool-annotate'),

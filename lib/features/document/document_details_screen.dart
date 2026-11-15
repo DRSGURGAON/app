@@ -236,6 +236,12 @@ class _DetailsView extends ConsumerWidget {
                     onPressed: () => PdfToolFlows.compress(context, doc: doc),
                   ),
                   ActionChip(
+                    key: const Key('details-edit-text'),
+                    avatar: const Icon(Icons.text_fields, size: 18),
+                    label: Text(l.toolEditText),
+                    onPressed: () => PdfToolFlows.editText(context, doc: doc),
+                  ),
+                  ActionChip(
                     key: const Key('details-annotate'),
                     avatar: const Icon(Icons.draw_outlined, size: 18),
                     label: Text(l.toolAnnotate),

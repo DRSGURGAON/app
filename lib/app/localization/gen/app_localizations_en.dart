@@ -916,7 +916,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get toolsPremiumNote =>
-      'Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.';
+      'Edit text, merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.';
 
   @override
   String get toolsPrivacyNote =>
@@ -1626,4 +1626,135 @@ class AppLocalizationsEn extends AppLocalizations {
   String aboutVersion(String version) {
     return 'Version $version';
   }
+
+  @override
+  String get toolEditText => 'Edit text';
+
+  @override
+  String get toolEditTextDesc =>
+      'Change the words in an English PDF, in the document\'s own font';
+
+  @override
+  String get editTextHint => 'Tap a line to change it. English text only.';
+
+  @override
+  String get editTextNoText =>
+      'This page has no text that can be edited. It may be a scanned image — use Annotate & Sign instead.';
+
+  @override
+  String get editTextFieldLabel => 'Text';
+
+  @override
+  String get editTextApply => 'Apply';
+
+  @override
+  String get editTextFit => 'Fit to the line';
+
+  @override
+  String get editTextFitHelp =>
+      'Narrows the text slightly if it would run into the next text.';
+
+  @override
+  String get fontOriginal => 'Original font';
+
+  @override
+  String fontSameFamily(String name) {
+    return 'Same font: $name';
+  }
+
+  @override
+  String fontMetricMatch(String name) {
+    return 'Closest match: $name';
+  }
+
+  @override
+  String fontMetricMatchHelp(String original) {
+    return 'Same width as $original; letters look slightly different. Add the original font for an exact match.';
+  }
+
+  @override
+  String fontSimilar(String name) {
+    return 'Different font: $name';
+  }
+
+  @override
+  String fontMissing(String chars) {
+    return 'No available font has: $chars';
+  }
+
+  @override
+  String get editTextNotEnglish =>
+      'Only English letters, numbers and common symbols can be typed.';
+
+  @override
+  String get editTextTooLong =>
+      'The new text is too long for this line. Shorten it or turn on Fit to the line.';
+
+  @override
+  String get editTextFonts => 'Fonts';
+
+  @override
+  String get editTextAddFont => 'Add a font (.ttf or .otf)';
+
+  @override
+  String get editTextFontsHelp =>
+      'Add the exact font a document uses (for example from your computer) so edits match it perfectly. Only add fonts you have the right to use.';
+
+  @override
+  String editTextFontAdded(String name) {
+    return 'Font added: $name';
+  }
+
+  @override
+  String get editTextFontInvalid => 'This file is not a font DocSafe can use.';
+
+  @override
+  String get editTextNoUserFonts => 'No fonts added yet.';
+
+  @override
+  String get editTextDeleteFont => 'Remove font';
+
+  @override
+  String get editTextSaveTitle => 'Save changes';
+
+  @override
+  String get editTextSaveInPlace => 'Save in this document';
+
+  @override
+  String get editTextSaveInPlaceHelp =>
+      'The previous version stays in Recently deleted for 30 days.';
+
+  @override
+  String get editTextSaveAsCopy => 'Save as a copy';
+
+  @override
+  String get editTextAckBody =>
+      'Use this only on your own documents. Changing official or government documents, certificates or anyone else\'s document can be illegal.';
+
+  @override
+  String get editTextSigned =>
+      'This PDF is digitally signed. Editing it will make the signature invalid.';
+
+  @override
+  String get editTextSignedContinue => 'Edit anyway';
+
+  @override
+  String get editTextSaved => 'Changes saved';
+
+  @override
+  String editTextPreviousTitle(String title) {
+    return '$title (before edit)';
+  }
+
+  @override
+  String editTextCopyTitle(String title) {
+    return '$title (edited)';
+  }
+
+  @override
+  String get editTextIdentityBlocked =>
+      'Documents in the Identity category (Aadhaar, PAN, passport, voter ID and similar) can\'t be edited. Changing official documents is not supported.';
+
+  @override
+  String get editTextEdited => 'Edited';
 }

@@ -11,6 +11,7 @@ DocSafe is a document vault that works entirely on your phone. This policy expla
 - The documents you import or scan, and their names, categories, folders, tags, dates, notes and reminders.
 - Optional: text read from a document (only if you choose "Save for search") and your saved signature (only if you tick "Save on this device").
 - Your settings, such as language and auto-lock time.
+- Fonts you add for editing PDF text (stored only on this phone, not encrypted because they are not personal data; removed by Erase all data).
 
 All of this is stored only on your phone. Each document is encrypted with its own key (AES-256-GCM); the keys are protected by the Android Keystore, and document details are kept in an encrypted database. Your PIN is never stored, only a protected verifier.
 
@@ -69,6 +70,7 @@ DocSafe एक दस्तावेज़ तिजोरी है जो प�
 - आपके द्वारा इम्पोर्ट या स्कैन किए गए दस्तावेज़, और उनके नाम, श्रेणियाँ, फ़ोल्डर, टैग, तारीखें, नोट्स और रिमाइंडर।
 - वैकल्पिक: दस्तावेज़ से पढ़ा गया टेक्स्ट (केवल तभी जब आप "खोज के लिए सहेजें" चुनें) और आपका सहेजा गया हस्ताक्षर (केवल तभी जब आप "इस डिवाइस पर सहेजें" चुनें)।
 - आपकी सेटिंग्स, जैसे भाषा और ऑटो-लॉक का समय।
+- PDF टेक्स्ट बदलने के लिए आपके जोड़े गए फ़ॉन्ट (केवल इसी फ़ोन पर; निजी जानकारी न होने से एन्क्रिप्ट नहीं; 'सारा डेटा मिटाएँ' से हट जाते हैं)।
 
 यह सब केवल आपके फ़ोन पर सहेजा जाता है। हर दस्तावेज़ अपनी अलग कुंजी (AES-256-GCM) से एन्क्रिप्ट होता है; ये कुंजियाँ Android Keystore से सुरक्षित रहती हैं, और दस्तावेज़ों का विवरण एन्क्रिप्टेड डेटाबेस में रहता है। आपका PIN कभी सहेजा नहीं जाता, केवल उसकी सुरक्षित जाँच-जानकारी रहती है।
 

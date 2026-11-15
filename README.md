@@ -75,6 +75,18 @@ Recently deleted). Not supported: editing text inside PDFs, opening password-pro
 | OCR masking also for US SSN and UK National Insurance numbers; US/UK category keywords; US month-first and month-name expiry dates | Implemented, tested |
 | Encrypted backup file (.dsbackup) with a separate backup password, saved via the system dialog (Drive, USB, any folder); restore on the same or a new phone | Implemented; format JVM-tested, vault round trip instrumented-tested; system dialogs **need a device run** |
 
+**Edit text (Premium, English PDFs):** change the words in a PDF, in the document's own font.
+
+| Area | State |
+|---|---|
+| Tap a line, change it; live preview is the real PDF re-rendered; undo; fit-to-line (≥ 80 %); multi-page | Implemented; host-tested with real PDFium |
+| Font fidelity: document's own font when it has every letter; else the same family (your fonts, phone fonts, DocSafe's copy of Liberation/Carlito/Caladea); else a metric twin (Calibri, Arial, Times, Courier, Cambria); badge shows which | Implemented, tested on Helvetica, LibreOffice (embedded subset) and Calibri-named PDFs |
+| Add your own .ttf/.otf fonts for exact matches | Implemented; native picker needs a device run |
+| Save in the same document (previous version in Recently deleted) or as a copy; identity category refused; signed-PDF warning; legal acknowledgement | Implemented, tested |
+| On-device run (pdfrx PDFium worker, APK fonts) | `integration_test/edit_text_test.dart` (CI emulator) |
+
+Not possible by design: Hindi text, reflowing paragraphs, scanned (image) PDFs.
+
 **Phase 6 — DocSafe Premium (Google Play Billing):** implemented; real purchases **not yet
 tested** (needs the Play Console internal-testing setup in docs/BILLING.md).
 

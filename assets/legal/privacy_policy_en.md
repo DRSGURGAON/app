@@ -9,6 +9,7 @@ DocSafe is a document vault that works entirely on your phone. This policy expla
 - The documents you import or scan, and their names, categories, folders, tags, dates, notes and reminders.
 - Optional: text read from a document (only if you choose "Save for search") and your saved signature (only if you tick "Save on this device").
 - Your settings, such as language and auto-lock time.
+- Fonts you add for editing PDF text (stored only on this phone, not encrypted because they are not personal data; removed by Erase all data).
 
 All of this is stored only on your phone. Each document is encrypted with its own key (AES-256-GCM); the keys are protected by the Android Keystore, and document details are kept in an encrypted database. Your PIN is never stored, only a protected verifier.
 

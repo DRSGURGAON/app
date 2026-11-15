@@ -334,8 +334,31 @@ Details and Play Console steps: docs/BILLING.md.
 - Limitation: client-side verification can be defeated on a rooted/patched device. This only
   unlocks paid features; it never weakens document encryption.
 
+## 12e. Edit text (Premium, English PDFs)
+
+- The editor decrypts the PDF to the usual short-lived temp file, reads it into Dart memory and
+  deletes the temp file at once; all editing happens in memory (PDFium edit API on pdfrx's
+  PDFium worker isolate). The result is encrypted through `importPdfBytes` (documented
+  in-memory exception). Nothing is written to disk in plaintext beyond the existing temp file.
+- Changed text is really replaced: the old text objects are removed from the page content
+  (verified by re-reading the saved file in tests), unlike a cover/overlay.
+- "Save in this document" swaps the document's encrypted file in one database transaction; the
+  previous file stays as a separate document in Recently deleted (30 days). Saved OCR text for
+  the document is dropped because it no longer matches.
+- Fonts: the document's own embedded font is reused when it has every character; otherwise a
+  font from the user's fonts, the phone's fonts or DocSafe's bundled OFL fonts is embedded.
+  User-added fonts are stored unencrypted (not personal data) in a private no-backup folder and
+  wiped by Erase all data. The editor never silently substitutes: a badge shows which font is
+  used.
+- Refused: Identity-category documents (as Annotate & Sign); digitally signed PDFs need an
+  explicit "Edit anyway" (signatures become invalid); legal acknowledgement before saving.
+
 ## 13. Known limitations
 
+- Edit text: English characters only; no reflow (each line is edited on its own); scanned
+  PDFs have no text to edit; fonts the document does not embed fully and that are not available
+  on the phone or added by the user are replaced by a metric-compatible or similar font (shown
+  in the editor).
 - The bundled OCR model adds about 13 MB to the per-device download (arm64 APK 34.6 → 47.9 MB,
   CI run 25). Play-services-delivered models would be smaller but need Google Play services and a
   one-time download; not chosen so OCR works offline and on devices without Play services.

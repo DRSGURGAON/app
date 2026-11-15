@@ -1679,7 +1679,7 @@ abstract class AppLocalizations {
   /// No description provided for @toolsPremiumNote.
   ///
   /// In en, this message translates to:
-  /// **'Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.'**
+  /// **'Edit text, merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.'**
   String get toolsPremiumNote;
 
   /// No description provided for @toolsPrivacyNote.
@@ -2845,6 +2845,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Version {version}'**
   String aboutVersion(String version);
+
+  /// No description provided for @toolEditText.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit text'**
+  String get toolEditText;
+
+  /// No description provided for @toolEditTextDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change the words in an English PDF, in the document\'s own font'**
+  String get toolEditTextDesc;
+
+  /// No description provided for @editTextHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap a line to change it. English text only.'**
+  String get editTextHint;
+
+  /// No description provided for @editTextNoText.
+  ///
+  /// In en, this message translates to:
+  /// **'This page has no text that can be edited. It may be a scanned image — use Annotate & Sign instead.'**
+  String get editTextNoText;
+
+  /// No description provided for @editTextFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get editTextFieldLabel;
+
+  /// No description provided for @editTextApply.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply'**
+  String get editTextApply;
+
+  /// No description provided for @editTextFit.
+  ///
+  /// In en, this message translates to:
+  /// **'Fit to the line'**
+  String get editTextFit;
+
+  /// No description provided for @editTextFitHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Narrows the text slightly if it would run into the next text.'**
+  String get editTextFitHelp;
+
+  /// No description provided for @fontOriginal.
+  ///
+  /// In en, this message translates to:
+  /// **'Original font'**
+  String get fontOriginal;
+
+  /// No description provided for @fontSameFamily.
+  ///
+  /// In en, this message translates to:
+  /// **'Same font: {name}'**
+  String fontSameFamily(String name);
+
+  /// No description provided for @fontMetricMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Closest match: {name}'**
+  String fontMetricMatch(String name);
+
+  /// No description provided for @fontMetricMatchHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Same width as {original}; letters look slightly different. Add the original font for an exact match.'**
+  String fontMetricMatchHelp(String original);
+
+  /// No description provided for @fontSimilar.
+  ///
+  /// In en, this message translates to:
+  /// **'Different font: {name}'**
+  String fontSimilar(String name);
+
+  /// No description provided for @fontMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'No available font has: {chars}'**
+  String fontMissing(String chars);
+
+  /// No description provided for @editTextNotEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Only English letters, numbers and common symbols can be typed.'**
+  String get editTextNotEnglish;
+
+  /// No description provided for @editTextTooLong.
+  ///
+  /// In en, this message translates to:
+  /// **'The new text is too long for this line. Shorten it or turn on Fit to the line.'**
+  String get editTextTooLong;
+
+  /// No description provided for @editTextFonts.
+  ///
+  /// In en, this message translates to:
+  /// **'Fonts'**
+  String get editTextFonts;
+
+  /// No description provided for @editTextAddFont.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a font (.ttf or .otf)'**
+  String get editTextAddFont;
+
+  /// No description provided for @editTextFontsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the exact font a document uses (for example from your computer) so edits match it perfectly. Only add fonts you have the right to use.'**
+  String get editTextFontsHelp;
+
+  /// No description provided for @editTextFontAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Font added: {name}'**
+  String editTextFontAdded(String name);
+
+  /// No description provided for @editTextFontInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This file is not a font DocSafe can use.'**
+  String get editTextFontInvalid;
+
+  /// No description provided for @editTextNoUserFonts.
+  ///
+  /// In en, this message translates to:
+  /// **'No fonts added yet.'**
+  String get editTextNoUserFonts;
+
+  /// No description provided for @editTextDeleteFont.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove font'**
+  String get editTextDeleteFont;
+
+  /// No description provided for @editTextSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get editTextSaveTitle;
+
+  /// No description provided for @editTextSaveInPlace.
+  ///
+  /// In en, this message translates to:
+  /// **'Save in this document'**
+  String get editTextSaveInPlace;
+
+  /// No description provided for @editTextSaveInPlaceHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'The previous version stays in Recently deleted for 30 days.'**
+  String get editTextSaveInPlaceHelp;
+
+  /// No description provided for @editTextSaveAsCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Save as a copy'**
+  String get editTextSaveAsCopy;
+
+  /// No description provided for @editTextAckBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this only on your own documents. Changing official or government documents, certificates or anyone else\'s document can be illegal.'**
+  String get editTextAckBody;
+
+  /// No description provided for @editTextSigned.
+  ///
+  /// In en, this message translates to:
+  /// **'This PDF is digitally signed. Editing it will make the signature invalid.'**
+  String get editTextSigned;
+
+  /// No description provided for @editTextSignedContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit anyway'**
+  String get editTextSignedContinue;
+
+  /// No description provided for @editTextSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved'**
+  String get editTextSaved;
+
+  /// No description provided for @editTextPreviousTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (before edit)'**
+  String editTextPreviousTitle(String title);
+
+  /// No description provided for @editTextCopyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{title} (edited)'**
+  String editTextCopyTitle(String title);
+
+  /// No description provided for @editTextIdentityBlocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents in the Identity category (Aadhaar, PAN, passport, voter ID and similar) can\'t be edited. Changing official documents is not supported.'**
+  String get editTextIdentityBlocked;
+
+  /// No description provided for @editTextEdited.
+  ///
+  /// In en, this message translates to:
+  /// **'Edited'**
+  String get editTextEdited;
 }
 
 class _AppLocalizationsDelegate

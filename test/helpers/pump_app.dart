@@ -15,6 +15,7 @@ import 'package:docsafe/features/pdf_tools/widgets/pdf_thumbnail.dart';
 import 'package:drift/drift.dart' show driftRuntimeOptions;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'fake_billing_service.dart';
@@ -61,6 +62,7 @@ Future<TestApp> pumpApp(
   OverlayRenderer? overlayRenderer,
   Locale deviceLocale = const Locale('en', 'US'),
   BillingService? billing,
+  List<Override> overrides = const [],
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -94,6 +96,7 @@ Future<TestApp> pumpApp(
             (marks, size) async =>
                 Uint8List.fromList([137, 80, 78, 71, marks.length]),
       ),
+      ...overrides,
       databaseOpenerProvider.overrideWithValue((path, key) {
         final db = openEncryptedMemoryDatabase('c' * 64);
         databases.add(db);

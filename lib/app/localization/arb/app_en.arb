@@ -415,7 +415,7 @@
   "toolCompress": "Compress PDF",
   "toolCompressDesc": "Reduce file size — one or several PDFs at once",
   "premiumBadge": "Premium",
-  "toolsPremiumNote": "Merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.",
+  "toolsPremiumNote": "Edit text, merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.",
   "toolsPrivacyNote": "Everything runs on this phone. Results are saved as new encrypted documents.",
   "pickPdf": "Choose a PDF",
   "pickPdfs": "Choose PDFs",
@@ -834,6 +834,97 @@
   "@aboutVersion": {
     "placeholders": {
       "version": {
+        "type": "String"
+      }
+    }
+  },
+  "toolEditText": "Edit text",
+  "toolEditTextDesc": "Change the words in an English PDF, in the document's own font",
+  "editTextHint": "Tap a line to change it. English text only.",
+  "editTextNoText": "This page has no text that can be edited. It may be a scanned image — use Annotate & Sign instead.",
+  "editTextFieldLabel": "Text",
+  "editTextApply": "Apply",
+  "editTextFit": "Fit to the line",
+  "editTextFitHelp": "Narrows the text slightly if it would run into the next text.",
+  "fontOriginal": "Original font",
+  "fontSameFamily": "Same font: {name}",
+  "fontMetricMatch": "Closest match: {name}",
+  "fontMetricMatchHelp": "Same width as {original}; letters look slightly different. Add the original font for an exact match.",
+  "fontSimilar": "Different font: {name}",
+  "fontMissing": "No available font has: {chars}",
+  "editTextNotEnglish": "Only English letters, numbers and common symbols can be typed.",
+  "editTextTooLong": "The new text is too long for this line. Shorten it or turn on Fit to the line.",
+  "editTextFonts": "Fonts",
+  "editTextAddFont": "Add a font (.ttf or .otf)",
+  "editTextFontsHelp": "Add the exact font a document uses (for example from your computer) so edits match it perfectly. Only add fonts you have the right to use.",
+  "editTextFontAdded": "Font added: {name}",
+  "editTextFontInvalid": "This file is not a font DocSafe can use.",
+  "editTextNoUserFonts": "No fonts added yet.",
+  "editTextDeleteFont": "Remove font",
+  "editTextSaveTitle": "Save changes",
+  "editTextSaveInPlace": "Save in this document",
+  "editTextSaveInPlaceHelp": "The previous version stays in Recently deleted for 30 days.",
+  "editTextSaveAsCopy": "Save as a copy",
+  "editTextAckBody": "Use this only on your own documents. Changing official or government documents, certificates or anyone else's document can be illegal.",
+  "editTextSigned": "This PDF is digitally signed. Editing it will make the signature invalid.",
+  "editTextSignedContinue": "Edit anyway",
+  "editTextSaved": "Changes saved",
+  "editTextPreviousTitle": "{title} (before edit)",
+  "editTextCopyTitle": "{title} (edited)",
+  "editTextIdentityBlocked": "Documents in the Identity category (Aadhaar, PAN, passport, voter ID and similar) can't be edited. Changing official documents is not supported.",
+  "editTextEdited": "Edited",
+  "@fontSameFamily": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMetricMatch": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontSimilar": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMissing": {
+    "placeholders": {
+      "chars": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextFontAdded": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextPreviousTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@editTextCopyTitle": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "@fontMetricMatchHelp": {
+    "placeholders": {
+      "original": {
         "type": "String"
       }
     }

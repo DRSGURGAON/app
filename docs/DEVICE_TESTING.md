@@ -222,6 +222,24 @@ licence key**, installed from the Play Store, on a phone signed in with a licenc
 | Q7 | Dark mode on / off | Same DocSafe look, readable |
 | Q8 | Switch language Hindi ↔ English on every screen | No English left on Hindi screens (except names, PDF, Premium price from Google) |
 
+## 14. Edit text (Premium)
+
+Use your own English PDFs: one made in Word (Calibri/Times), one from Google Docs, one bank/
+utility PDF, one scanned PDF.
+
+| # | Step | Expected |
+|---|---|---|
+| T1 | PDF Tools → Edit text → a Word PDF; tap a line | Line outlined; sheet shows the text and a font badge |
+| T2 | Change a name using letters that appear elsewhere in the document | Badge "Original font"; preview identical in style |
+| T3 | Use letters that do not appear anywhere (e.g. Q, Z, X) | Badge "Same font" or "Closest match"; check the look in the preview |
+| T4 | Fonts → Add a font (.ttf from your PC, e.g. Calibri) and repeat T3 | Badge "Same font: Calibri"; identical look |
+| T5 | Make a line much longer | "Fit to the line" narrows it; far too long → warning, red outline |
+| T6 | Save in this document → open it in DocSafe and in another PDF viewer after export | New text, old text not searchable/selectable anywhere; previous version in Recently deleted |
+| T7 | Scanned PDF | "No text that can be edited" |
+| T8 | Identity-category PDF | Refused |
+| T9 | Signed PDF (e.g. an e-signed form) | Warning before saving |
+| T10 | Type Hindi | "Only English…", Apply disabled |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |
@@ -235,6 +253,7 @@ licence key**, installed from the Play Store, on a phone signed in with a licenc
 | PDF tools (§8) | | | |
 | Premium / billing (§12) | | | |
 | Accessibility / performance (§13) | | | |
+| Edit text (§14) | | | |
 | Annotate & Sign (§9) | | | |
 | OCR & reminders (§10) | | | |
 | Backup & language (§11) | | | |
