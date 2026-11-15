@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Seedha Chat</string>
+    <string name="process_text_label">Seedha Chat</string>
+    <string name="label_number">Phone number (no need to save it)</string>
+    <string name="hint_cc">Code</string>
+    <string name="plus" translatable="false">+</string>
+    <string name="history_meta">%1$s · %2$s</string>
+    <string name="hint_number">98765 43210</string>
+    <string name="paste">Paste number</string>
+    <string name="clear">Clear</string>
+    <string name="label_message">Message (optional)</string>
+    <string name="hint_message">Type a message…</string>
+    <string name="open_whatsapp">Open in WhatsApp</string>
+    <string name="open_business">Open in WhatsApp Business</string>
+    <string name="whatsapp_not_installed">WhatsApp not installed</string>
+    <string name="business_not_installed">WhatsApp Business not installed</string>
+    <string name="none_installed">Neither app is installed on this phone. You can still share the chat link.</string>
+    <string name="share_link">Share chat link</string>
+    <string name="history">Recent</string>
+    <string name="label_whatsapp">WhatsApp</string>
+    <string name="label_business">Business</string>
+    <string name="error_empty">Enter a phone number.</string>
+    <string name="error_invalid">This doesn\'t look like a valid number. Check the country code and digits.</string>
+    <string name="clipboard_empty">Clipboard is empty.</string>
+    <string name="no_number_found">No phone number found in that text.</string>
+    <string name="cannot_open">Couldn\'t open the chat on this phone.</string>
+    <string name="delete">Delete</string>
+    <string name="delete_entry">Remove %1$s from recent?</string>
+    <string name="clear_history">Clear recent</string>
+    <string name="clear_history_confirm">Remove all recent numbers from this phone?</string>
+    <string name="about">About</string>
+    <string name="about_text">Version %1$s\n\nOpen a chat with any number without saving it to your contacts. The message is only pre-filled. You still tap send.\n\nRecent numbers are stored only on this phone and never uploaded. The app asks for no permissions.\n\nThis app is not affiliated with, endorsed or sponsored by WhatsApp or Meta. WhatsApp is a trademark of its respective owner.</string>
+    <string-array name="templates">
+        <item>Hello!</item>
+        <item>Hi, I got your number from…</item>
+        <item>Your order is ready.</item>
+        <item>Please share your location.</item>
+        <item>Thank you!</item>
+    </string-array>
+</resources>

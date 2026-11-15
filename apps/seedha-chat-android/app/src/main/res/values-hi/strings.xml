@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">सीधा चैट</string>
+    <string name="process_text_label">सीधा चैट</string>
+    <string name="label_number">फ़ोन नंबर (सेव करने की ज़रूरत नहीं)</string>
+    <string name="hint_cc">कोड</string>
+    <string name="history_meta">%1$s · %2$s</string>
+    <string name="hint_number">98765 43210</string>
+    <string name="paste">नंबर पेस्ट करें</string>
+    <string name="clear">मिटाएँ</string>
+    <string name="label_message">मैसेज (ज़रूरी नहीं)</string>
+    <string name="hint_message">मैसेज लिखें…</string>
+    <string name="open_whatsapp">WhatsApp में खोलें</string>
+    <string name="open_business">WhatsApp Business में खोलें</string>
+    <string name="whatsapp_not_installed">WhatsApp इंस्टॉल नहीं है</string>
+    <string name="business_not_installed">WhatsApp Business इंस्टॉल नहीं है</string>
+    <string name="none_installed">इस फ़ोन में दोनों में से कोई ऐप नहीं है। आप चैट लिंक फिर भी शेयर कर सकते हैं।</string>
+    <string name="share_link">चैट लिंक शेयर करें</string>
+    <string name="history">हाल के नंबर</string>
+    <string name="label_whatsapp">WhatsApp</string>
+    <string name="label_business">Business</string>
+    <string name="error_empty">फ़ोन नंबर डालें।</string>
+    <string name="error_invalid">यह नंबर सही नहीं लग रहा। देश का कोड और अंक जाँचें।</string>
+    <string name="clipboard_empty">क्लिपबोर्ड खाली है।</string>
+    <string name="no_number_found">इस टेक्स्ट में कोई फ़ोन नंबर नहीं मिला।</string>
+    <string name="cannot_open">इस फ़ोन पर चैट नहीं खुल सका।</string>
+    <string name="delete">हटाएँ</string>
+    <string name="delete_entry">%1$s को हाल की सूची से हटाएँ?</string>
+    <string name="clear_history">हाल की सूची मिटाएँ</string>
+    <string name="clear_history_confirm">इस फ़ोन से हाल के सभी नंबर हटाएँ?</string>
+    <string name="about">जानकारी</string>
+    <string name="about_text">वर्ज़न %1$s\n\nकिसी भी नंबर से चैट खोलें, बिना कॉन्टैक्ट में सेव किए। मैसेज सिर्फ़ पहले से लिखा जाता है, भेजने के लिए आपको खुद टैप करना होगा।\n\nहाल के नंबर सिर्फ़ इसी फ़ोन में रहते हैं, कहीं अपलोड नहीं होते। ऐप कोई परमिशन नहीं माँगता।\n\nयह ऐप WhatsApp या Meta से जुड़ा, समर्थित या प्रायोजित नहीं है। WhatsApp उसके मालिक का ट्रेडमार्क है।</string>
+    <string-array name="templates">
+        <item>नमस्ते!</item>
+        <item>नमस्ते, आपका नंबर मुझे … से मिला</item>
+        <item>आपका ऑर्डर तैयार है।</item>
+        <item>कृपया अपनी लोकेशन भेजें।</item>
+        <item>धन्यवाद!</item>
+    </string-array>
+</resources>
