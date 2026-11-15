@@ -1,0 +1,19 @@
+Fallback fonts for PDF text editing. Licensed under the SIL Open Font License 1.1 (see OFL.txt).
+
+DocSafe Sans (metrics of Arial / Helvetica) is a modified (subset, renamed) version of LiberationSans.
+Digitized data copyright (c) 2010 Google Corporation. 
+Copyright (c) 2012 Red Hat, Inc.
+
+DocSafe Serif (metrics of Times New Roman / Times) is a modified (subset, renamed) version of LiberationSerif.
+Digitized data copyright (c) 2010 Google Corporation.
+Copyright (c) 2012 Red Hat, Inc.
+
+DocSafe Mono (metrics of Courier New / Courier) is a modified (subset, renamed) version of LiberationMono.
+Digitized data copyright (c) 2010 Google Corporation.
+Copyright (c) 2012 Red Hat, Inc.
+
+DocSafe Office Sans (metrics of Calibri) is a modified (subset, renamed) version of Carlito.
+Copyright 2013 The Carlito Project Authors (https://github.com/googlefonts/carlito)
+
+DocSafe Office Serif (metrics of Cambria) is a modified (subset, renamed) version of Caladea.
+Copyright 2012 The Caladea Project Authors (https://github.com/huertatipografica/Caladea)

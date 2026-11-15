@@ -20,6 +20,9 @@ dependencies:
   sqlite3: ^3.9.0
   # PDF rendering (PDFium) from a local file path.
   pdfrx: ^2.12.0
+  # Phase "Edit text": PDFium edit API (same library pdfrx uses) and FFI helpers.
+  pdfium_dart: ^0.4.1
+  ffi: ^2.2.0
   intl: ^0.20.3
 
 dev_dependencies:
@@ -47,6 +50,7 @@ flutter:
   assets:
     - assets/fonts/OFL.txt
     - assets/legal/
+    - assets/pdf_fonts/
   # Brand typeface (Latin) with Noto Sans Devanagari for Hindi; both SIL OFL 1.1,
   # bundled so the app never downloads fonts.
   fonts:
