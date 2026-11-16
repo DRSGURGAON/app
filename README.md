@@ -76,6 +76,8 @@ Recently deleted). Not supported: editing text inside PDFs, opening password-pro
 | UI language follows the phone (Hindi on Hindi phones, else English) until the user picks one | Implemented, tested |
 | OCR masking also for US SSN and UK National Insurance numbers; US/UK category keywords; US month-first and month-name expiry dates | Implemented, tested |
 | Encrypted backup file (.dsbackup) with a separate backup password, saved via the system dialog (Drive, USB, any folder); restore on the same or a new phone | Implemented; format JVM-tested, vault round trip instrumented-tested; system dialogs **need a device run** |
+| Backup password strength meter (offline: common passwords, runs, repeats, digit-only, estimated bits); weak passwords refused with advice | Implemented, unit + widget tested |
+| Backup reminder: card on Home when a backup is due (every 30 days by default, 90 or off; first reminder 7 days after the first document; "Later" = 7 days). In-app only, no notification | Implemented, unit + widget tested |
 
 **Edit text (Premium, English PDFs):** change the words in a PDF, in the document's own font.
 

@@ -9,12 +9,27 @@ import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
+import '../../data/repositories/document_repository.dart';
 import '../../data/services/backup_service.dart';
+import '../../data/services/password_strength.dart';
 import '../pdf_tools/widgets/tool_runner.dart';
 
 final lastBackupProvider = FutureProvider.autoDispose<DateTime?>(
   (ref) async => (await ref.watch(backupServiceProvider.future)).lastBackup(),
 );
+
+final backupReminderDaysProvider = FutureProvider.autoDispose<int>(
+  (ref) async => (await ref.watch(backupServiceProvider.future)).reminderDays(),
+);
+
+/// The backup reminder to show on Home, or null. Re-checked whenever the
+/// vault changes.
+final backupReminderProvider = FutureProvider.autoDispose<BackupReminder?>((
+  ref,
+) async {
+  ref.watch(vaultStatsProvider);
+  return (await ref.watch(backupServiceProvider.future)).dueReminder();
+});
 
 /// Encrypted backup file + restore (Settings → Backup & restore).
 class BackupScreen extends ConsumerWidget {
@@ -37,6 +52,7 @@ class BackupScreen extends ConsumerWidget {
     );
     if (summary == null) return;
     ref.invalidate(lastBackupProvider);
+    ref.invalidate(backupReminderProvider);
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -129,6 +145,7 @@ class BackupScreen extends ConsumerWidget {
     final locale = Localizations.localeOf(context).toLanguageTag();
     final theme = Theme.of(context);
     final last = ref.watch(lastBackupProvider).value;
+    final reminderDays = ref.watch(backupReminderDaysProvider).value;
     return Scaffold(
       appBar: AppBar(title: Text(l.settingsBackup)),
       body: ListView(
@@ -183,7 +200,42 @@ class BackupScreen extends ConsumerWidget {
             icon: const Icon(Icons.settings_backup_restore),
             label: Text(l.backupRestore),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.notifications_none_outlined),
+            title: Text(l.backupReminderSetting),
+            subtitle: Text(l.backupReminderHelp),
+          ),
+          if (reminderDays != null)
+            // Full width so it fits at 200 % font size.
+            DropdownButtonFormField<int>(
+              key: const Key('backup-reminder-days'),
+              initialValue: reminderDays,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: l.backupReminderSetting,
+                border: const OutlineInputBorder(),
+              ),
+              onChanged: (v) async {
+                if (v == null) return;
+                final service = await ref.read(backupServiceProvider.future);
+                await service.setReminderDays(v);
+                ref
+                  ..invalidate(backupReminderDaysProvider)
+                  ..invalidate(backupReminderProvider);
+              },
+              items: [
+                for (final d in backupReminderChoices)
+                  DropdownMenuItem(
+                    value: d,
+                    child: Text(
+                      d == 0 ? l.backupReminderOff : l.backupReminderEvery(d),
+                    ),
+                  ),
+              ],
+            ),
+          const SizedBox(height: 8),
           Text(
             l.backupNotIncluded,
             style: theme.textTheme.bodySmall?.copyWith(
@@ -225,9 +277,11 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final tooShort = _first.text.characters.length < minBackupPasswordLength;
+    final strength = passwordStrength(_first.text);
+    final tooShort = strength == PasswordStrength.tooShort;
+    final weak = strength == PasswordStrength.weak;
     final mismatch = _second.text.isNotEmpty && _second.text != _first.text;
-    final ok = !tooShort && _second.text == _first.text && _ack;
+    final ok = !tooShort && !weak && _second.text == _first.text && _ack;
     return AlertDialog(
       title: Text(l.backupPasswordTitle),
       scrollable: true,
@@ -248,6 +302,7 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
             ),
             onChanged: (_) => setState(() {}),
           ),
+          if (!tooShort) _StrengthMeter(strength),
           TextField(
             // Keyboards must not learn document names, notes or passwords.
             enableIMEPersonalizedLearning: false,
@@ -289,6 +344,70 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
           child: Text(l.backupContinue),
         ),
       ],
+    );
+  }
+}
+
+/// Three bars and a label; weak passwords are refused with advice.
+class _StrengthMeter extends StatelessWidget {
+  const _StrengthMeter(this.strength);
+  final PasswordStrength strength;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    final text = Theme.of(context).textTheme;
+    final (level, color, label) = switch (strength) {
+      PasswordStrength.strong => (3, Colors.green, l.passwordStrengthStrong),
+      PasswordStrength.fair => (2, Colors.amber, l.passwordStrengthFair),
+      _ => (1, scheme.error, l.passwordStrengthWeak),
+    };
+    return Padding(
+      padding: const EdgeInsets.only(top: 8, bottom: 4),
+      child: Semantics(
+        liveRegion: true,
+        label: label,
+        excludeSemantics: strength != PasswordStrength.weak,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                for (var i = 1; i <= 3; i++) ...[
+                  Expanded(
+                    child: Container(
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: i <= level
+                            ? color
+                            : scheme.surfaceContainerHighest,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                    ),
+                  ),
+                  if (i < 3) const SizedBox(width: 4),
+                ],
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              key: const Key('backup-password-strength'),
+              style: text.labelMedium?.copyWith(
+                color: strength == PasswordStrength.weak ? scheme.error : null,
+              ),
+            ),
+            if (strength == PasswordStrength.weak)
+              Text(
+                l.passwordWeakHelp,
+                style: text.bodySmall?.copyWith(color: scheme.error),
+              )
+            else if (strength == PasswordStrength.fair)
+              Text(l.passwordTip, style: text.bodySmall),
+          ],
+        ),
+      ),
     );
   }
 }

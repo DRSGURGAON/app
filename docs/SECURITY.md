@@ -293,7 +293,8 @@ picks in the system "save" dialog (Google Drive app, USB drive, any folder). Doc
 has **no network permission**; uploading, if any, is done by the app the user chose.
 
 - **Key:** a separate *backup password* (≥ 8 characters, entered twice, with an explicit "cannot be
-  recovered" acknowledgement). PBKDF2-HMAC-SHA256, 600,000 iterations, random 16-byte salt
+  recovered" acknowledgement; an offline strength check refuses common passwords, keyboard/number
+  runs, repeats, short digit-only passwords and low estimated entropy — `password_strength.dart`). PBKDF2-HMAC-SHA256, 600,000 iterations, random 16-byte salt
   (`BackupFormat`, verified against RFC 7914 and the JDK). The derived key wraps a random 256-bit
   DEK; the content is one DSF1 stream (same chunked AES-256-GCM as the vault). Changing the salt or
   iteration count makes the file unopenable (treated like a wrong password). Brute force is limited

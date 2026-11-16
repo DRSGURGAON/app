@@ -1,3 +1,5 @@
+import 'package:docsafe/core/database/app_database.dart';
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -35,7 +37,55 @@ FilledButton dialogButton(WidgetTester tester, String label) => tester.widget(
   ),
 );
 
+Future<void> ageDocuments(TestApp app, Duration by) async {
+  final db = app.databases.last;
+  final rows = await app.tester.runAsync(() => db.select(db.documents).get());
+  for (final r in rows!) {
+    await app.tester.runAsync(
+      () => (db.update(db.documents)..where((t) => t.id.equals(r.id))).write(
+        DocumentsCompanion(createdAt: Value(r.createdAt.subtract(by))),
+      ),
+    );
+  }
+  await settle(app.tester);
+}
+
 void main() {
+  testWidgets('backup reminder card: never backed up, later, off', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    final engine = FakePdfEngine();
+    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    await importDoc(tester, fake, engine, 'Passport.pdf');
+    await goTab(tester, en.navHome);
+    // A brand-new vault is not nagged.
+    expect(find.byKey(const Key('backup-reminder-card')), findsNothing);
+
+    await ageDocuments(app, const Duration(days: 10));
+    await goTab(tester, en.navVault);
+    await goTab(tester, en.navHome);
+    expect(find.text(en.backupReminderNever), findsOneWidget);
+    await tester.tap(find.byKey(const Key('backup-reminder-now')));
+    await settle(tester);
+    expect(find.byKey(const Key('backup-create')), findsOneWidget);
+    await tester.binding.handlePopRoute();
+    await settle(tester);
+    await goTab(tester, en.navHome);
+    await tester.tap(find.byKey(const Key('backup-reminder-later')));
+    await settle(tester);
+    expect(find.byKey(const Key('backup-reminder-card')), findsNothing);
+
+    // Turning the reminder off: Settings shows the choice.
+    await openBackup(tester, settings: en.navSettings);
+    expect(find.text(en.backupReminderEvery(30)), findsOneWidget);
+    await scrollAndTap(tester, find.byKey(const Key('backup-reminder-days')));
+    await tester.tap(find.text(en.backupReminderOff).last);
+    await settle(tester);
+    expect(find.text(en.backupReminderOff), findsOneWidget);
+    await app.dispose();
+  });
+
   testWidgets('create backup: password rules, then saved with a summary', (
     tester,
   ) async {
@@ -51,6 +101,12 @@ void main() {
     await settle(tester);
     // Too short.
     await enterNewPassword(tester, 'short', 'short');
+    expect(dialogButton(tester, en.backupContinue).onPressed, isNull);
+    expect(find.byKey(const Key('backup-password-strength')), findsNothing);
+    // Long enough but on every guess list: refused with advice.
+    await enterNewPassword(tester, 'Password@123', 'Password@123', ack: false);
+    expect(find.text(en.passwordStrengthWeak), findsOneWidget);
+    expect(find.text(en.passwordWeakHelp), findsOneWidget);
     expect(dialogButton(tester, en.backupContinue).onPressed, isNull);
     // Mismatch.
     await tester.enterText(
@@ -70,6 +126,7 @@ void main() {
       'long enough 1',
     );
     await tester.pump();
+    expect(find.text(en.passwordStrengthStrong), findsOneWidget);
     await tester.tap(find.text(en.backupContinue));
     await settle(tester);
 

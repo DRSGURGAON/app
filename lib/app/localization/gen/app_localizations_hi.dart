@@ -1932,4 +1932,54 @@ class AppLocalizationsHi extends AppLocalizations {
   String batchDeleted(int count) {
     return '$count दस्तावेज़ \'हाल ही में हटाए गए\' में भेजे गए';
   }
+
+  @override
+  String get passwordStrengthWeak => 'मज़बूती: कमज़ोर';
+
+  @override
+  String get passwordStrengthFair => 'मज़बूती: ठीक';
+
+  @override
+  String get passwordStrengthStrong => 'मज़बूती: मज़बूत';
+
+  @override
+  String get passwordWeakHelp =>
+      'इसे आसानी से अनुमान लगाया जा सकता है। कुछ अलग-अलग शब्द लिखें, या अक्षर, अंक और चिह्न मिलाएँ।';
+
+  @override
+  String get passwordTip =>
+      'सुझाव: सिर्फ़ आपको पता हो ऐसा छोटा वाक्य, जैसे “Neela aasmaan, 3 chidiya!”, मज़बूत भी है और याद रखना आसान भी।';
+
+  @override
+  String get backupReminderTitle => 'अपने दस्तावेज़ों का बैकअप लें';
+
+  @override
+  String get backupReminderNever =>
+      'आपके दस्तावेज़ सिर्फ़ इसी फ़ोन पर हैं। फ़ोन खोने या रीसेट होने पर ये चले जाएँगे। बैकअप में एक मिनट लगता है।';
+
+  @override
+  String backupReminderLast(int days) {
+    return 'आखिरी बैकअप $days दिन पहले लिया था। उसके बाद जोड़े गए दस्तावेज़ उसमें नहीं हैं।';
+  }
+
+  @override
+  String get backupReminderNow => 'अभी बैकअप लें';
+
+  @override
+  String get backupReminderLater => 'बाद में';
+
+  @override
+  String get backupReminderSetting => 'बैकअप रिमाइंडर';
+
+  @override
+  String get backupReminderOff => 'बंद';
+
+  @override
+  String backupReminderEvery(int days) {
+    return 'हर $days दिन';
+  }
+
+  @override
+  String get backupReminderHelp =>
+      'बैकअप का समय होने पर होम पर एक कार्ड याद दिलाता है। अपने-आप कोई बैकअप नहीं होता।';
 }

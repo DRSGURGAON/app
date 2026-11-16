@@ -256,6 +256,17 @@ utility PDF, one scanned PDF.
 | F10 | Back button while selecting | Selection ends; screen stays |
 | F11 | Smallest phone, Hindi, 200 % font | Sheet scrolls, bottom bar labels readable, nothing cut off |
 
+## 16. Backup password strength and reminder
+
+| # | Step | Expected |
+|---|---|---|
+| R1 | Backup → Create → type `Password@123` twice | "Strength: weak" with advice; Continue disabled |
+| R2 | Type a short sentence, e.g. `Neela aasmaan, 3 chidiya!` | "Strength: strong"; Continue enabled after ticking the acknowledgement |
+| R3 | Fresh install, add a document, change the phone date 8 days ahead, open DocSafe | Home shows "Back up your documents" |
+| R4 | Tap Later | Card hidden; returns after 7 more days |
+| R5 | Back up now → create a backup → Home | Card gone |
+| R6 | Backup screen → Backup reminder → Off | Card never shown |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

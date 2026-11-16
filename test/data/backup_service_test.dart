@@ -255,4 +255,89 @@ void main() {
     expect(await backup.create(pw('correct horse 42')), isNull);
     expect(await backup.lastBackup(), isNull);
   });
+
+  group('backup reminder', () {
+    final t0 = DateTime(2026, 1, 1, 9);
+    BackupReminder? due({
+      int days = 30,
+      DateTime? last,
+      DateTime? oldest,
+      DateTime? snoozed,
+      required DateTime now,
+    }) => backupReminderDue(
+      now: now,
+      intervalDays: days,
+      lastBackup: last,
+      oldestDocument: oldest,
+      snoozedUntil: snoozed,
+    );
+
+    test('rules: off, empty vault, grace, interval, snooze', () {
+      DateTime d(int n) => t0.add(Duration(days: n));
+      expect(due(now: d(100)), isNull, reason: 'no documents');
+      expect(
+        due(days: 0, oldest: t0, now: d(100)),
+        isNull,
+        reason: 'off',
+      );
+      expect(
+        due(oldest: t0, now: d(6)),
+        isNull,
+        reason: 'grace',
+      );
+      final never = due(oldest: t0, now: d(7))!;
+      expect(never.lastBackup, isNull);
+      expect(never.daysSince, 7);
+      expect(due(oldest: t0, last: d(10), now: d(39)), isNull);
+      final late = due(oldest: t0, last: d(10), now: d(40))!;
+      expect(late.daysSince, 30);
+      expect(late.lastBackup, d(10));
+      expect(due(days: 90, oldest: t0, last: d(10), now: d(40)), isNull);
+      expect(due(oldest: t0, last: d(10), now: d(40), snoozed: d(41)), isNull);
+      expect(
+        due(oldest: t0, last: d(10), now: d(42), snoozed: d(41)),
+        isNotNull,
+      );
+    });
+
+    test('service: settings, snooze, trash ignored, backup clears', () async {
+      var clock = t0;
+      final docs2 = DocumentRepository(db, fake, clock: () => clock);
+      final svc = BackupService(db, fake, clock: () => clock);
+      expect(await svc.reminderDays(), defaultBackupReminderDays);
+      expect(await svc.dueReminder(), isNull);
+
+      fake.nextImport = fakeImport(id: 'e' * 32, fingerprint: 'r1');
+      final doc =
+          ((await docs2.importFromPicker()) as ImportSucceeded).document;
+      clock = t0.add(const Duration(days: 8));
+      expect((await svc.dueReminder())!.daysSince, 8);
+
+      // A document in Recently deleted does not count.
+      await docs2.moveToTrash(doc.id);
+      expect(await svc.dueReminder(), isNull);
+      await docs2.restore(doc.id);
+
+      await svc.setReminderDays(0);
+      expect(await svc.dueReminder(), isNull);
+      await svc.setReminderDays(90);
+      expect(await svc.reminderDays(), 90);
+      expect(() => svc.setReminderDays(12), throwsArgumentError);
+      expect(await svc.dueReminder(), isNotNull);
+
+      await svc.snoozeReminder();
+      expect(await svc.dueReminder(), isNull);
+      clock = clock.add(backupSnooze + const Duration(minutes: 1));
+      expect(await svc.dueReminder(), isNotNull);
+
+      // A backup resets everything.
+      await svc.snoozeReminder();
+      final summary = await svc.create(Uint8List.fromList(List.filled(12, 65)));
+      expect(summary, isNotNull);
+      clock = clock.add(backupSnooze * 2);
+      expect(await svc.dueReminder(), isNull);
+      clock = clock.add(const Duration(days: 90));
+      expect((await svc.dueReminder())!.lastBackup, isNotNull);
+    });
+  });
 }

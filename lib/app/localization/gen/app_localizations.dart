@@ -3337,6 +3337,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 document moved to Recently deleted} other{{count} documents moved to Recently deleted}}'**
   String batchDeleted(int count);
+
+  /// No description provided for @passwordStrengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength: weak'**
+  String get passwordStrengthWeak;
+
+  /// No description provided for @passwordStrengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength: fair'**
+  String get passwordStrengthFair;
+
+  /// No description provided for @passwordStrengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strength: strong'**
+  String get passwordStrengthStrong;
+
+  /// No description provided for @passwordWeakHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Too easy to guess. Use a few unrelated words, or mix letters, numbers and symbols.'**
+  String get passwordWeakHelp;
+
+  /// No description provided for @passwordTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip: a short sentence only you know, like “Neela aasmaan, 3 chidiya!”, is strong and easy to remember.'**
+  String get passwordTip;
+
+  /// No description provided for @backupReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up your documents'**
+  String get backupReminderTitle;
+
+  /// No description provided for @backupReminderNever.
+  ///
+  /// In en, this message translates to:
+  /// **'Your documents are only on this phone. If it is lost or reset, they are gone. A backup takes a minute.'**
+  String get backupReminderNever;
+
+  /// No description provided for @backupReminderLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last backup {days, plural, =1{1 day} other{{days} days}} ago. Documents added since then are not in it.'**
+  String backupReminderLast(int days);
+
+  /// No description provided for @backupReminderNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get backupReminderNow;
+
+  /// No description provided for @backupReminderLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Later'**
+  String get backupReminderLater;
+
+  /// No description provided for @backupReminderSetting.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup reminder'**
+  String get backupReminderSetting;
+
+  /// No description provided for @backupReminderOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get backupReminderOff;
+
+  /// No description provided for @backupReminderEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {days} days'**
+  String backupReminderEvery(int days);
+
+  /// No description provided for @backupReminderHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'A card on Home reminds you when a backup is due. Nothing is backed up automatically.'**
+  String get backupReminderHelp;
 }
 
 class _AppLocalizationsDelegate

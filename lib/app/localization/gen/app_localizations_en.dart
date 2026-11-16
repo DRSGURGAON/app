@@ -1959,4 +1959,60 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get passwordStrengthWeak => 'Strength: weak';
+
+  @override
+  String get passwordStrengthFair => 'Strength: fair';
+
+  @override
+  String get passwordStrengthStrong => 'Strength: strong';
+
+  @override
+  String get passwordWeakHelp =>
+      'Too easy to guess. Use a few unrelated words, or mix letters, numbers and symbols.';
+
+  @override
+  String get passwordTip =>
+      'Tip: a short sentence only you know, like “Neela aasmaan, 3 chidiya!”, is strong and easy to remember.';
+
+  @override
+  String get backupReminderTitle => 'Back up your documents';
+
+  @override
+  String get backupReminderNever =>
+      'Your documents are only on this phone. If it is lost or reset, they are gone. A backup takes a minute.';
+
+  @override
+  String backupReminderLast(int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return 'Last backup $_temp0 ago. Documents added since then are not in it.';
+  }
+
+  @override
+  String get backupReminderNow => 'Back up now';
+
+  @override
+  String get backupReminderLater => 'Later';
+
+  @override
+  String get backupReminderSetting => 'Backup reminder';
+
+  @override
+  String get backupReminderOff => 'Off';
+
+  @override
+  String backupReminderEvery(int days) {
+    return 'Every $days days';
+  }
+
+  @override
+  String get backupReminderHelp =>
+      'A card on Home reminds you when a backup is due. Nothing is backed up automatically.';
 }

@@ -14,6 +14,46 @@ import '../repositories/text_rules.dart';
 /// Minimum backup password length (characters).
 const minBackupPasswordLength = 8;
 
+/// Backup reminder choices in days; 0 = off. 30 is the default.
+const backupReminderChoices = [0, 30, 90];
+const defaultBackupReminderDays = 30;
+
+/// A vault never backed up is reminded about once its oldest document is
+/// this old (so a brand-new user is not nagged on day one).
+const firstBackupGrace = Duration(days: 7);
+
+/// "Later" on the reminder card hides it for this long.
+const backupSnooze = Duration(days: 7);
+
+/// A due backup reminder: [lastBackup] is null if there never was one.
+class BackupReminder {
+  const BackupReminder({this.lastBackup, required this.daysSince});
+  final DateTime? lastBackup;
+
+  /// Whole days since the last backup, or since the oldest document if none.
+  final int daysSince;
+}
+
+/// Pure rule for the reminder card (unit-tested).
+BackupReminder? backupReminderDue({
+  required DateTime now,
+  required int intervalDays,
+  required DateTime? lastBackup,
+  required DateTime? oldestDocument,
+  DateTime? snoozedUntil,
+}) {
+  if (intervalDays <= 0 || oldestDocument == null) return null;
+  if (snoozedUntil != null && snoozedUntil.isAfter(now)) return null;
+  if (lastBackup == null) {
+    final age = now.difference(oldestDocument);
+    if (age < firstBackupGrace) return null;
+    return BackupReminder(daysSince: age.inDays);
+  }
+  final since = now.difference(lastBackup);
+  if (since < Duration(days: intervalDays)) return null;
+  return BackupReminder(lastBackup: lastBackup, daysSince: since.inDays);
+}
+
 /// Version of the metadata JSON inside a backup.
 const backupMetadataVersion = 1;
 
@@ -52,6 +92,57 @@ class BackupService {
   final DateTime Function() _clock;
 
   static const _lastBackupKey = 'backup.last';
+  static const _reminderDaysKey = 'backup.reminderDays';
+  static const _snoozedUntilKey = 'backup.snoozedUntil';
+
+  Future<String?> _setting(String key) async => (await (_db.select(
+    _db.appSettings,
+  )..where((t) => t.key.equals(key))).getSingleOrNull())?.value;
+
+  Future<void> _put(String key, String value) => _db
+      .into(_db.appSettings)
+      .insertOnConflictUpdate(
+        AppSettingsCompanion.insert(key: key, value: value),
+      );
+
+  /// Reminder interval in days (0 = off).
+  Future<int> reminderDays() async {
+    final v = int.tryParse(await _setting(_reminderDaysKey) ?? '');
+    return backupReminderChoices.contains(v) ? v! : defaultBackupReminderDays;
+  }
+
+  Future<void> setReminderDays(int days) {
+    if (!backupReminderChoices.contains(days)) {
+      throw ArgumentError.value(days, 'days');
+    }
+    return _put(_reminderDaysKey, '$days');
+  }
+
+  /// Hides the reminder card for [backupSnooze].
+  Future<void> snoozeReminder() =>
+      _put(_snoozedUntilKey, _clock().add(backupSnooze).toIso8601String());
+
+  /// The reminder to show now, or null.
+  Future<BackupReminder?> dueReminder() async {
+    final oldest = _db.documents.createdAt.min();
+    final row =
+        await (_db.selectOnly(_db.documents)
+              ..addColumns([oldest])
+              ..where(
+                _db.documents.id.isNotInQuery(
+                  _db.selectOnly(_db.recentlyDeleted)
+                    ..addColumns([_db.recentlyDeleted.documentId]),
+                ),
+              ))
+            .getSingle();
+    return backupReminderDue(
+      now: _clock(),
+      intervalDays: await reminderDays(),
+      lastBackup: await lastBackup(),
+      oldestDocument: row.read(oldest),
+      snoozedUntil: DateTime.tryParse(await _setting(_snoozedUntilKey) ?? ''),
+    );
+  }
 
   Future<DateTime?> lastBackup() async {
     final row = await (_db.select(
@@ -75,14 +166,10 @@ class BackupService {
         meta.fileIds,
       );
       if (summary != null) {
-        await _db
-            .into(_db.appSettings)
-            .insertOnConflictUpdate(
-              AppSettingsCompanion.insert(
-                key: _lastBackupKey,
-                value: now.toIso8601String(),
-              ),
-            );
+        await _put(_lastBackupKey, now.toIso8601String());
+        await (_db.delete(
+          _db.appSettings,
+        )..where((t) => t.key.equals(_snoozedUntilKey))).go();
         AppLogger.event('backup_created');
       }
       return summary;

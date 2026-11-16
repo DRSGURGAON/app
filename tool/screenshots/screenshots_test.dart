@@ -19,6 +19,7 @@ import '../../test/features/reminders_ocr_flow_test.dart'
     show pumpUntil, docIdByTitle;
 import '../../test/features/edit_text_flow_test.dart'
     show pumpEditor, addPdf, runStartingWith, typeEdit;
+import '../../test/features/backup_flow_test.dart' show ageDocuments;
 import '../../test/helpers/fake_billing_service.dart';
 import '../../test/helpers/fake_pdf_engine.dart';
 import '../../test/helpers/fake_security_service.dart';
@@ -332,6 +333,47 @@ void main() {
     await shot(tester, '42-selection');
     await tester.tap(find.byKey(const Key('batch-category')));
     await shot(tester, '43-batch-category');
+    await app.dispose();
+  });
+
+  testWidgets('backup strength and reminder', (tester) async {
+    await loadFonts();
+    final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final t = lang == 'hi' ? hi : en;
+    final fake = await unlockedFake(lang: lang);
+    final engine = FakePdfEngine();
+    final app = await pumpApp(
+      tester,
+      fake,
+      pdfEngine: engine,
+      size: shotSize(),
+    );
+    await seed(
+      app,
+      fake,
+      engine,
+      importLabel: lang == 'hi' ? hi.homeImportPdf : '',
+    );
+    await tester.pump(const Duration(seconds: 10));
+    await ageDocuments(app, const Duration(days: 12));
+    await goTab(tester, t.navVault);
+    await goTab(tester, t.navHome);
+    await shot(tester, '50-backup-reminder');
+    await tester.tap(find.byKey(const Key('backup-reminder-now')));
+    await settle(tester);
+    await shot(tester, '51-backup-screen');
+    await tester.tap(find.byKey(const Key('backup-create')));
+    await settle(tester);
+    await tester.enterText(
+      find.byKey(const Key('backup-password-1')),
+      'Password@123',
+    );
+    await shot(tester, '52-password-weak');
+    await tester.enterText(
+      find.byKey(const Key('backup-password-1')),
+      'Neela aasmaan, 3 chidiya!',
+    );
+    await shot(tester, '53-password-strong');
     await app.dispose();
   });
 }

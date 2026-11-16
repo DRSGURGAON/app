@@ -13,6 +13,7 @@ STRONG PROTECTION
 
 ORGANIZED AND QUICK TO FIND
 • Categories, folders, tags, favorites and fast search.
+• Premium: advanced filters (type, expiry, date added, category, tag) and batch actions — select many documents to favorite, move, categorize, export or delete at once.
 • Issue and expiry dates with reminders before a document expires. Reminder notifications never show the document name.
 • Scan paper documents into clean PDFs with the camera.
 • Read text from a document on the phone (OCR, Hindi and English) to suggest the category and expiry date.
@@ -23,12 +24,13 @@ PDF TOOLS, ON THE PHONE
 
 YOUR BACKUP, YOUR CHOICE
 • Create an encrypted backup file protected by a password only you know, and save it wherever you like — Google Drive, a USB drive or a folder. Restore it on the same or a new phone.
+• A strength meter helps you pick a password that is hard to guess, and an optional reminder on the home screen tells you when a new backup is due.
 
 HINDI AND ENGLISH
 • DocSafe follows your phone's language and can be switched anytime.
 
 DOCSAFE PREMIUM
-Monthly or yearly subscription through Google Play: Edit text, merge, split and compress PDFs, Annotate & Sign, search inside documents, and unlimited reminders. Prices are shown in the app before you buy. Cancel anytime in Google Play.
+Monthly or yearly subscription through Google Play: Edit text, merge, split and compress PDFs, Annotate & Sign, search inside documents, advanced filters, batch actions and unlimited reminders. Prices are shown in the app before you buy. Cancel anytime in Google Play.
 
 PLEASE NOTE
 • DocSafe is a private storage app. It is not DigiLocker, is not affiliated with any government, and does not verify documents.

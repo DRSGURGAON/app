@@ -1055,5 +1055,33 @@
         "type": "int"
       }
     }
-  }
+  },
+  "passwordStrengthWeak": "Strength: weak",
+  "passwordStrengthFair": "Strength: fair",
+  "passwordStrengthStrong": "Strength: strong",
+  "passwordWeakHelp": "Too easy to guess. Use a few unrelated words, or mix letters, numbers and symbols.",
+  "passwordTip": "Tip: a short sentence only you know, like “Neela aasmaan, 3 chidiya!”, is strong and easy to remember.",
+  "backupReminderTitle": "Back up your documents",
+  "backupReminderNever": "Your documents are only on this phone. If it is lost or reset, they are gone. A backup takes a minute.",
+  "backupReminderLast": "Last backup {days, plural, =1{1 day} other{{days} days}} ago. Documents added since then are not in it.",
+  "@backupReminderLast": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "backupReminderNow": "Back up now",
+  "backupReminderLater": "Later",
+  "backupReminderSetting": "Backup reminder",
+  "backupReminderOff": "Off",
+  "backupReminderEvery": "Every {days} days",
+  "@backupReminderEvery": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "backupReminderHelp": "A card on Home reminds you when a backup is due. Nothing is backed up automatically."
 }

@@ -15,6 +15,8 @@ import '../../data/models/vault_document.dart';
 import '../../data/repositories/category_repository.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/repositories/folder_repository.dart';
+import '../../data/services/backup_service.dart';
+import '../settings/backup_screen.dart';
 import '../vault/widgets/document_list.dart';
 import '../vault/widgets/document_tile.dart';
 import '../vault/widgets/import_flow.dart';
@@ -94,6 +96,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: _BackupReminderCard()),
           SliverToBoxAdapter(child: SectionHeader(title: l.homeExpiringSoon)),
           _PreviewList(
             docs: expiring.whenData((d) => d.take(5).toList()),
@@ -325,6 +328,89 @@ class _SearchBar extends StatelessWidget {
 }
 
 /// "Your vault is protected" status on the hero (taps to Privacy & security).
+/// Shown when a backup is due (Settings → Backup & restore → reminder).
+class _BackupReminderCard extends ConsumerWidget {
+  const _BackupReminderCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final due = ref.watch(backupReminderProvider).value;
+    if (due == null) return const SizedBox.shrink();
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    return Padding(
+      key: const Key('backup-reminder-card'),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Card(
+        color: scheme.tertiaryContainer,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 14, 8, 6),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.cloud_upload_outlined,
+                    color: scheme.onTertiaryContainer,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l.backupReminderTitle,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: scheme.onTertiaryContainer,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          due.lastBackup == null
+                              ? l.backupReminderNever
+                              : l.backupReminderLast(due.daysSince),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: scheme.onTertiaryContainer,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              Wrap(
+                alignment: WrapAlignment.end,
+                spacing: 4,
+                children: [
+                  TextButton(
+                    key: const Key('backup-reminder-later'),
+                    onPressed: () async {
+                      final service = await ref.read(
+                        backupServiceProvider.future,
+                      );
+                      await service.snoozeReminder();
+                      ref.invalidate(backupReminderProvider);
+                    },
+                    child: Text(l.backupReminderLater),
+                  ),
+                  FilledButton.tonal(
+                    key: const Key('backup-reminder-now'),
+                    onPressed: () => context.push(Routes.backup),
+                    child: Text(l.backupReminderNow),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _SecurityPill extends StatelessWidget {
   const _SecurityPill({required this.status});
   final SecurityStatus status;
