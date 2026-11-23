@@ -597,6 +597,53 @@ class ExportSummary {
   }
 }
 
+/// Premium automatic backup: set up or not, and the destination's name.
+class AutoBackupStatus {
+  AutoBackupStatus({required this.configured, this.destination});
+
+  bool configured;
+
+  String? destination;
+
+  List<Object?> _toList() {
+    return <Object?>[configured, destination];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static AutoBackupStatus decode(Object result) {
+    result as List<Object?>;
+    return AutoBackupStatus(
+      configured: result[0]! as bool,
+      destination: result[1] as String?,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! AutoBackupStatus || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(configured, other.configured) &&
+        _deepEquals(destination, other.destination);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'AutoBackupStatus(configured: $configured, destination: $destination)';
+  }
+}
+
 /// One reminder notification time (epoch ms) with an optional label.
 class ReminderAlarm {
   ReminderAlarm({required this.at, this.label});
@@ -1104,32 +1151,35 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is ExportSummary) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is ReminderAlarm) {
+    } else if (value is AutoBackupStatus) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    } else if (value is ScannedPage) {
+    } else if (value is ReminderAlarm) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    } else if (value is ScanPageSpec) {
+    } else if (value is ScannedPage) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    } else if (value is ImagePageSpec) {
+    } else if (value is ScanPageSpec) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    } else if (value is PageOverlay) {
+    } else if (value is ImagePageSpec) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is OcrResult) {
+    } else if (value is PageOverlay) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is BackupSummary) {
+    } else if (value is OcrResult) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is RestoredFile) {
+    } else if (value is BackupSummary) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is RestoreResult) {
+    } else if (value is RestoredFile) {
       buffer.putUint8(151);
+      writeValue(buffer, value.encode());
+    } else if (value is RestoreResult) {
+      buffer.putUint8(152);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1174,22 +1224,24 @@ class _PigeonCodec extends StandardMessageCodec {
       case 142:
         return ExportSummary.decode(readValue(buffer)!);
       case 143:
-        return ReminderAlarm.decode(readValue(buffer)!);
+        return AutoBackupStatus.decode(readValue(buffer)!);
       case 144:
-        return ScannedPage.decode(readValue(buffer)!);
+        return ReminderAlarm.decode(readValue(buffer)!);
       case 145:
-        return ScanPageSpec.decode(readValue(buffer)!);
+        return ScannedPage.decode(readValue(buffer)!);
       case 146:
-        return ImagePageSpec.decode(readValue(buffer)!);
+        return ScanPageSpec.decode(readValue(buffer)!);
       case 147:
-        return PageOverlay.decode(readValue(buffer)!);
+        return ImagePageSpec.decode(readValue(buffer)!);
       case 148:
-        return OcrResult.decode(readValue(buffer)!);
+        return PageOverlay.decode(readValue(buffer)!);
       case 149:
-        return BackupSummary.decode(readValue(buffer)!);
+        return OcrResult.decode(readValue(buffer)!);
       case 150:
-        return RestoredFile.decode(readValue(buffer)!);
+        return BackupSummary.decode(readValue(buffer)!);
       case 151:
+        return RestoredFile.decode(readValue(buffer)!);
+      case 152:
         return RestoreResult.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1705,6 +1757,97 @@ class SecurityHostApi {
       isNullValid: true,
     );
     return (pigeonVar_replyValue as List<Object?>?)?.cast<ScannedPage>();
+  }
+
+  /// Premium automatic backup: whether it is set up, and where to.
+  Future<AutoBackupStatus> autoBackupStatus() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.autoBackupStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as AutoBackupStatus;
+  }
+
+  /// Asks for the destination file in the system "save" dialog (Google Drive,
+  /// a folder...), keeps a persistable permission for it and stores a key
+  /// derived from [password] (zeroed afterwards), wrapped with the Keystore.
+  /// The password itself is never stored. False if the user cancelled.
+  Future<bool> setUpAutoBackup(Uint8List password) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.setUpAutoBackup$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[password],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as bool;
+  }
+
+  /// Writes a full backup (same format; opens with the backup password) to a
+  /// private temp file, then replaces the destination file with it.
+  /// Errors: IO if the destination is gone or no longer writable.
+  Future<BackupSummary> runAutoBackup(
+    Uint8List metadata,
+    List<String> fileIds,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.runAutoBackup$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[metadata, fileIds],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as BackupSummary;
+  }
+
+  /// Forgets the destination and the key; releases the permission.
+  Future<void> disableAutoBackup() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.disableAutoBackup$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
   }
 
   /// Photos to PDF: the Android photo picker (no storage permission) for up

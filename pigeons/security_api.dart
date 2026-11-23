@@ -154,6 +154,13 @@ class ExportSummary {
   int failed;
 }
 
+/// Premium automatic backup: set up or not, and the destination's name.
+class AutoBackupStatus {
+  AutoBackupStatus({required this.configured, this.destination});
+  bool configured;
+  String? destination;
+}
+
 /// One reminder notification time (epoch ms) with an optional label.
 class ReminderAlarm {
   ReminderAlarm({required this.at, this.label});
@@ -345,6 +352,27 @@ abstract class SecurityHostApi {
   /// erase or the next app start.
   @async
   List<ScannedPage>? startScan(int pageLimit, bool allowGalleryImport);
+
+  /// Premium automatic backup: whether it is set up, and where to.
+  @async
+  AutoBackupStatus autoBackupStatus();
+
+  /// Asks for the destination file in the system "save" dialog (Google Drive,
+  /// a folder...), keeps a persistable permission for it and stores a key
+  /// derived from [password] (zeroed afterwards), wrapped with the Keystore.
+  /// The password itself is never stored. False if the user cancelled.
+  @async
+  bool setUpAutoBackup(Uint8List password);
+
+  /// Writes a full backup (same format; opens with the backup password) to a
+  /// private temp file, then replaces the destination file with it.
+  /// Errors: IO if the destination is gone or no longer writable.
+  @async
+  BackupSummary runAutoBackup(Uint8List metadata, List<String> fileIds);
+
+  /// Forgets the destination and the key; releases the permission.
+  @async
+  void disableAutoBackup();
 
   /// Photos to PDF: the Android photo picker (no storage permission) for up
   /// to [limit] photos. Each photo is turned upright (EXIF orientation),

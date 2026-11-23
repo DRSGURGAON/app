@@ -11,6 +11,7 @@ export 'native/security_api.g.dart'
         BackupSummary,
         CompressionLevel,
         ImagePageSpec,
+        AutoBackupStatus,
         ReminderAlarm,
         DatabaseConfig,
         ExportItem,
@@ -65,6 +66,10 @@ abstract interface class SecurityService {
   });
   Future<List<ScannedPage>?> pickPhotos(int limit);
   Future<ScannedPage?> takePhoto();
+  Future<AutoBackupStatus> autoBackupStatus();
+  Future<bool> setUpAutoBackup(Uint8List password);
+  Future<BackupSummary> runAutoBackup(Uint8List metadata, List<String> fileIds);
+  Future<void> disableAutoBackup();
   Future<List<ImportedFile>> saveScan(
     List<ScanPageSpec> pages,
     ScanSaveFormat format,
@@ -223,6 +228,22 @@ class PigeonSecurityService implements SecurityService {
 
   @override
   Future<ScannedPage?> takePhoto() => _guard(_api.takePhoto);
+
+  @override
+  Future<AutoBackupStatus> autoBackupStatus() => _guard(_api.autoBackupStatus);
+
+  @override
+  Future<bool> setUpAutoBackup(Uint8List password) =>
+      _guard(() => _api.setUpAutoBackup(password));
+
+  @override
+  Future<BackupSummary> runAutoBackup(
+    Uint8List metadata,
+    List<String> fileIds,
+  ) => _guard(() => _api.runAutoBackup(metadata, fileIds));
+
+  @override
+  Future<void> disableAutoBackup() => _guard(_api.disableAutoBackup);
 
   @override
   Future<List<ImportedFile>> saveScan(

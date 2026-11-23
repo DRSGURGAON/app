@@ -58,6 +58,35 @@ class BackupManager(private val vault: VaultStore) {
         return Written(ok, skipped, counting.count)
     }
 
+    /**
+     * Automatic backup body: same format, but encrypted with a key derived
+     * earlier from the backup password. [keepGoing] is checked between
+     * documents; when it returns false (vault locked) the backup is abandoned.
+     */
+    fun write(
+        out: OutputStream,
+        derived: BackupFormat.DerivedKey,
+        metadata: ByteArray,
+        fileIds: List<String>,
+        keepGoing: () -> Boolean,
+    ): Written {
+        fileIds.forEach(VaultStore::validateId)
+        val counting = CountingOutputStream(BufferedOutputStream(out, 64 * 1024))
+        val enc = BackupFormat.create(counting, derived)
+        val writer = BackupContainer.Writer(enc)
+        writer.metadata(metadata)
+        var ok = 0
+        var skipped = 0
+        for (id in fileIds) {
+            if (!keepGoing()) throw `in`.docsafe.app.security.VaultSession.SessionLockedException()
+            if (writer.file(id) { sink -> vault.decryptTo(id, sink) }) ok++ else skipped++
+        }
+        writer.end()
+        enc.finish()
+        counting.flush()
+        return Written(ok, skipped, counting.count)
+    }
+
     /** Writes to a document the user created in the system "save" dialog; deletes it on failure. */
     fun writeTo(
         resolver: ContentResolver,

@@ -84,6 +84,45 @@ object BackupFormat {
         return StreamingAead(random).openEncryptor(sink, wrapper, fileId)
     }
 
+    /**
+     * A backup key derived once from the password (automatic backups): the
+     * same salt and iterations go into every header, so a backup written with
+     * it opens with the password like any other. [key] is the 32-byte
+     * PBKDF2 output; keep it wrapped at rest and zero it after use.
+     */
+    class DerivedKey(val salt: ByteArray, val iterations: Int, val key: ByteArray) {
+        init {
+            require(salt.size == SALT_LEN) { "Bad salt" }
+            require(iterations in MIN_ITERATIONS..MAX_ITERATIONS) { "Unsupported iteration count" }
+            require(key.size == 32) { "Bad key" }
+        }
+    }
+
+    /** Derives a [DerivedKey] from [password] with a new random salt (slow: PBKDF2). */
+    fun deriveKey(
+        password: ByteArray,
+        iterations: Int = DEFAULT_ITERATIONS,
+        random: SecureRandom = SecureRandom(),
+    ): DerivedKey {
+        val salt = ByteArray(SALT_LEN).also(random::nextBytes)
+        return DerivedKey(salt, iterations, Pbkdf2.hmacSha256(password, salt, iterations, 32))
+    }
+
+    /** Like [create], but with a key from [deriveKey] (no password needed at write time). */
+    fun create(
+        sink: OutputStream,
+        derived: DerivedKey,
+        random: SecureRandom = SecureRandom(),
+    ): StreamingAead.EncryptingOutputStream {
+        sink.write(
+            ByteBuffer.allocate(HEADER_LEN).put(MAGIC).put(VERSION).put(KDF_PBKDF2_SHA256)
+                .putInt(derived.iterations).put(derived.salt).array(),
+        )
+        val key = SecretKeySpec(derived.key, "AES")
+        val fileId = ByteArray(StreamingAead.FILE_ID_LEN).also(random::nextBytes)
+        return StreamingAead(random).openEncryptor(sink, AesGcmKeyWrapper { key }, fileId)
+    }
+
     /** Reads the outer header. [FormatException] if this is not a DocSafe backup. */
     fun readHeader(input: InputStream): Header {
         val h = ByteArray(HEADER_LEN)

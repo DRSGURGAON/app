@@ -32,6 +32,7 @@ All of this is stored only on your phone. Each document is encrypted with its ow
 ## Backups and exports
 
 - **Encrypted backup:** you choose where to save the backup file (for example Google Drive, a USB drive or a folder). The file is encrypted with a backup password that only you know. If you save it to a cloud service, that service stores the file under your own account; Document Scanner Pro has no access to it.
+- **Automatic backup (Premium):** if you turn it on, you pick one file once (for example in Google Drive). When you open the app and a backup is due, Document Scanner Pro replaces that file with a new encrypted backup. Your backup password is not stored; a key made from it stays locked in this phone's secure hardware. Document Scanner Pro has no internet access: any upload is done by the app that owns the location you picked (for example the Google Drive app), under your own account.
 - **Export:** an exported document is a normal, unencrypted copy saved where you choose. It is outside Document Scanner Pro's protection.
 
 ## Permissions

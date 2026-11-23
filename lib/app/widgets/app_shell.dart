@@ -7,8 +7,13 @@ import 'package:go_router/go_router.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../data/repositories/reminder_repository.dart';
+import '../../data/services/backup_service.dart';
+import '../../features/settings/backup_screen.dart';
 import '../localization/gen/app_localizations.dart';
 import '../router/app_router.dart';
+
+/// How long after unlock / resume the automatic backup waits.
+const autoBackupStartDelay = Duration(seconds: 3);
 
 /// Bottom navigation: Home, Vault, PDF Tools, Reminders, Settings. Only
 /// mounted while unlocked; keeps the native reminder schedule in sync and
@@ -32,9 +37,45 @@ class _AppShellState extends ConsumerState<AppShell>
     _refreshPremium();
   }
 
+  bool _autoBackupRunning = false;
+  Timer? _autoBackupTimer;
+
+  /// Premium automatic backup, at most once per due interval, only while
+  /// unlocked (a lock half-way aborts it; the next unlock tries again).
+  /// Waits a moment so the first screen draws before the vault is read.
+  void _scheduleAutoBackup() {
+    _autoBackupTimer?.cancel();
+    _autoBackupTimer = Timer(autoBackupStartDelay, _autoBackupIfDue);
+  }
+
+  Future<void> _autoBackupIfDue() async {
+    if (_autoBackupRunning || !mounted) return;
+    _autoBackupRunning = true;
+    try {
+      final service = await ref.read(backupServiceProvider.future);
+      if (!mounted) return;
+      final outcome = await service.runAutoBackup(
+        premium: ref.read(premiumUnlockedProvider),
+      );
+      if (mounted &&
+          (outcome == AutoBackupOutcome.done ||
+              outcome == AutoBackupOutcome.failed)) {
+        ref
+          ..invalidate(autoBackupInfoProvider)
+          ..invalidate(lastBackupProvider)
+          ..invalidate(backupReminderProvider);
+      }
+    } catch (_) {
+      // runAutoBackup records its own failures; nothing else to show here.
+    } finally {
+      _autoBackupRunning = false;
+    }
+  }
+
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _autoBackupTimer?.cancel();
     super.dispose();
   }
 
@@ -47,8 +88,13 @@ class _AppShellState extends ConsumerState<AppShell>
     }
   }
 
-  void _refreshPremium() =>
-      unawaited(ref.read(premiumProvider.notifier).refresh());
+  void _refreshPremium() => unawaited(
+    ref.read(premiumProvider.notifier).refresh().catchError((Object _) {}).then(
+      (_) {
+        if (mounted) _scheduleAutoBackup();
+      },
+    ),
+  );
 
   Future<void> _openLaunchTarget() async {
     try {

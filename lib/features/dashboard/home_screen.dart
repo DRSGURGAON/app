@@ -9,6 +9,7 @@ import '../../app/theme/brand.dart';
 import '../../app/widgets/brand_mark.dart';
 import '../../app/widgets/dialogs.dart';
 import '../../app/widgets/states.dart';
+import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_service.dart';
 import '../../data/models/vault_document.dart';
@@ -103,6 +104,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
           ),
+          const SliverToBoxAdapter(child: _AutoBackupFailedCard()),
           const SliverToBoxAdapter(child: _BackupReminderCard()),
           // Categories first, as folder-like tiles with their icons.
           SliverToBoxAdapter(child: SectionHeader(title: l.homeCategories)),
@@ -422,7 +424,43 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-/// "Your vault is protected" status on the hero (taps to Privacy & security).
+/// Shown when the last Premium automatic backup failed.
+class _AutoBackupFailedCard extends ConsumerWidget {
+  const _AutoBackupFailedCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final failed = ref.watch(autoBackupInfoProvider).value?.failed ?? false;
+    if (!failed || !ref.watch(premiumUnlockedProvider)) {
+      return const SizedBox.shrink();
+    }
+    final l = AppLocalizations.of(context);
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      key: const Key('auto-backup-failed-card'),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+      child: Card(
+        color: scheme.errorContainer,
+        child: ListTile(
+          leading: Icon(
+            Icons.cloud_off_outlined,
+            color: scheme.onErrorContainer,
+          ),
+          title: Text(
+            l.autoBackupFailedHome,
+            style: TextStyle(color: scheme.onErrorContainer),
+          ),
+          trailing: TextButton(
+            key: const Key('auto-backup-fix'),
+            onPressed: () => context.push(Routes.backup),
+            child: Text(l.autoBackupFix),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Shown when a backup is due (Settings → Backup & restore → reminder).
 class _BackupReminderCard extends ConsumerWidget {
   const _BackupReminderCard();

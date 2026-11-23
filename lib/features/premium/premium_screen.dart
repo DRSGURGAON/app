@@ -188,6 +188,11 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
               body: l.premiumBatchDesc,
             ),
             _Benefit(
+              icon: Icons.cloud_sync_outlined,
+              title: l.premiumAutoBackup,
+              body: l.premiumAutoBackupDesc,
+            ),
+            _Benefit(
               icon: Icons.notifications_active_outlined,
               title: l.premiumReminders,
               body: l.premiumRemindersDesc(freeActiveReminderLimit),

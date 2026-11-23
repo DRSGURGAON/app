@@ -19,9 +19,11 @@ import `in`.docsafe.app.scanner.ScanStore
 import `in`.docsafe.app.scanner.ScannerLauncher
 import `in`.docsafe.app.scanner.ScannerUnavailableException
 import `in`.docsafe.app.security.VaultSession
+import `in`.docsafe.app.storage.AutoBackup
 import `in`.docsafe.app.storage.BackupManager
 import `in`.docsafe.app.storage.DocumentExporter
 import `in`.docsafe.app.storage.DocumentImporter
+import `in`.docsafe.crypto.BackupFormat
 import `in`.docsafe.crypto.BackupPasswordException
 import `in`.docsafe.crypto.ExportNames
 import `in`.docsafe.crypto.FormatException
@@ -467,6 +469,48 @@ class SecurityHostApiImpl(
         } finally {
             password.fill(0)
         }
+    }
+
+    override suspend fun autoBackupStatus(): AutoBackupStatus = guard {
+        io {
+            session.requireUnlocked()
+            session.autoBackup.status().let { AutoBackupStatus(it.configured, it.destination) }
+        }
+    }
+
+    override suspend fun setUpAutoBackup(password: ByteArray): Boolean = guard {
+        try {
+            session.requireUnlocked()
+            if (password.size < MIN_BACKUP_PASSWORD_BYTES) throw InvalidInputException("Password too short")
+            val target = documentUi.createDocument(
+                BackupManager.fileName(AutoBackup.FILE_NAME),
+                BackupManager.MIME,
+            ) ?: return@guard false
+            io {
+                session.requireUnlocked()
+                val derived = BackupFormat.deriveKey(password)
+                try {
+                    session.autoBackup.configure(target, derived)
+                } finally {
+                    derived.key.fill(0)
+                }
+            }
+            true
+        } finally {
+            password.fill(0)
+        }
+    }
+
+    override suspend fun runAutoBackup(metadata: ByteArray, fileIds: List<String>): BackupSummary = guard {
+        io {
+            session.requireUnlocked()
+            val w = session.autoBackup.run(session.vaultStore, metadata, fileIds) { session.unlocked }
+            BackupSummary(w.files.toLong(), w.skipped.toLong(), w.bytes)
+        }
+    }
+
+    override suspend fun disableAutoBackup() = guard {
+        io { session.autoBackup.clear() }
     }
 
     override suspend fun importFontFile(): String? = guard {

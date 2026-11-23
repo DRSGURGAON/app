@@ -7,12 +7,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/localization/display_names.dart';
 import '../../app/localization/error_messages.dart';
 import '../../app/localization/gen/app_localizations.dart';
+import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../core/security/security_failure.dart';
 import '../../data/repositories/document_repository.dart';
 import '../../data/services/backup_service.dart';
 import '../../data/services/password_strength.dart';
 import '../pdf_tools/widgets/tool_runner.dart';
+import '../premium/premium_screen.dart';
 
 final lastBackupProvider = FutureProvider.autoDispose<DateTime?>(
   (ref) async => (await ref.watch(backupServiceProvider.future)).lastBackup(),
@@ -30,6 +32,42 @@ final backupReminderProvider = FutureProvider.autoDispose<BackupReminder?>((
   ref.watch(vaultStatsProvider);
   return (await ref.watch(backupServiceProvider.future)).dueReminder();
 });
+
+/// Everything the automatic-backup section shows.
+class AutoBackupInfo {
+  const AutoBackupInfo({
+    required this.configured,
+    this.destination,
+    required this.days,
+    this.last,
+    required this.failed,
+  });
+  final bool configured;
+  final String? destination;
+  final int days;
+  final DateTime? last;
+  final bool failed;
+}
+
+final autoBackupInfoProvider = FutureProvider.autoDispose<AutoBackupInfo>((
+  ref,
+) async {
+  final service = await ref.watch(backupServiceProvider.future);
+  final status = await service.autoBackupStatus();
+  return AutoBackupInfo(
+    configured: status.configured,
+    destination: status.destination,
+    days: await service.autoBackupDays(),
+    last: await service.lastAutoBackup(),
+    failed: status.configured && await service.autoBackupFailed(),
+  );
+});
+
+/// Refreshes everything that shows backup dates or state.
+void invalidateBackupState(WidgetRef ref) => ref
+  ..invalidate(autoBackupInfoProvider)
+  ..invalidate(lastBackupProvider)
+  ..invalidate(backupReminderProvider);
 
 /// Encrypted backup file + restore (Settings → Backup & restore).
 class BackupScreen extends ConsumerWidget {
@@ -51,8 +89,7 @@ class BackupScreen extends ConsumerWidget {
       () => lock.runWithoutAutoLock(() => service.create(password)),
     );
     if (summary == null) return;
-    ref.invalidate(lastBackupProvider);
-    ref.invalidate(backupReminderProvider);
+    invalidateBackupState(ref);
     messenger.showSnackBar(
       SnackBar(
         content: Text(
@@ -235,6 +272,8 @@ class BackupScreen extends ConsumerWidget {
                   ),
               ],
             ),
+          const Divider(height: 32),
+          const _AutoBackupSection(),
           const SizedBox(height: 8),
           Text(
             l.backupNotIncluded,
@@ -248,6 +287,238 @@ class BackupScreen extends ConsumerWidget {
   }
 }
 
+/// Premium: a backup file chosen once and replaced automatically.
+class _AutoBackupSection extends ConsumerWidget {
+  const _AutoBackupSection();
+
+  Future<void> _setUp(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    if (!ref.read(premiumUnlockedProvider)) {
+      await Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => PremiumScreen(feature: l.premiumAutoBackup),
+        ),
+      );
+      return;
+    }
+    final password = await showDialog<Uint8List>(
+      context: context,
+      builder: (_) => _NewPasswordDialog(note: l.autoBackupPasswordNote),
+    );
+    if (password == null || !context.mounted) return;
+    final service = await ref.read(backupServiceProvider.future);
+    if (!context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final lock = ref.read(lockControllerProvider.notifier);
+    final done = await runTool(
+      context,
+      () => lock.runWithoutAutoLock(() => service.enableAutoBackup(password)),
+    );
+    invalidateBackupState(ref);
+    if (done == true) {
+      messenger.showSnackBar(SnackBar(content: Text(l.autoBackupOn)));
+    }
+  }
+
+  Future<void> _runNow(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final service = await ref.read(backupServiceProvider.future);
+    if (!context.mounted) return;
+    final lock = ref.read(lockControllerProvider.notifier);
+    final outcome = await runTool(
+      context,
+      () => lock.runWithoutAutoLock(
+        () => service.runAutoBackup(premium: true, force: true),
+      ),
+    );
+    invalidateBackupState(ref);
+    if (outcome == AutoBackupOutcome.failed) {
+      messenger.showSnackBar(SnackBar(content: Text(l.autoBackupFailed)));
+    } else if (outcome == AutoBackupOutcome.done) {
+      messenger.showSnackBar(SnackBar(content: Text(l.autoBackupOn)));
+    }
+  }
+
+  Future<void> _turnOff(BuildContext context, WidgetRef ref) async {
+    final l = AppLocalizations.of(context);
+    final ok = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.autoBackupTurnOff),
+        content: Text(l.autoBackupTurnOffBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(l.cancel),
+          ),
+          FilledButton(
+            key: const Key('auto-backup-off-confirm'),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(l.autoBackupTurnOff),
+          ),
+        ],
+      ),
+    );
+    if (ok != true || !context.mounted) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final service = await ref.read(backupServiceProvider.future);
+    try {
+      await service.disableAutoBackup();
+    } on SecurityFailure catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(l.errorFor(e.code))));
+      return;
+    }
+    invalidateBackupState(ref);
+    messenger.showSnackBar(SnackBar(content: Text(l.autoBackupTurnedOff)));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final locale = Localizations.localeOf(context).toLanguageTag();
+    final theme = Theme.of(context);
+    final premium = ref.watch(premiumUnlockedProvider);
+    final info = ref.watch(autoBackupInfoProvider).value;
+    final configured = info?.configured ?? false;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                l.autoBackupTitle,
+                style: theme.textTheme.titleMedium,
+              ),
+            ),
+            if (!premium)
+              Chip(
+                avatar: const Icon(Icons.workspace_premium_outlined, size: 18),
+                label: Text(l.premiumBadge),
+              ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Text(l.autoBackupIntro),
+        const SizedBox(height: 12),
+        if (!configured)
+          FilledButton.tonalIcon(
+            key: const Key('auto-backup-setup'),
+            onPressed: info == null ? null : () => _setUp(context, ref),
+            icon: const Icon(Icons.cloud_sync_outlined),
+            label: Text(l.autoBackupSetUp),
+          )
+        else ...[
+          if (!premium)
+            _Notice(text: l.autoBackupNeedsPremium, error: false)
+          else if (info!.failed)
+            _Notice(text: l.autoBackupFailed, error: true),
+          ListTile(
+            key: const Key('auto-backup-status'),
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.cloud_done_outlined),
+            title: Text(l.autoBackupOn),
+            subtitle: Text(
+              [
+                info!.destination == null
+                    ? l.autoBackupDestinationUnknown
+                    : l.autoBackupDestination(info.destination!),
+                info.last == null
+                    ? l.autoBackupNotYet
+                    : l.autoBackupLast(formatDate(info.last!, locale)),
+              ].join('\n'),
+            ),
+          ),
+          DropdownButtonFormField<int>(
+            key: const Key('auto-backup-days'),
+            initialValue: info.days,
+            isExpanded: true,
+            decoration: InputDecoration(
+              labelText: l.autoBackupEvery,
+              border: const OutlineInputBorder(),
+            ),
+            onChanged: (v) async {
+              if (v == null) return;
+              final service = await ref.read(backupServiceProvider.future);
+              await service.setAutoBackupDays(v);
+              ref.invalidate(autoBackupInfoProvider);
+            },
+            items: [
+              for (final d in autoBackupChoices)
+                DropdownMenuItem(
+                  value: d,
+                  child: Text(switch (d) {
+                    1 => l.autoBackupDaily,
+                    7 => l.autoBackupWeekly,
+                    _ => l.autoBackupMonthly,
+                  }),
+                ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              FilledButton.tonalIcon(
+                key: const Key('auto-backup-now'),
+                onPressed: premium ? () => _runNow(context, ref) : null,
+                icon: const Icon(Icons.backup_outlined),
+                label: Text(l.autoBackupNow),
+              ),
+              if (info.failed)
+                OutlinedButton(
+                  key: const Key('auto-backup-redo'),
+                  onPressed: premium ? () => _setUp(context, ref) : null,
+                  child: Text(l.autoBackupSetUp),
+                ),
+              TextButton(
+                key: const Key('auto-backup-off'),
+                onPressed: () => _turnOff(context, ref),
+                child: Text(l.autoBackupTurnOff),
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _Notice extends StatelessWidget {
+  const _Notice({required this.text, required this.error});
+  final String text;
+  final bool error;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final bg = error ? scheme.errorContainer : scheme.secondaryContainer;
+    final fg = error ? scheme.onErrorContainer : scheme.onSecondaryContainer;
+    return Card(
+      key: Key(error ? 'auto-backup-failed' : 'auto-backup-paused'),
+      color: bg,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(
+              error ? Icons.error_outline : Icons.pause_circle_outline,
+              color: fg,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(text, style: TextStyle(color: fg)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class _WrongPassword implements Exception {
   const _WrongPassword();
 }
@@ -255,7 +526,10 @@ class _WrongPassword implements Exception {
 Uint8List _utf8(String s) => Uint8List.fromList(utf8.encode(s));
 
 class _NewPasswordDialog extends StatefulWidget {
-  const _NewPasswordDialog();
+  const _NewPasswordDialog({this.note});
+
+  /// Extra explanation above the fields (automatic backup).
+  final String? note;
 
   @override
   State<_NewPasswordDialog> createState() => _NewPasswordDialogState();
@@ -288,6 +562,11 @@ class _NewPasswordDialogState extends State<_NewPasswordDialog> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          if (widget.note != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(widget.note!),
+            ),
           TextField(
             // Keyboards must not learn document names, notes or passwords.
             enableIMEPersonalizedLearning: false,

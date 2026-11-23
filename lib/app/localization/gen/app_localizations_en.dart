@@ -2116,4 +2116,83 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get premiumLifetimeAlsoSub =>
       'You also have a subscription. Cancel it in Google Play so you are not charged again.';
+
+  @override
+  String get autoBackupTitle => 'Automatic backup';
+
+  @override
+  String get autoBackupIntro =>
+      'Choose a file once, for example in Google Drive or on a USB drive. Document Scanner Pro then replaces it with a fresh encrypted backup when you open the app and a backup is due. Uploading is done by the app that owns the location (e.g. Google Drive); Document Scanner Pro itself has no internet access.';
+
+  @override
+  String get autoBackupSetUp => 'Set up automatic backup';
+
+  @override
+  String get autoBackupPasswordNote =>
+      'This password is not saved. A key made from it stays locked in this phone\'s secure hardware so later backups need no password. You need the password to restore.';
+
+  @override
+  String get autoBackupOn => 'Automatic backup is on';
+
+  @override
+  String autoBackupDestination(String name) {
+    return 'Saving to: $name';
+  }
+
+  @override
+  String get autoBackupDestinationUnknown => 'Saving to the file you chose';
+
+  @override
+  String autoBackupLast(String date) {
+    return 'Last automatic backup: $date';
+  }
+
+  @override
+  String get autoBackupNotYet => 'No automatic backup yet';
+
+  @override
+  String get autoBackupEvery => 'How often';
+
+  @override
+  String get autoBackupDaily => 'Every day';
+
+  @override
+  String get autoBackupWeekly => 'Every week';
+
+  @override
+  String get autoBackupMonthly => 'Every 30 days';
+
+  @override
+  String get autoBackupNow => 'Back up now';
+
+  @override
+  String get autoBackupTurnOff => 'Turn off';
+
+  @override
+  String get autoBackupTurnOffBody =>
+      'Automatic backups stop. The backup file already saved stays where it is.';
+
+  @override
+  String get autoBackupTurnedOff => 'Automatic backup is off.';
+
+  @override
+  String get autoBackupFailed =>
+      'The last automatic backup failed. The file may have been moved or deleted, or the storage is full. Try Back up now, or set it up again.';
+
+  @override
+  String get autoBackupFailedHome => 'Automatic backup failed';
+
+  @override
+  String get autoBackupFix => 'Fix';
+
+  @override
+  String get autoBackupNeedsPremium =>
+      'Premium has ended, so automatic backups are paused. Your existing backup file is unchanged.';
+
+  @override
+  String get premiumAutoBackup => 'Automatic backup';
+
+  @override
+  String get premiumAutoBackupDesc =>
+      'An encrypted backup saved for you to Google Drive or another place you choose';
 }

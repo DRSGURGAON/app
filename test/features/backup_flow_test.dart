@@ -1,4 +1,7 @@
 import 'package:docsafe/core/database/app_database.dart';
+import 'package:docsafe/core/entitlement/entitlement.dart';
+import 'package:docsafe/core/security/security_failure.dart';
+import 'package:docsafe/features/premium/premium_screen.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -209,6 +212,94 @@ void main() {
     await tester.tap(find.text(hi.cancel));
     await settle(tester);
     await scrollAndTap(tester, find.byKey(const Key('backup-restore')));
+    await app.dispose();
+  });
+
+  testWidgets('automatic backup: free users see Premium', (tester) async {
+    final fake = await unlockedFake();
+    final app = await pumpApp(tester, fake);
+    await openBackup(tester, settings: en.navSettings);
+    await scrollAndTap(tester, find.byKey(const Key('auto-backup-setup')));
+    expect(find.byType(PremiumScreen), findsOneWidget);
+    expect(find.text(en.premiumLocked(en.premiumAutoBackup)), findsOneWidget);
+    expect(fake.autoBackupConfigured, isFalse);
+    await app.dispose();
+  });
+
+  testWidgets('automatic backup: set up, back up now, failure card, turn off', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    final engine = FakePdfEngine();
+    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
+    await importDoc(tester, fake, engine, 'Passport.pdf');
+    await openBackup(tester, settings: en.navSettings);
+
+    await scrollAndTap(tester, find.byKey(const Key('auto-backup-setup')));
+    expect(find.text(en.autoBackupPasswordNote), findsOneWidget);
+    await enterNewPassword(
+      tester,
+      'Long-horse-battery-7',
+      'Long-horse-battery-7',
+    );
+    await tester.tap(find.text(en.backupContinue));
+    await settle(tester);
+    expect(fake.autoBackupConfigured, isTrue);
+    expect(fake.autoBackupRuns, hasLength(1));
+    expect(fake.autoBackupPasswordBuffers.single.every((b) => b == 0), isTrue);
+    await reveal(tester, find.byKey(const Key('auto-backup-status')));
+    expect(
+      find.textContaining('DocumentScannerPro-auto-backup.dsbackup'),
+      findsOneWidget,
+    );
+    expect(find.textContaining(en.autoBackupNotYet), findsNothing);
+
+    // A failed run shows on the screen and on Home until a run works.
+    fake.nextAutoBackupFailure = const SecurityFailure(SecurityErrorCode.io);
+    await scrollAndTap(tester, find.byKey(const Key('auto-backup-now')));
+    expect(find.byKey(const Key('auto-backup-failed')), findsOneWidget);
+    await tester.pump(const Duration(seconds: 6));
+    await settle(tester);
+    await goTab(tester, en.navHome);
+    await scrollToTop(tester);
+    expect(find.byKey(const Key('auto-backup-failed-card')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('auto-backup-fix')));
+    await settle(tester);
+    await scrollAndTap(tester, find.byKey(const Key('auto-backup-now')));
+    expect(fake.autoBackupRuns, hasLength(2));
+    expect(find.byKey(const Key('auto-backup-failed')), findsNothing);
+    await tester.pump(const Duration(seconds: 6));
+    await settle(tester);
+
+    await scrollAndTap(tester, find.byKey(const Key('auto-backup-off')));
+    await tester.tap(find.byKey(const Key('auto-backup-off-confirm')));
+    await settle(tester);
+    expect(fake.autoBackupConfigured, isFalse);
+    expect(find.byKey(const Key('auto-backup-setup')), findsOneWidget);
+    await app.dispose();
+  });
+
+  testWidgets('automatic backup runs by itself after unlock when due', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    fake.autoBackupConfigured = true;
+    final engine = FakePdfEngine();
+    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
+    await importDoc(tester, fake, engine, 'Passport.pdf');
+    // Resume triggers the Premium check, then the delayed run.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump(const Duration(seconds: 4));
+    await settle(tester);
+    expect(fake.autoBackupRuns, isNotEmpty);
+    final runs = fake.autoBackupRuns.length;
+    // Not due again right away.
+    tester.binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await tester.pump(const Duration(seconds: 4));
+    await settle(tester);
+    expect(fake.autoBackupRuns, hasLength(runs));
     await app.dispose();
   });
 }

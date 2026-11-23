@@ -256,6 +256,156 @@ void main() {
     expect(await backup.lastBackup(), isNull);
   });
 
+  group('automatic backup', () {
+    test('due rule: never run, before and after the interval', () {
+      final t = DateTime(2026, 11, 8, 10);
+      expect(autoBackupDue(now: t, intervalDays: 7, lastRun: null), isTrue);
+      expect(
+        autoBackupDue(
+          now: t,
+          intervalDays: 7,
+          lastRun: t.subtract(const Duration(days: 6, hours: 23)),
+        ),
+        isFalse,
+      );
+      expect(
+        autoBackupDue(
+          now: t,
+          intervalDays: 7,
+          lastRun: t.subtract(const Duration(days: 7)),
+        ),
+        isTrue,
+      );
+      expect(
+        autoBackupDue(
+          now: t,
+          intervalDays: 1,
+          lastRun: t.subtract(const Duration(hours: 25)),
+        ),
+        isTrue,
+      );
+    });
+
+    test('not Premium or not set up: nothing runs', () async {
+      await add('A.pdf');
+      fake.autoBackupConfigured = true;
+      expect(
+        await backup.runAutoBackup(premium: false),
+        AutoBackupOutcome.notPremium,
+      );
+      fake.autoBackupConfigured = false;
+      expect(
+        await backup.runAutoBackup(premium: true),
+        AutoBackupOutcome.notSetUp,
+      );
+      expect(fake.autoBackupRuns, isEmpty);
+    });
+
+    test(
+      'enable: dialog, first backup, password zeroed; then only when due',
+      () async {
+        await add('A.pdf');
+        final password = pw('Long-horse-battery-7');
+        expect(await backup.enableAutoBackup(password), isTrue);
+        expect(password.every((b) => b == 0), isTrue);
+        expect(fake.autoBackupRuns.single, hasLength(1));
+        expect(await backup.lastAutoBackup(), now);
+        // The manual "last backup" date moves too (reminder card hides).
+        expect(await backup.lastBackup(), now);
+        expect(await backup.dueReminder(), isNull);
+
+        expect(
+          await backup.runAutoBackup(premium: true),
+          AutoBackupOutcome.notDue,
+        );
+        expect(fake.autoBackupRuns, hasLength(1));
+
+        final later = BackupService(
+          db,
+          fake,
+          clock: () => now.add(const Duration(days: 7)),
+        );
+        expect(
+          await later.runAutoBackup(premium: true),
+          AutoBackupOutcome.done,
+        );
+        expect(fake.autoBackupRuns, hasLength(2));
+      },
+    );
+
+    test('cancelled dialog: not set up, nothing written', () async {
+      fake.cancelAutoBackupSetup = true;
+      expect(
+        await backup.enableAutoBackup(pw('Long-horse-battery-7')),
+        isFalse,
+      );
+      expect(fake.autoBackupConfigured, isFalse);
+      expect(fake.autoBackupRuns, isEmpty);
+    });
+
+    test('interval setting: default 7, only offered choices', () async {
+      expect(await backup.autoBackupDays(), defaultAutoBackupDays);
+      await backup.setAutoBackupDays(30);
+      expect(await backup.autoBackupDays(), 30);
+      expect(() => backup.setAutoBackupDays(3), throwsArgumentError);
+    });
+
+    test('a failure is remembered until a backup works; a lock is not a '
+        'failure', () async {
+      await add('A.pdf');
+      fake.autoBackupConfigured = true;
+      fake.nextAutoBackupFailure = const SecurityFailure(
+        SecurityErrorCode.locked,
+      );
+      expect(
+        await backup.runAutoBackup(premium: true),
+        AutoBackupOutcome.failed,
+      );
+      expect(await backup.autoBackupFailed(), isFalse);
+      expect(await backup.lastAutoBackup(), isNull);
+
+      fake.nextAutoBackupFailure = const SecurityFailure(SecurityErrorCode.io);
+      expect(
+        await backup.runAutoBackup(premium: true),
+        AutoBackupOutcome.failed,
+      );
+      expect(await backup.autoBackupFailed(), isTrue);
+
+      // Still due (never succeeded), so the next unlock tries again.
+      expect(await backup.runAutoBackup(premium: true), AutoBackupOutcome.done);
+      expect(await backup.autoBackupFailed(), isFalse);
+    });
+
+    test(
+      'first backup failing after setup throws so the screen can say so',
+      () async {
+        await add('A.pdf');
+        // Fail the first run only.
+        fake.nextAutoBackupFailure = const SecurityFailure(
+          SecurityErrorCode.io,
+        );
+        await expectLater(
+          backup.enableAutoBackup(pw('Long-horse-battery-7')),
+          throwsA(isA<SecurityFailure>()),
+        );
+        expect(fake.autoBackupConfigured, isTrue);
+        expect(await backup.autoBackupFailed(), isTrue);
+      },
+    );
+
+    test('turning off forgets the destination and the dates', () async {
+      await add('A.pdf');
+      await backup.enableAutoBackup(pw('Long-horse-battery-7'));
+      await backup.disableAutoBackup();
+      expect(fake.autoBackupConfigured, isFalse);
+      expect(await backup.lastAutoBackup(), isNull);
+      expect(
+        await backup.runAutoBackup(premium: true),
+        AutoBackupOutcome.notSetUp,
+      );
+    });
+  });
+
   group('backup reminder', () {
     final t0 = DateTime(2026, 1, 1, 9);
     BackupReminder? due({

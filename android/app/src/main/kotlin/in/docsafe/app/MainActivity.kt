@@ -141,6 +141,11 @@ class MainActivity : FlutterFragmentActivity() {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 type = mimeType
                 putExtra(Intent.EXTRA_TITLE, fileName)
+                // Lets automatic backups keep writing to the chosen file later.
+                addFlags(
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION,
+                )
             },
         )
 

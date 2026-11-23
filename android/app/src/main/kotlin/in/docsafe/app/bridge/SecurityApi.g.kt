@@ -668,6 +668,51 @@ data class ExportSummary (
 }
 
 /**
+ * Premium automatic backup: set up or not, and the destination's name.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class AutoBackupStatus (
+  val configured: Boolean,
+  val destination: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): AutoBackupStatus {
+      val configured = pigeonVar_list[0] as Boolean
+      val destination = pigeonVar_list[1] as String?
+      return AutoBackupStatus(configured, destination)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      configured,
+      destination,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as AutoBackupStatus
+    return SecurityApiPigeonUtils.deepEquals(this.configured, other.configured) && SecurityApiPigeonUtils.deepEquals(this.destination, other.destination)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.configured)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.destination)
+    return result
+  }
+  override fun toString(): String {
+    return "AutoBackupStatus(configured=$configured, destination=$destination)"
+  }
+}
+
+/**
  * One reminder notification time (epoch ms) with an optional label.
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -1166,45 +1211,50 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       143.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ReminderAlarm.fromList(it)
+          AutoBackupStatus.fromList(it)
         }
       }
       144.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ScannedPage.fromList(it)
+          ReminderAlarm.fromList(it)
         }
       }
       145.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ScanPageSpec.fromList(it)
+          ScannedPage.fromList(it)
         }
       }
       146.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ImagePageSpec.fromList(it)
+          ScanPageSpec.fromList(it)
         }
       }
       147.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          PageOverlay.fromList(it)
+          ImagePageSpec.fromList(it)
         }
       }
       148.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          OcrResult.fromList(it)
+          PageOverlay.fromList(it)
         }
       }
       149.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          BackupSummary.fromList(it)
+          OcrResult.fromList(it)
         }
       }
       150.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          RestoredFile.fromList(it)
+          BackupSummary.fromList(it)
         }
       }
       151.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          RestoredFile.fromList(it)
+        }
+      }
+      152.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
           RestoreResult.fromList(it)
         }
@@ -1270,40 +1320,44 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is ReminderAlarm -> {
+      is AutoBackupStatus -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is ScannedPage -> {
+      is ReminderAlarm -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is ScanPageSpec -> {
+      is ScannedPage -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is ImagePageSpec -> {
+      is ScanPageSpec -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is PageOverlay -> {
+      is ImagePageSpec -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is OcrResult -> {
+      is PageOverlay -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is BackupSummary -> {
+      is OcrResult -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is RestoredFile -> {
+      is BackupSummary -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is RestoreResult -> {
+      is RestoredFile -> {
         stream.write(151)
+        writeValue(stream, value.toList())
+      }
+      is RestoreResult -> {
+        stream.write(152)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1371,6 +1425,23 @@ interface SecurityHostApi {
    * erase or the next app start.
    */
   suspend fun startScan(pageLimit: Long, allowGalleryImport: Boolean): List<ScannedPage>?
+  /** Premium automatic backup: whether it is set up, and where to. */
+  suspend fun autoBackupStatus(): AutoBackupStatus
+  /**
+   * Asks for the destination file in the system "save" dialog (Google Drive,
+   * a folder...), keeps a persistable permission for it and stores a key
+   * derived from [password] (zeroed afterwards), wrapped with the Keystore.
+   * The password itself is never stored. False if the user cancelled.
+   */
+  suspend fun setUpAutoBackup(password: ByteArray): Boolean
+  /**
+   * Writes a full backup (same format; opens with the backup password) to a
+   * private temp file, then replaces the destination file with it.
+   * Errors: IO if the destination is gone or no longer writable.
+   */
+  suspend fun runAutoBackup(metadata: ByteArray, fileIds: List<String>): BackupSummary
+  /** Forgets the destination and the key; releases the permission. */
+  suspend fun disableAutoBackup()
   /**
    * Photos to PDF: the Android photo picker (no storage permission) for up
    * to [limit] photos. Each photo is turned upright (EXIF orientation),
@@ -1897,6 +1968,80 @@ interface SecurityHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.startScan(pageLimitArg, allowGalleryImportArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.autoBackupStatus$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.autoBackupStatus())
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.setUpAutoBackup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val passwordArg = args[0] as ByteArray
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.setUpAutoBackup(passwordArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.runAutoBackup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val metadataArg = args[0] as ByteArray
+            val fileIdsArg = args[1] as List<String>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.runAutoBackup(metadataArg, fileIdsArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.disableAutoBackup$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                api.disableAutoBackup()
+                listOf(null)
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)
               }

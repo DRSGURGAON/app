@@ -54,6 +54,20 @@ BackupReminder? backupReminderDue({
   return BackupReminder(lastBackup: lastBackup, daysSince: since.inDays);
 }
 
+/// Premium automatic backup: how often (days) it may run; 7 by default.
+const autoBackupChoices = [1, 7, 30];
+const defaultAutoBackupDays = 7;
+
+enum AutoBackupOutcome { done, notDue, notSetUp, notPremium, failed }
+
+/// Pure rule: is an automatic backup due? (unit-tested)
+bool autoBackupDue({
+  required DateTime now,
+  required int intervalDays,
+  required DateTime? lastRun,
+}) =>
+    lastRun == null || !now.isBefore(lastRun.add(Duration(days: intervalDays)));
+
 /// Version of the metadata JSON inside a backup.
 const backupMetadataVersion = 1;
 
@@ -104,6 +118,98 @@ class BackupService {
       .insertOnConflictUpdate(
         AppSettingsCompanion.insert(key: key, value: value),
       );
+
+  // ---------------------------------------------------- automatic backup
+
+  static const _autoDaysKey = 'backup.autoDays';
+  static const _autoLastKey = 'backup.autoLast';
+  static const _autoFailedKey = 'backup.autoFailed';
+
+  Future<AutoBackupStatus> autoBackupStatus() => _security.autoBackupStatus();
+
+  Future<int> autoBackupDays() async {
+    final v = int.tryParse(await _setting(_autoDaysKey) ?? '');
+    return autoBackupChoices.contains(v) ? v! : defaultAutoBackupDays;
+  }
+
+  Future<void> setAutoBackupDays(int days) {
+    if (!autoBackupChoices.contains(days)) {
+      throw ArgumentError.value(days, 'days');
+    }
+    return _put(_autoDaysKey, '$days');
+  }
+
+  Future<DateTime?> lastAutoBackup() async =>
+      DateTime.tryParse(await _setting(_autoLastKey) ?? '');
+
+  /// The last automatic backup failed (destination gone, disk full...).
+  Future<bool> autoBackupFailed() async =>
+      await _setting(_autoFailedKey) == '1';
+
+  /// Sets up the destination (system dialog) and the key, then makes the
+  /// first backup. False if the user cancelled the dialog. [password] is
+  /// zeroed. Throws [SecurityFailure] if the first backup fails.
+  Future<bool> enableAutoBackup(Uint8List password) async {
+    if (!await _security.setUpAutoBackup(password)) return false;
+    final r = await runAutoBackup(premium: true, force: true);
+    if (r == AutoBackupOutcome.failed) {
+      throw const SecurityFailure(SecurityErrorCode.io);
+    }
+    return true;
+  }
+
+  Future<void> disableAutoBackup() async {
+    await _security.disableAutoBackup();
+    await (_db.delete(
+      _db.appSettings,
+    )..where((t) => t.key.isIn([_autoLastKey, _autoFailedKey]))).go();
+  }
+
+  /// Runs an automatic backup if it is set up, Premium is active and it is
+  /// due (or [force]). Never throws: failures are recorded and reported.
+  Future<AutoBackupOutcome> runAutoBackup({
+    required bool premium,
+    bool force = false,
+  }) async {
+    if (!premium) return AutoBackupOutcome.notPremium;
+    final AutoBackupStatus status;
+    try {
+      status = await _security.autoBackupStatus();
+    } on SecurityFailure {
+      return AutoBackupOutcome.notSetUp;
+    }
+    if (!status.configured) return AutoBackupOutcome.notSetUp;
+    if (!force &&
+        !autoBackupDue(
+          now: _clock(),
+          intervalDays: await autoBackupDays(),
+          lastRun: await lastAutoBackup(),
+        )) {
+      return AutoBackupOutcome.notDue;
+    }
+    try {
+      final meta = await buildMetadata();
+      await _security.runAutoBackup(
+        Uint8List.fromList(utf8.encode(jsonEncode(meta.json))),
+        meta.fileIds,
+      );
+      final now = _clock().toIso8601String();
+      await _put(_autoLastKey, now);
+      await _put(_lastBackupKey, now);
+      await (_db.delete(
+        _db.appSettings,
+      )..where((t) => t.key.isIn([_autoFailedKey, _snoozedUntilKey]))).go();
+      AppLogger.event('auto_backup_done');
+      return AutoBackupOutcome.done;
+    } on SecurityFailure catch (e) {
+      // Locked half-way: not a failure, the next unlock tries again.
+      if (e.code != SecurityErrorCode.locked) {
+        await _put(_autoFailedKey, '1');
+        AppLogger.event('auto_backup_failed');
+      }
+      return AutoBackupOutcome.failed;
+    }
+  }
 
   /// Reminder interval in days (0 = off).
   Future<int> reminderDays() async {

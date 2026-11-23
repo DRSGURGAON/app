@@ -3571,6 +3571,144 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You also have a subscription. Cancel it in Google Play so you are not charged again.'**
   String get premiumLifetimeAlsoSub;
+
+  /// No description provided for @autoBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup'**
+  String get autoBackupTitle;
+
+  /// No description provided for @autoBackupIntro.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a file once, for example in Google Drive or on a USB drive. Document Scanner Pro then replaces it with a fresh encrypted backup when you open the app and a backup is due. Uploading is done by the app that owns the location (e.g. Google Drive); Document Scanner Pro itself has no internet access.'**
+  String get autoBackupIntro;
+
+  /// No description provided for @autoBackupSetUp.
+  ///
+  /// In en, this message translates to:
+  /// **'Set up automatic backup'**
+  String get autoBackupSetUp;
+
+  /// No description provided for @autoBackupPasswordNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This password is not saved. A key made from it stays locked in this phone\'s secure hardware so later backups need no password. You need the password to restore.'**
+  String get autoBackupPasswordNote;
+
+  /// No description provided for @autoBackupOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup is on'**
+  String get autoBackupOn;
+
+  /// No description provided for @autoBackupDestination.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to: {name}'**
+  String autoBackupDestination(String name);
+
+  /// No description provided for @autoBackupDestinationUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Saving to the file you chose'**
+  String get autoBackupDestinationUnknown;
+
+  /// No description provided for @autoBackupLast.
+  ///
+  /// In en, this message translates to:
+  /// **'Last automatic backup: {date}'**
+  String autoBackupLast(String date);
+
+  /// No description provided for @autoBackupNotYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No automatic backup yet'**
+  String get autoBackupNotYet;
+
+  /// No description provided for @autoBackupEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'How often'**
+  String get autoBackupEvery;
+
+  /// No description provided for @autoBackupDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Every day'**
+  String get autoBackupDaily;
+
+  /// No description provided for @autoBackupWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every week'**
+  String get autoBackupWeekly;
+
+  /// No description provided for @autoBackupMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 30 days'**
+  String get autoBackupMonthly;
+
+  /// No description provided for @autoBackupNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Back up now'**
+  String get autoBackupNow;
+
+  /// No description provided for @autoBackupTurnOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn off'**
+  String get autoBackupTurnOff;
+
+  /// No description provided for @autoBackupTurnOffBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backups stop. The backup file already saved stays where it is.'**
+  String get autoBackupTurnOffBody;
+
+  /// No description provided for @autoBackupTurnedOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup is off.'**
+  String get autoBackupTurnedOff;
+
+  /// No description provided for @autoBackupFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The last automatic backup failed. The file may have been moved or deleted, or the storage is full. Try Back up now, or set it up again.'**
+  String get autoBackupFailed;
+
+  /// No description provided for @autoBackupFailedHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup failed'**
+  String get autoBackupFailedHome;
+
+  /// No description provided for @autoBackupFix.
+  ///
+  /// In en, this message translates to:
+  /// **'Fix'**
+  String get autoBackupFix;
+
+  /// No description provided for @autoBackupNeedsPremium.
+  ///
+  /// In en, this message translates to:
+  /// **'Premium has ended, so automatic backups are paused. Your existing backup file is unchanged.'**
+  String get autoBackupNeedsPremium;
+
+  /// No description provided for @premiumAutoBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup'**
+  String get premiumAutoBackup;
+
+  /// No description provided for @premiumAutoBackupDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'An encrypted backup saved for you to Google Drive or another place you choose'**
+  String get premiumAutoBackupDesc;
 }
 
 class _AppLocalizationsDelegate

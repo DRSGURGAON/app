@@ -292,6 +292,20 @@ utility PDF, one scanned PDF.
 | A4 | Free plan: tap the automatic switch | Premium screen |
 | A5 | Erase all data | No more notifications |
 
+## 19. Automatic backup (Premium)
+
+| # | Step | Expected |
+|---|---|---|
+| AB1 | Premium (debug switch). Backup & restore → Set up automatic backup → strong password → pick a file **in Google Drive** | Dialog closes; "Automatic backup is on", file name shown; the file appears in Drive (after the Drive app uploads) |
+| AB2 | Restore that Drive file on another phone / after Erase all data, with the password | All documents back |
+| AB3 | Add a document, "Back up now"; check the file's modified time / size in Drive | Same file replaced (no second copy), newer size |
+| AB4 | Set "Every day", change the phone date +1 day, lock and unlock | A new backup a few seconds after unlock |
+| AB5 | Delete the file in Drive (or revoke access in Settings → Apps), then "Back up now" | Failure notice on the screen and a card on Home; "Set up automatic backup" again fixes it |
+| AB6 | Repeat AB1 with a USB drive / local folder (Files app) | Works the same |
+| AB7 | Lock the app (power button) during a long automatic backup | Run stops, no failure shown; old file in the destination is intact; it runs again after unlock |
+| AB8 | Free plan: tap Set up | Premium screen |
+| AB9 | Turn off; Erase all data | No further writes; old file stays |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

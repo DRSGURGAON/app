@@ -201,6 +201,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 7a | Annotate & Sign: source + flattened intermediate | as #1 (the intermediate is an encrypted vault container, decrypted to a temp file only while reassembling); overlay PNGs in memory | Save copy | When the save finishes (intermediate container deleted; orphan sweep on next start) | No |
 | 7b | OCR input / output | input decrypted as #1 (one page bitmap at a time in memory); recognised text in memory, shown to the user | "Read text" | When OCR finishes (temp deleted in `finally`); text discarded unless the user saves it — then stored masked in the encrypted DB | No |
 | 7c | Backup / restore | none on disk: vault plaintext streams through memory into the encrypted backup, and back into new vault containers | Backup or restore | When it finishes | No |
+| 7d | Automatic backup temp file | `cache/autobackup_tmp/*.part` — **ciphertext** (finished backup before it is copied out) | Automatic backup runs | Right after the copy (or on failure); next start | No |
 | 8 | Exported copies | Where the user chose | Explicit export | Never by DocSafe (user's copy) | Depends on destination |
 
 Never plaintext: vault containers (`no_backup/vault/*.dsf`), the database (`no_backup/db`), wrapped
@@ -340,9 +341,38 @@ has **no network permission**; uploading, if any, is done by the app the user ch
   content, by keyed fingerprint) are skipped. Restoring adds to the vault; it never deletes.
 - **Bridge:** the password crosses as UTF-8 bytes and is zeroed on both sides after use; metadata
   JSON crosses in memory (documented exception); document bytes never cross.
-- **Limitations:** no automatic/scheduled backup yet (needs the Drive API = network permission;
-  deliberately not done). A backup file is only as safe as its password; the file name and size
+- **Limitations:** a backup file is only as safe as its password; the file name and size
   are visible to wherever it is stored.
+
+## 12c-auto. Automatic backup (Premium)
+
+Still **no network permission** and no Google sign-in. The user picks one file once in the system
+"save" dialog (`ACTION_CREATE_DOCUMENT`, e.g. in the Google Drive app); DocSafe takes a persistable
+read/write URI permission for that one document and later overwrites it. Uploading is done by the
+provider app.
+
+- **Key:** the backup password is entered once (same strength rules) and **never stored**. A key is
+  derived from it with the same PBKDF2 parameters as a manual backup (`BackupFormat.deriveKey`,
+  fresh random salt) and kept as `(salt, iterations, key)` wrapped with the Keystore KEK (AES-GCM,
+  AAD `DocSafe/AUTOBACKUP/KEY/v1`) in `no_backup/autobackup/key.v1`. Every automatic backup uses
+  that salt and a fresh random DEK, so it opens with the password on any phone, exactly like a
+  manual backup. The target URI is wrapped the same way (`target.v1`, AAD `.../TARGET/v1`).
+  Anyone who can unwrap the KEK (i.e. an unlocked session on this phone) can write backups, never
+  read the password.
+- **When:** only while the vault is unlocked: a few seconds after unlock / return to the app, if
+  Premium is active and the chosen interval (1, 7 or 30 days; default 7) has passed. Nothing runs
+  in the background while locked (no WorkManager). Locking mid-run aborts it (`keepGoing` checks
+  the session); it is retried on the next unlock and is not counted as a failure.
+- **Writing:** the backup is first written completely to `cache/autobackup_tmp/*.part`
+  (**ciphertext only**), synced, then copied over the destination with mode `"wt"`; the temp file
+  is deleted in `finally` and swept on the next start. A failure (file deleted/moved, permission
+  revoked, storage full) keeps the last good destination file, sets a flag shown in Backup &
+  restore and on Home, and is retried on the next unlock.
+- **Turn off / erase:** "Turn off" and "Erase all data" wipe both wrapped files and release the
+  URI permission; the already-saved backup file is left where it is (the user's copy).
+- **Premium ends:** runs stop; the setup stays so it resumes if Premium comes back.
+- **Not verified yet on a real phone:** whether every provider (especially Google Drive) keeps the
+  persistable permission and supports `"wt"` overwrite (DEVICE_TESTING §19).
 
 ## 12d. Google Play Billing (Phase 6)
 

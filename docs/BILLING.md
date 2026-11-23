@@ -11,6 +11,7 @@
 | Save recognised text for search ("Inside documents") | — | Yes |
 | Advanced filters (type, expiry, date added, category, tag) | — | Yes |
 | Batch actions (select many: favourite, move, category, export, delete) | — | Yes |
+| Automatic backup (to a file the user picked once, e.g. in Google Drive; no network permission) | — | Yes |
 | Active reminders | 3 | Unlimited + automatic 7 days before every expiry |
 
 Locked tools show the Premium screen; after a successful purchase the tool continues.

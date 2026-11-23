@@ -28,7 +28,9 @@ feature changes.
   nothing is sent anywhere.
 - **Backups.** The user saves the encrypted backup file through the Android system dialog
   to a place they choose (Drive, USB, folder). DocSafe does not upload it, so this is not
-  collection by DocSafe.
+  collection by DocSafe. Automatic backup (Premium) only re-writes the file the user picked once
+  through the same dialog; any upload is done by that provider's app (DocSafe has no INTERNET
+  permission).
 
 ## Permissions (no special declarations needed)
 

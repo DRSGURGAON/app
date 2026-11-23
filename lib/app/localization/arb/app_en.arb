@@ -1153,5 +1153,42 @@
   "premiumLifetimeNote": "Pay once. No subscription, nothing renews.",
   "premiumLifetimeActive": "Lifetime Premium: paid once, it never expires on this Google account.",
   "premiumLifetimeLegal": "One-time payment through Google Play to your Google account. It does not renew. Restore it on a new phone with Restore purchases.",
-  "premiumLifetimeAlsoSub": "You also have a subscription. Cancel it in Google Play so you are not charged again."
+  "premiumLifetimeAlsoSub": "You also have a subscription. Cancel it in Google Play so you are not charged again.",
+  "autoBackupTitle": "Automatic backup",
+  "autoBackupIntro": "Choose a file once, for example in Google Drive or on a USB drive. Document Scanner Pro then replaces it with a fresh encrypted backup when you open the app and a backup is due. Uploading is done by the app that owns the location (e.g. Google Drive); Document Scanner Pro itself has no internet access.",
+  "autoBackupSetUp": "Set up automatic backup",
+  "autoBackupPasswordNote": "This password is not saved. A key made from it stays locked in this phone's secure hardware so later backups need no password. You need the password to restore.",
+  "autoBackupOn": "Automatic backup is on",
+  "autoBackupDestination": "Saving to: {name}",
+  "@autoBackupDestination": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "autoBackupDestinationUnknown": "Saving to the file you chose",
+  "autoBackupLast": "Last automatic backup: {date}",
+  "@autoBackupLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "autoBackupNotYet": "No automatic backup yet",
+  "autoBackupEvery": "How often",
+  "autoBackupDaily": "Every day",
+  "autoBackupWeekly": "Every week",
+  "autoBackupMonthly": "Every 30 days",
+  "autoBackupNow": "Back up now",
+  "autoBackupTurnOff": "Turn off",
+  "autoBackupTurnOffBody": "Automatic backups stop. The backup file already saved stays where it is.",
+  "autoBackupTurnedOff": "Automatic backup is off.",
+  "autoBackupFailed": "The last automatic backup failed. The file may have been moved or deleted, or the storage is full. Try Back up now, or set it up again.",
+  "autoBackupFailedHome": "Automatic backup failed",
+  "autoBackupFix": "Fix",
+  "autoBackupNeedsPremium": "Premium has ended, so automatic backups are paused. Your existing backup file is unchanged.",
+  "premiumAutoBackup": "Automatic backup",
+  "premiumAutoBackupDesc": "An encrypted backup saved for you to Google Drive or another place you choose"
 }

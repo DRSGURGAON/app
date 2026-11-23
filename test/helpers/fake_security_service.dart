@@ -32,6 +32,14 @@ class FakeSecurityService implements SecurityService {
   List<ScannedPage>? nextScan;
   SecurityFailure? nextScanFailure;
 
+  /// Automatic backup simulation.
+  bool autoBackupConfigured = false;
+  String? autoBackupDestination;
+  bool cancelAutoBackupSetup = false;
+  SecurityFailure? nextAutoBackupFailure;
+  final autoBackupRuns = <List<String>>[];
+  final autoBackupPasswordBuffers = <Uint8List>[];
+
   /// Photos to PDF simulation: next picker / camera result (null = cancelled).
   List<ScannedPage>? nextPhotos;
   ScannedPage? nextCameraPhoto;
@@ -337,6 +345,58 @@ class FakeSecurityService implements SecurityService {
     nextPhotos = null;
     if (pages != null) pendingScanPages.addAll(pages.map((p) => p.path));
     return pages;
+  }
+
+  @override
+  Future<AutoBackupStatus> autoBackupStatus() async {
+    _requireUnlocked();
+    return AutoBackupStatus(
+      configured: autoBackupConfigured,
+      destination: autoBackupConfigured ? autoBackupDestination : null,
+    );
+  }
+
+  @override
+  Future<bool> setUpAutoBackup(Uint8List password) async {
+    _requireUnlocked();
+    autoBackupPasswordBuffers.add(password);
+    try {
+      if (password.length < 8) {
+        throw const SecurityFailure(SecurityErrorCode.invalidInput);
+      }
+      if (cancelAutoBackupSetup) return false;
+      autoBackupConfigured = true;
+      autoBackupDestination ??= 'DocumentScannerPro-auto-backup.dsbackup';
+      return true;
+    } finally {
+      password.fillRange(0, password.length, 0);
+    }
+  }
+
+  @override
+  Future<BackupSummary> runAutoBackup(
+    Uint8List metadata,
+    List<String> fileIds,
+  ) async {
+    _requireUnlocked();
+    if (!autoBackupConfigured) {
+      throw const SecurityFailure(SecurityErrorCode.io);
+    }
+    final failure = nextAutoBackupFailure;
+    nextAutoBackupFailure = null;
+    if (failure != null) throw failure;
+    autoBackupRuns.add(List.of(fileIds));
+    return BackupSummary(
+      files: fileIds.length,
+      skipped: 0,
+      bytes: 1000 + fileIds.length,
+    );
+  }
+
+  @override
+  Future<void> disableAutoBackup() async {
+    autoBackupConfigured = false;
+    autoBackupDestination = null;
   }
 
   @override

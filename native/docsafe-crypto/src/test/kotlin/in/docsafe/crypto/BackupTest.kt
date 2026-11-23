@@ -178,4 +178,28 @@ class BackupTest {
         val r = BackupContainer.Reader(ByteArrayInputStream(BackupContainer.MAGIC + byteArrayOf(1, 0)))
         assertNull(r.next())
     }
+
+    @Test
+    fun aBackupWrittenWithADerivedKeyOpensWithThePassword() {
+        val password = "नीला आसमान, 3 चिड़िया!".toByteArray()
+        val derived = BackupFormat.deriveKey(password, BackupFormat.MIN_ITERATIONS)
+        // Two automatic backups with the same derived key, different content.
+        for (round in 1..2) {
+            val out = ByteArrayOutputStream()
+            val enc = BackupFormat.create(out, derived)
+            BackupContainer.Writer(enc).apply {
+                metadata("round $round".toByteArray())
+                file("d".repeat(32)) { it.write(ByteArray(1000) { round.toByte() }) }
+                end()
+            }
+            enc.finish()
+            val (meta, files) = restore(out.toByteArray(), "नीला आसमान, 3 चिड़िया!")
+            assertContentEquals("round $round".toByteArray(), meta)
+            assertContentEquals(ByteArray(1000) { round.toByte() }, files["d".repeat(32)]!!.first)
+            assertFailsWith<BackupPasswordException> { restore(out.toByteArray(), "wrong password!!") }
+        }
+        assertFailsWith<IllegalArgumentException> { BackupFormat.DerivedKey(ByteArray(3), 100_000, ByteArray(32)) }
+        assertFailsWith<IllegalArgumentException> { BackupFormat.DerivedKey(ByteArray(16), 100_000, ByteArray(8)) }
+    }
 }
+

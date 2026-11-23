@@ -23,6 +23,16 @@ class VaultSession private constructor(context: Context) {
     /** Fonts the user added for editing PDF text (not secret, but erased with everything). */
     val fontsDir = File(appContext.noBackupFilesDir, "fonts")
 
+    /** Premium automatic backups (destination + Keystore-wrapped derived key). */
+    val autoBackup: `in`.docsafe.app.storage.AutoBackup by lazy {
+        `in`.docsafe.app.storage.AutoBackup(
+            appContext.contentResolver,
+            File(appContext.noBackupFilesDir, "autobackup"),
+            File(appContext.cacheDir, "autobackup_tmp"),
+            AesGcmKeyWrapper { KeystoreKeys.kek() },
+        )
+    }
+
     val keyWrapper: KeyWrapper = AesGcmKeyWrapper { KeystoreKeys.kek() }
     private val macFactory = HmacSha256Factory { KeystoreKeys.hmac() }
 
@@ -71,6 +81,7 @@ class VaultSession private constructor(context: Context) {
         vaultStore.sweepPartials()
         vaultStore.sweepTemp()
         scanStore.sweep()
+        autoBackup.sweepTemp()
     }
 
     /**
@@ -103,6 +114,7 @@ class VaultSession private constructor(context: Context) {
         }
         SecureFiles.wipeDirectory(keysDir)
         SecureFiles.wipeDirectory(fontsDir)
+        autoBackup.clear()
         biometric.clear()
         pinManager.clear()
         KeystoreKeys.deleteAll()

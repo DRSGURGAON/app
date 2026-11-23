@@ -2082,4 +2082,84 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get premiumLifetimeAlsoSub =>
       'आपकी एक सदस्यता भी है। दोबारा पैसे न कटें, इसलिए उसे Google Play में रद्द करें।';
+
+  @override
+  String get autoBackupTitle => 'अपने-आप बैकअप';
+
+  @override
+  String get autoBackupIntro =>
+      'एक बार कोई फ़ाइल चुनें, जैसे Google Drive या USB ड्राइव में। फिर जब आप ऐप खोलेंगे और बैकअप का समय होगा, Document Scanner Pro उसे नए एन्क्रिप्टेड बैकअप से बदल देगा। अपलोड वही ऐप करता है जिसकी वह जगह है (जैसे Google Drive); Document Scanner Pro के पास खुद इंटरनेट की पहुँच नहीं है।';
+
+  @override
+  String get autoBackupSetUp => 'अपने-आप बैकअप चालू करें';
+
+  @override
+  String get autoBackupPasswordNote =>
+      'यह पासवर्ड सेव नहीं होता। इससे बनी एक कुंजी इस फ़ोन के सुरक्षित हार्डवेयर में बंद रहती है, ताकि आगे के बैकअप में पासवर्ड न लगे। बहाल करने के लिए पासवर्ड ज़रूरी है।';
+
+  @override
+  String get autoBackupOn => 'अपने-आप बैकअप चालू है';
+
+  @override
+  String autoBackupDestination(String name) {
+    return 'यहाँ सेव हो रहा है: $name';
+  }
+
+  @override
+  String get autoBackupDestinationUnknown =>
+      'आपकी चुनी फ़ाइल में सेव हो रहा है';
+
+  @override
+  String autoBackupLast(String date) {
+    return 'पिछला अपने-आप बैकअप: $date';
+  }
+
+  @override
+  String get autoBackupNotYet => 'अभी तक कोई अपने-आप बैकअप नहीं';
+
+  @override
+  String get autoBackupEvery => 'कितनी बार';
+
+  @override
+  String get autoBackupDaily => 'हर दिन';
+
+  @override
+  String get autoBackupWeekly => 'हर हफ़्ते';
+
+  @override
+  String get autoBackupMonthly => 'हर 30 दिन';
+
+  @override
+  String get autoBackupNow => 'अभी बैकअप लें';
+
+  @override
+  String get autoBackupTurnOff => 'बंद करें';
+
+  @override
+  String get autoBackupTurnOffBody =>
+      'अपने-आप बैकअप रुक जाएँगे। पहले से सेव बैकअप फ़ाइल वहीं रहेगी।';
+
+  @override
+  String get autoBackupTurnedOff => 'अपने-आप बैकअप बंद है।';
+
+  @override
+  String get autoBackupFailed =>
+      'पिछला अपने-आप बैकअप नहीं हो पाया। हो सकता है फ़ाइल हटा दी गई हो या जगह भर गई हो। \'अभी बैकअप लें\' आज़माएँ या इसे फिर से चालू करें।';
+
+  @override
+  String get autoBackupFailedHome => 'अपने-आप बैकअप नहीं हो पाया';
+
+  @override
+  String get autoBackupFix => 'ठीक करें';
+
+  @override
+  String get autoBackupNeedsPremium =>
+      'Premium खत्म हो गया है, इसलिए अपने-आप बैकअप रुके हुए हैं। आपकी मौजूदा बैकअप फ़ाइल नहीं बदली।';
+
+  @override
+  String get premiumAutoBackup => 'अपने-आप बैकअप';
+
+  @override
+  String get premiumAutoBackupDesc =>
+      'एन्क्रिप्टेड बैकअप आपके लिए Google Drive या आपकी चुनी किसी जगह पर सेव होता है';
 }
