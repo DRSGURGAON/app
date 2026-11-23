@@ -47,7 +47,7 @@ void main() {
     final app = await pumpApp(tester, fake);
     fake.nextScan = null; // user pressed back in the scanner
     await startScan(tester);
-    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
+    expect(find.text(en.homeCategories.toUpperCase()), findsOneWidget);
     expect(fake.pendingScanPages, isEmpty);
     expect(fake.lastSavedScan, isNull);
     await app.dispose();
@@ -190,7 +190,7 @@ void main() {
     await tester.tap(find.widgetWithText(FilledButton, en.scanDiscard));
     await settle(tester);
     expect(fake.pendingScanPages, isEmpty);
-    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
+    expect(find.text(en.homeCategories.toUpperCase()), findsOneWidget);
     await app.dispose();
   });
 
@@ -215,6 +215,7 @@ void main() {
     await tester.enterText(find.byType(TextField).first, 'RC');
     await tester.tap(find.text(en.save));
     await settle(tester);
+    await reveal(tester, find.text('RC'));
     expect(find.text('RC'), findsOneWidget);
     expect(find.text('Car'), findsOneWidget); // details shows the folder
     await app.dispose();

@@ -51,14 +51,17 @@ void main() {
   ) async {
     final fake = await unlockedFake();
     final app = await pumpApp(tester, fake);
-    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
-    expect(find.text(en.homeNoRecent), findsOneWidget);
+    expect(find.text(en.homeCategories.toUpperCase()), findsOneWidget);
     expect(find.text(en.homeSecurityPinOnly), findsOneWidget);
     expect(find.text(en.categoryIdentity), findsOneWidget);
+    await reveal(tester, find.text(en.homeNoRecent));
+    expect(find.text(en.homeNoRecent), findsOneWidget);
+    await scrollToTop(tester);
 
     await importPdf(tester, fake, 'Driving Licence.pdf');
     expect(fake.lastPickerTypes, ['application/pdf']);
     expect(find.text(en.vaultImported), findsOneWidget);
+    await reveal(tester, find.text('Driving Licence'));
     expect(find.text('Driving Licence'), findsOneWidget);
     await app.dispose();
   });
@@ -83,6 +86,7 @@ void main() {
       final app = await pumpApp(tester, fake);
       await importPdf(tester, fake, 'scan001.pdf');
       await dismissSnackBar(tester);
+      await reveal(tester, find.text('scan001'));
       await tester.tap(find.text('scan001'));
       await settle(tester);
       expect(find.text(en.detailsTitle), findsOneWidget);
@@ -136,6 +140,7 @@ void main() {
     final fake = await unlockedFake();
     final app = await pumpApp(tester, fake);
     await importPdf(tester, fake, 'Policy.pdf', id: 'b');
+    await reveal(tester, find.text('Policy'));
     await tester.tap(find.text('Policy'));
     await settle(tester);
     await tester.tap(find.text(en.detailsCategory));
@@ -145,6 +150,7 @@ void main() {
     await tester.pageBack();
     await settle(tester);
 
+    await scrollToTop(tester);
     await tester.tap(find.text(en.homeSearchHint));
     await settle(tester);
     await tester.enterText(find.byType(TextField), 'insur');
@@ -181,6 +187,7 @@ void main() {
     await settle(tester);
     await tester.tap(find.text(en.homeImportPdf));
     await settle(tester);
+    await reveal(tester, find.text('RC'));
     expect(find.text('RC'), findsOneWidget);
 
     await tester.tap(find.byType(PopupMenuButton<String>));
@@ -190,7 +197,8 @@ void main() {
     expect(find.text(en.folderDeleteConfirm('Car')), findsOneWidget);
     await tester.tap(find.text(en.delete));
     await settle(tester);
-    expect(find.text('RC'), findsOneWidget); // still in the vault list
+    await reveal(tester, find.text('RC'));
+    expect(find.text('RC'), findsOneWidget); // still in the vault
     await app.dispose();
   });
 
@@ -199,6 +207,7 @@ void main() {
     final app = await pumpApp(tester, fake);
     await importPdf(tester, fake, 'Marksheet.pdf', id: 'd');
     await dismissSnackBar(tester);
+    await reveal(tester, find.text('Marksheet'));
     await tester.tap(find.text('Marksheet'));
     await settle(tester);
     await tester.tap(find.text(en.detailsExport));

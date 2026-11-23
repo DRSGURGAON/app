@@ -104,11 +104,25 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           const SliverToBoxAdapter(child: _BackupReminderCard()),
+          // Categories first, as folder-like tiles with their icons.
+          SliverToBoxAdapter(child: SectionHeader(title: l.homeCategories)),
+          SliverToBoxAdapter(
+            child: categories.when(
+              loading: () => const SizedBox(height: 96),
+              error: (e, _) => ErrorState(
+                message: errorMessageFor(l, e),
+                onRetry: () => ref.invalidate(categoriesProvider),
+              ),
+              data: (cats) => _CategoryGrid(categories: cats),
+            ),
+          ),
           SliverToBoxAdapter(child: SectionHeader(title: l.homeExpiringSoon)),
           _PreviewList(
             docs: expiring.whenData((d) => d.take(5).toList()),
             emptyText: l.homeNoExpiring,
           ),
+          SliverToBoxAdapter(child: SectionHeader(title: l.homeFavourites)),
+          _PreviewList(docs: favourites, emptyText: l.homeNoFavourites),
           SliverToBoxAdapter(
             child: SectionHeader(
               title: l.homeRecent,
@@ -119,41 +133,7 @@ class HomeScreen extends ConsumerWidget {
             ),
           ),
           _PreviewList(docs: recent, emptyText: l.homeNoRecent),
-          SliverToBoxAdapter(child: SectionHeader(title: l.homeFavourites)),
-          _PreviewList(docs: favourites, emptyText: l.homeNoFavourites),
-          SliverToBoxAdapter(child: SectionHeader(title: l.homeCategories)),
-          SliverToBoxAdapter(
-            child: categories.when(
-              loading: () => const SizedBox(height: 48),
-              error: (e, _) => ErrorState(
-                message: errorMessageFor(l, e),
-                onRetry: () => ref.invalidate(categoriesProvider),
-              ),
-              data: (cats) => Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 28),
-                child: Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: [
-                    for (final c in cats)
-                      ActionChip(
-                        avatar: Icon(
-                          categoryIcon(c.key),
-                          size: 18,
-                          color: CategoryStyle.of(c.key).color,
-                        ),
-                        label: Text(
-                          c.documentCount == 0
-                              ? l.categoryName(c)
-                              : '${l.categoryName(c)} · ${c.documentCount}',
-                        ),
-                        onPressed: () => context.push(Routes.category(c.id)),
-                      ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          const SliverToBoxAdapter(child: SizedBox(height: 28)),
         ],
       ),
     );
@@ -250,6 +230,106 @@ Future<void> createFolder(BuildContext context, WidgetRef ref) async {
 }
 
 IconData categoryIcon(String? key) => CategoryStyle.of(key).icon;
+
+/// Categories as tiles (3 per row on phones, 4 on wider screens). Tiles grow
+/// with the text, so long Hindi names and large font sizes never overflow.
+class _CategoryGrid extends StatelessWidget {
+  const _CategoryGrid({required this.categories});
+  final List<CategorySummary> categories;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+    child: LayoutBuilder(
+      builder: (context, box) {
+        const gap = 10.0;
+        final columns = box.maxWidth >= 560 ? 4 : 3;
+        final width = (box.maxWidth - gap * (columns - 1)) / columns;
+        // Rows of equal-height tiles (the tallest tile in a row sets it).
+        return Column(
+          children: [
+            for (var i = 0; i < categories.length; i += columns) ...[
+              if (i > 0) const SizedBox(height: gap),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    for (var j = i; j < i + columns; j++) ...[
+                      if (j > i) const SizedBox(width: gap),
+                      SizedBox(
+                        width: width,
+                        child: j < categories.length
+                            ? _CategoryTile(category: categories[j])
+                            : null,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ],
+        );
+      },
+    ),
+  );
+}
+
+class _CategoryTile extends StatelessWidget {
+  const _CategoryTile({required this.category});
+  final CategorySummary category;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final style = CategoryStyle.of(category.key);
+    final name = l.categoryName(category);
+    return Card(
+      key: Key('home-category-${category.id}'),
+      margin: EdgeInsets.zero,
+      color: theme.colorScheme.surfaceContainerLowest,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => context.push(Routes.category(category.id)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 12, 10, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ExcludeSemantics(
+                child: Container(
+                  width: 42,
+                  height: 42,
+                  decoration: BoxDecoration(
+                    color: style.color.withValues(alpha: .18),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(style.icon, color: style.color, size: 22),
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(fontSize: 13),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                l.documentCount(category.documentCount),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class _PreviewList extends ConsumerWidget {
   const _PreviewList({required this.docs, required this.emptyText});

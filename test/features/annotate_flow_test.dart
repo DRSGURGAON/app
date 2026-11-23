@@ -61,6 +61,7 @@ void main() {
     expect(find.byType(PremiumScreen), findsNothing);
 
     await goTab(tester, en.navHome);
+    await reveal(tester, find.text('Form'));
     await tester.tap(find.text('Form'));
     await settle(tester);
     await scrollAndTap(tester, find.byKey(const Key('details-annotate')));
@@ -93,6 +94,7 @@ void main() {
 
     await goTab(tester, en.navTools);
     await scrollAndTap(tester, find.byKey(const Key('tool-annotate')));
+    await reveal(tester, find.text('Form'));
     await tester.tap(find.text('Form'));
     await settle(tester);
     expect(find.text(en.annotatePageOf(1, 3)), findsOneWidget);
@@ -179,6 +181,7 @@ void main() {
     final app = await pumpApp(tester, fake, pdfEngine: engine);
     app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await importDoc(tester, fake, engine, 'Aadhaar.pdf');
+    await reveal(tester, find.text('Aadhaar'));
     await tester.tap(find.text('Aadhaar'));
     await settle(tester);
     await scrollAndTap(tester, find.text(en.detailsCategory));
@@ -201,6 +204,7 @@ void main() {
     final app = await pumpApp(tester, fake, pdfEngine: engine);
     app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
     await importDoc(tester, fake, engine, 'Notes.pdf');
+    await reveal(tester, find.text('Notes'));
     await tester.tap(find.text('Notes'));
     await settle(tester);
     await scrollAndTap(tester, find.byKey(const Key('details-annotate')));

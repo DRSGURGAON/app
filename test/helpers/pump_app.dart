@@ -144,3 +144,26 @@ Future<void> scrollAndTap(WidgetTester tester, Finder finder) async {
   await tester.tap(finder);
   await settle(tester);
 }
+
+/// Scrolls the main list until [finder] matches something on screen (Home
+/// keeps recent documents at the bottom, below categories and favourites).
+/// [finder] may match several widgets.
+Future<void> reveal(WidgetTester tester, Finder finder) async {
+  for (var i = 0; i < 40 && finder.hitTestable().evaluate().isEmpty; i++) {
+    if (i == 20) {
+      // Still covered: usually a snackbar at the bottom; let it time out.
+      await tester.pump(const Duration(seconds: 6));
+      await tester.pumpAndSettle();
+      continue;
+    }
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -200));
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+  await tester.pumpAndSettle();
+}
+
+/// Scrolls the main list back to the top.
+Future<void> scrollToTop(WidgetTester tester) async {
+  await tester.drag(find.byType(Scrollable).first, const Offset(0, 5000));
+  await tester.pumpAndSettle();
+}

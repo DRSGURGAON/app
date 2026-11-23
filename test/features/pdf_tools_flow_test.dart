@@ -201,6 +201,7 @@ void main() {
     final app = await pumpApp(tester, fake, pdfEngine: engine);
     unlockPremium(app);
     await importDoc(tester, fake, engine, 'Form.pdf', pages: 3);
+    await reveal(tester, find.text('Form'));
     await tester.tap(find.text('Form'));
     await settle(tester);
     await tester.tap(find.text(en.toolSplit));

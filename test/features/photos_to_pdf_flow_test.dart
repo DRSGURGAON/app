@@ -73,7 +73,7 @@ void main() {
     final app = await pumpApp(tester, fake);
     fake.nextPhotos = null;
     await openPhotosFromHome(tester);
-    expect(find.text(en.homeRecent.toUpperCase()), findsOneWidget);
+    expect(find.text(en.homeCategories.toUpperCase()), findsOneWidget);
     expect(fake.pendingScanPages, isEmpty);
     await app.dispose();
   });

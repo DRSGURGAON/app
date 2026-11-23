@@ -80,6 +80,7 @@ Future<VaultDocument> addPdf(
 
 Future<void> openEditor(WidgetTester tester, String title) async {
   await goTab(tester, en.navHome);
+  await reveal(tester, find.text(title));
   await tester.tap(find.text(title).first);
   await settle(tester);
   await tester.scrollUntilVisible(
