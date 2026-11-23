@@ -20,7 +20,7 @@ void main() {
     // Fallback fonts for edited PDF text (subset, renamed Liberation 2,
     // Carlito and Caladea).
     yield LicenseEntryWithLineBreaks(
-      const ['DocSafe Sans, Serif, Mono, Office Sans, Office Serif'],
+      const ['Scanner Pro Sans, Serif, Mono, Office Sans, Office Serif'],
       '${await rootBundle.loadString('assets/pdf_fonts/NOTICE.txt')}\n'
       '${await rootBundle.loadString('assets/pdf_fonts/OFL.txt')}',
     );

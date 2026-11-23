@@ -223,7 +223,7 @@ void main() {
     await settle(tester);
     await typeEdit(tester, 'Dear Vikram Joshi,');
     expect(
-      find.text(en.fontMetricMatch('DocSafe Office Sans')),
+      find.text(en.fontMetricMatch('Scanner Pro Office Sans')),
       findsOneWidget,
     );
     expect(find.text(en.fontMetricMatchHelp('Calibri')), findsOneWidget);
@@ -270,12 +270,15 @@ void main() {
 
     fake.nextFontImport = (
       'Mine.ttf',
-      File('assets/pdf_fonts/DocSafeSerif-Regular.ttf').readAsBytesSync(),
+      File('assets/pdf_fonts/ScannerProSerif-Regular.ttf').readAsBytesSync(),
     );
     await tester.tap(find.byKey(const Key('add-font')));
     await settle(tester);
-    expect(find.text(en.editTextFontAdded('DocSafe Serif')), findsOneWidget);
-    expect(find.text('DocSafe Serif'), findsWidgets);
+    expect(
+      find.text(en.editTextFontAdded('Scanner Pro Serif')),
+      findsOneWidget,
+    );
+    expect(find.text('Scanner Pro Serif'), findsWidgets);
 
     await tester.tap(find.byTooltip(en.editTextDeleteFont));
     await settle(tester);

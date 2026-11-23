@@ -123,7 +123,7 @@ void main() {
   test('a font the user added is used when it matches the family', () async {
     // A "Calibri" the user owns (here: DocSafe's Calibri twin renamed).
     final doc = await addPdf('letter_calibri.pdf', 'Joining.pdf');
-    final src = File('assets/pdf_fonts/DocSafeOfficeSans-Regular.ttf');
+    final src = File('assets/pdf_fonts/ScannerProOfficeSans-Regular.ttf');
     fake.nextFontImport = (
       'Calibri.ttf',
       _renameFamily(src.readAsBytesSync(), 'Calibri'),

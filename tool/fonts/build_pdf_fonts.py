@@ -1,7 +1,7 @@
 """Builds the fallback fonts used by PDF "Edit text" (assets/pdf_fonts/).
 
 They are metric-compatible clones of common office fonts, cut down to the
-characters DocSafe lets users type when editing English PDFs, and renamed
+characters the app lets users type when editing English PDFs, and renamed
 because the SIL OFL does not allow modified fonts to keep their original
 names. Run from the repo root:  python3 tool/fonts/build_pdf_fonts.py <fonts dir>
 where <fonts dir> contains the Liberation 2.x, Carlito and Caladea .ttf files
@@ -22,11 +22,11 @@ UNICODES = (
 
 FAMILIES = [
     # (new family, source file prefix, styles, metric twin of)
-    ("DocSafe Sans", "LiberationSans", ["Regular", "Bold", "Italic", "BoldItalic"], "Arial / Helvetica"),
-    ("DocSafe Serif", "LiberationSerif", ["Regular", "Bold", "Italic", "BoldItalic"], "Times New Roman / Times"),
-    ("DocSafe Mono", "LiberationMono", ["Regular", "Bold"], "Courier New / Courier"),
-    ("DocSafe Office Sans", "Carlito", ["Regular", "Bold", "Italic", "BoldItalic"], "Calibri"),
-    ("DocSafe Office Serif", "Caladea", ["Regular", "Bold", "Italic", "BoldItalic"], "Cambria"),
+    ("Scanner Pro Sans", "LiberationSans", ["Regular", "Bold", "Italic", "BoldItalic"], "Arial / Helvetica"),
+    ("Scanner Pro Serif", "LiberationSerif", ["Regular", "Bold", "Italic", "BoldItalic"], "Times New Roman / Times"),
+    ("Scanner Pro Mono", "LiberationMono", ["Regular", "Bold"], "Courier New / Courier"),
+    ("Scanner Pro Office Sans", "Carlito", ["Regular", "Bold", "Italic", "BoldItalic"], "Calibri"),
+    ("Scanner Pro Office Serif", "Caladea", ["Regular", "Bold", "Italic", "BoldItalic"], "Cambria"),
 ]
 
 STYLE_NAMES = {"Regular": "Regular", "Bold": "Bold", "Italic": "Italic", "BoldItalic": "Bold Italic"}
@@ -62,7 +62,7 @@ def build(src_dir, out_dir):
                     name.removeNames(nameID=rec.nameID)
             name.setName(family, 1, 3, 1, 0x409)
             name.setName(STYLE_NAMES[style], 2, 3, 1, 0x409)
-            name.setName(f"{ps};DocSafe", 3, 3, 1, 0x409)
+            name.setName(f"{ps};ScannerPro", 3, 3, 1, 0x409)
             name.setName(full, 4, 3, 1, 0x409)
             name.setName(ps, 6, 3, 1, 0x409)
             out = os.path.join(out_dir, f"{ps}.ttf")

@@ -49,7 +49,7 @@ class LibraryFont {
     this.twinOf = const [],
   });
 
-  /// Stable id, e.g. "asset:DocSafeSans-Regular" or "user:Calibri.ttf".
+  /// Stable id, e.g. "asset:ScannerProSans-Regular" or "user:Calibri.ttf".
   final String id;
   final FontFileInfo info;
   final FontSource source;
@@ -84,22 +84,22 @@ String normaliseFamily(String name) {
 
 /// Metric-compatible twins (same character widths), by normalised family.
 const metricTwins = <String, String>{
-  'arial': 'DocSafe Sans',
-  'helvetica': 'DocSafe Sans',
-  'arimo': 'DocSafe Sans',
-  'liberationsans': 'DocSafe Sans',
-  'timesnew': 'DocSafe Serif',
-  'times': 'DocSafe Serif',
-  'tinos': 'DocSafe Serif',
-  'liberationserif': 'DocSafe Serif',
-  'couriernew': 'DocSafe Mono',
-  'courier': 'DocSafe Mono',
-  'cousine': 'DocSafe Mono',
-  'liberationmono': 'DocSafe Mono',
-  'calibri': 'DocSafe Office Sans',
-  'carlito': 'DocSafe Office Sans',
-  'cambria': 'DocSafe Office Serif',
-  'caladea': 'DocSafe Office Serif',
+  'arial': 'Scanner Pro Sans',
+  'helvetica': 'Scanner Pro Sans',
+  'arimo': 'Scanner Pro Sans',
+  'liberationsans': 'Scanner Pro Sans',
+  'timesnew': 'Scanner Pro Serif',
+  'times': 'Scanner Pro Serif',
+  'tinos': 'Scanner Pro Serif',
+  'liberationserif': 'Scanner Pro Serif',
+  'couriernew': 'Scanner Pro Mono',
+  'courier': 'Scanner Pro Mono',
+  'cousine': 'Scanner Pro Mono',
+  'liberationmono': 'Scanner Pro Mono',
+  'calibri': 'Scanner Pro Office Sans',
+  'carlito': 'Scanner Pro Office Sans',
+  'cambria': 'Scanner Pro Office Serif',
+  'caladea': 'Scanner Pro Office Serif',
 };
 
 /// Picks the most faithful font for [text] in a run set in [font].
@@ -146,10 +146,10 @@ FontChoice chooseFont(
   }
 
   final generic = font.monospace
-      ? 'DocSafe Mono'
+      ? 'Scanner Pro Mono'
       : font.serif
-      ? 'DocSafe Serif'
-      : 'DocSafe Sans';
+      ? 'Scanner Pro Serif'
+      : 'Scanner Pro Sans';
   final g = best(library.where((f) => f.info.family == generic));
   if (g != null) return FontChoice(FontMatchKind.similar, font: g);
   // Last resort: any font that has every character; null when none does

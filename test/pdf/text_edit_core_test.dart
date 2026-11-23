@@ -99,7 +99,7 @@ void main() {
       final f = m.fonts[run(m, 'Dear').fontKey]!;
       final c = chooseFont(f, 'Dear Vikram Joshi,', library);
       expect(c.kind, FontMatchKind.sameFamily);
-      expect(c.font!.info.family, 'DocSafe Office Sans');
+      expect(c.font!.info.family, 'Scanner Pro Office Sans');
       expect(c.font!.info.bold, isFalse);
     });
 
@@ -109,7 +109,7 @@ void main() {
       expect(normaliseFamily(f.family), 'calibri');
       final c = chooseFont(f, 'Dear Vikram Joshi,', library);
       expect(c.kind, FontMatchKind.metricMatch);
-      expect(c.font!.info.family, 'DocSafe Office Sans');
+      expect(c.font!.info.family, 'Scanner Pro Office Sans');
     });
 
     test('a font the user added wins over built-in twins', () {
@@ -143,7 +143,7 @@ void main() {
       expect(normaliseFamily('ArialMT'), 'arial');
       expect(normaliseFamily('Arial,Bold'), 'arial');
       expect(normaliseFamily('CourierNewPSMT'), 'couriernew');
-      expect(metricTwins['timesnew'], 'DocSafe Serif');
+      expect(metricTwins['timesnew'], 'Scanner Pro Serif');
     });
 
     test('a character no available font has: no font offered', () {
@@ -229,7 +229,10 @@ void main() {
       final after = analyzePdf(p, r.bytes);
       final dear = run(after, 'Dear');
       expect(dear.text, 'Dear Vikram Joshi,');
-      expect(after.fonts[dear.fontKey]!.family, contains('DocSafeOfficeSans'));
+      expect(
+        after.fonts[dear.fontKey]!.family,
+        contains('ScannerProOfficeSans'),
+      );
       expect(after.runs.map((x) => x.text).join(' '), isNot(contains('Rahul')));
     });
 
@@ -304,9 +307,9 @@ void main() {
 
   test('font file parser reads names, style and characters', () {
     final (sans, _) = builtIns.firstWhere(
-      (e) => e.$1.id.endsWith('DocSafeSans-Bold.ttf'),
+      (e) => e.$1.id.endsWith('ScannerProSans-Bold.ttf'),
     );
-    expect(sans.info.family, 'DocSafe Sans');
+    expect(sans.info.family, 'Scanner Pro Sans');
     expect(sans.info.bold, isTrue);
     expect(sans.info.runes, containsAll('AZaz09€£'.runes));
     expect(sans.info.runes, isNot(contains('क'.runes.first)));
