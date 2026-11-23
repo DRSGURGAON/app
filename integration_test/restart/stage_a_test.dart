@@ -41,6 +41,11 @@ void main() {
     await settleFor(tester);
 
     // Fresh install: onboarding -> PIN -> skip biometric (real native layer).
+    await tester.scrollUntilVisible(
+      find.text(hi.onboardingBackupTitle),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
     await tester.scrollUntilVisible(
       find.byType(Checkbox),
@@ -56,7 +61,7 @@ void main() {
     await settleFor(tester);
     await tester.tap(find.byType(OutlinedButton));
     await settleFor(tester);
-    expect(find.text(hi.homeRecent), findsOneWidget);
+    expect(find.text(hi.homeCategories), findsOneWidget);
 
     final folderId = await (await container.read(
       folderRepositoryProvider.future,

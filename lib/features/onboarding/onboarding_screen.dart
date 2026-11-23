@@ -52,10 +52,15 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 const SizedBox(height: 12),
                 const _HeroIllustration(),
                 const SizedBox(height: 8),
-                Text(
-                  l.appName,
-                  textAlign: TextAlign.center,
-                  style: theme.textTheme.headlineMedium,
+                // One line on every phone: the name scales down if needed.
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    l.appName,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.headlineMedium,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(

@@ -62,7 +62,7 @@ void main() {
     expect(find.text(hi.lockWrongPin(4)), findsOneWidget);
     await enterPinOnPad(tester, restartPin);
     await settleFor(tester);
-    expect(find.text(hi.homeRecent), findsOneWidget);
+    expect(find.text(hi.homeCategories), findsOneWidget);
 
     final repo = await container.read(documentRepositoryProvider.future);
     final docs = await repo.watchAll().first;

@@ -50,8 +50,13 @@ void main() {
     await settle(tester);
 
     // Fresh install -> onboarding in Hindi.
-    expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
     final scrollable = find.byType(Scrollable).first;
+    await tester.scrollUntilVisible(
+      find.text(hi.onboardingBackupTitle),
+      200,
+      scrollable: scrollable,
+    );
+    expect(find.text(hi.onboardingBackupTitle), findsOneWidget);
     await tester.scrollUntilVisible(
       find.byType(Checkbox),
       200,
@@ -71,8 +76,9 @@ void main() {
     await settle(tester);
 
     // Home opened -> SQLCipher database created with the Keystore-wrapped key.
-    expect(find.text(hi.homeRecent), findsOneWidget);
-    expect(find.text(hi.homeNoRecent), findsOneWidget);
+    expect(find.text(hi.homeCategories), findsOneWidget);
+    // Categories come from the encrypted database.
+    expect(find.text(hi.categoryIdentity), findsOneWidget);
 
     // Lock: native session locked, DB closed.
     await tester.tap(find.byTooltip(hi.vaultLock));
@@ -95,8 +101,9 @@ void main() {
     // Correct PIN unlocks and the encrypted DB re-opens with the same key.
     await enterPin(tester, '258036');
     await settle(tester);
-    expect(find.text(hi.homeRecent), findsOneWidget);
-    expect(find.text(hi.homeNoRecent), findsOneWidget);
+    expect(find.text(hi.homeCategories), findsOneWidget);
+    // Categories come from the encrypted database.
+    expect(find.text(hi.categoryIdentity), findsOneWidget);
 
     // Metadata survives an app restart: create a folder, rebuild the whole
     // Dart app state (new ProviderContainer), unlock again, folder is there.
