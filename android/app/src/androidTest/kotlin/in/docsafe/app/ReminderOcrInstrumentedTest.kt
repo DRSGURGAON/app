@@ -137,7 +137,7 @@ class ReminderOcrInstrumentedTest {
         val extras = posted!!.notification.extras
         val text = "${extras.getCharSequence("android.title")} ${extras.getCharSequence("android.text")}"
         android.util.Log.i("DocSafeTest", "REMINDER notification=$text")
-        assertTrue(text, text.contains("DocSafe"))
+        assertTrue(text, text.contains("Document Scanner Pro"))
         assertEquals(
             "hidden on the lock screen",
             android.app.Notification.VISIBILITY_PRIVATE,
