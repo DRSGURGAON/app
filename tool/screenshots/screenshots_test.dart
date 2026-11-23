@@ -9,6 +9,7 @@ import 'package:docsafe/app/router/app_router.dart';
 import 'package:docsafe/core/entitlement/entitlement.dart';
 import 'package:docsafe/data/repositories/document_repository.dart';
 import 'package:docsafe/data/repositories/reminder_repository.dart';
+import 'package:docsafe/core/security/security_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -374,6 +375,37 @@ void main() {
       'Neela aasmaan, 3 chidiya!',
     );
     await shot(tester, '53-password-strong');
+    await app.dispose();
+  });
+
+  testWidgets('photos to pdf', (tester) async {
+    await loadFonts();
+    final lang = Platform.environment['SHOTS_LANG'] ?? 'en';
+    final t = lang == 'hi' ? hi : en;
+    final dir = Platform.environment['PHOTOS_DIR'];
+    if (dir == null) return; // needs sample JPEGs (dummy content)
+    final fake = await unlockedFake(lang: lang);
+    final app = await pumpApp(tester, fake, size: shotSize());
+    await shot(tester, '60-home-photos-action');
+    fake.nextPhotos = [
+      for (final n in ['p1', 'p2', 'p3'])
+        ScannedPage(path: '$dir/$n.jpg', width: 900, height: 1200),
+    ];
+    await tester.tap(find.byKey(const Key('home-photos-to-pdf')));
+    await settle(tester);
+    // Let the thumbnails decode from disk.
+    for (var i = 0; i < 3; i++) {
+      await tester.runAsync(
+        () => Future<void>.delayed(const Duration(milliseconds: 300)),
+      );
+      await tester.pump();
+    }
+    await shot(tester, '61-photos-review');
+    await tester.tap(find.byTooltip(t.scanAddPages));
+    await settle(tester);
+    await shot(tester, '62-photos-add-menu');
+    await tester.tap(find.byTooltip(t.scanAddPages));
+    await settle(tester);
     await app.dispose();
   });
 }
