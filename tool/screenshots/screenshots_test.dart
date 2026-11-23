@@ -28,8 +28,14 @@ import '../../test/helpers/pump_app.dart';
 
 final outDir = Platform.environment['SHOTS_DIR'] ?? 'build/shots';
 
-/// SHOTS_SMALL=1: small phone; SHOTS_STORE=1: Google Play size (1080x1920).
-Size shotSize() => Platform.environment['SHOTS_STORE'] == '1'
+/// SHOTS_SMALL=1: small phone; SHOTS_STORE=1: Google Play size (1080x1920);
+/// SHOTS_SIZE=WxH: any physical size (e.g. foldable screens).
+Size shotSize() => Platform.environment['SHOTS_SIZE'] != null
+    ? Size(
+        double.parse(Platform.environment['SHOTS_SIZE']!.split('x')[0]),
+        double.parse(Platform.environment['SHOTS_SIZE']!.split('x')[1]),
+      )
+    : Platform.environment['SHOTS_STORE'] == '1'
     ? const Size(1080, 1920)
     : Platform.environment['SHOTS_SMALL'] == '1'
     ? const Size(800, 1200)
