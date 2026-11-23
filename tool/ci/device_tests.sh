@@ -5,6 +5,17 @@ set -euo pipefail
 APP=in.docsafe.app
 DEVICE="${DEVICE:-emulator-5554}"
 adb_() { adb -s "$DEVICE" "$@"; }
+# Every stage runs even if an earlier one failed, so one CI run reports ALL
+# failures (not only the first); the script still fails at the end.
+FAILED=()
+stage() {
+  local name="$1"; shift
+  echo "== $name"
+  if ! "$@"; then
+    echo "::error::stage failed: $name"
+    FAILED+=("$name")
+  fi
+}
 wait_boot() {
   adb_ wait-for-device
   until [ "$(adb_ shell getprop sys.boot_completed | tr -d '\r')" = "1" ]; do sleep 2; done
@@ -12,48 +23,45 @@ wait_boot() {
   sleep 5
 }
 
-echo "== 1. Android instrumented tests (real Keystore, vault, scan save path)"
-(cd android && ./gradlew :app:connectedDebugAndroidTest --console=plain)
+stage "1. Android instrumented tests (real Keystore, vault, scan save path)" \
+  bash -c 'cd android && ./gradlew :app:connectedDebugAndroidTest --console=plain'
 
-echo "== 2. Security flow (fresh install; ends with erase-all; app uninstalled after)"
-flutter test integration_test/security_foundation_test.dart -d "$DEVICE"
+stage "2. Security flow (fresh install; ends with erase-all)" \
+  flutter test integration_test/security_foundation_test.dart -d "$DEVICE"
 
-echo "== 3. Preview robustness (fresh install)"
-flutter test integration_test/preview_test.dart -d "$DEVICE"
+stage "3. Preview robustness" flutter test integration_test/preview_test.dart -d "$DEVICE"
 
-echo "== 3b. PDF tools (real PDFium + native image/compress)"
-flutter test integration_test/pdf_tools_test.dart -d "$DEVICE"
+stage "3b. PDF tools" flutter test integration_test/pdf_tools_test.dart -d "$DEVICE"
 
-echo "== 3c. Annotate & Sign (real overlay render + native flatten + PDFium)"
-flutter test integration_test/annotate_test.dart -d "$DEVICE"
+stage "3c. Annotate & Sign" flutter test integration_test/annotate_test.dart -d "$DEVICE"
 
-echo "== 3d. OCR (bundled ML Kit model) and reminders"
-flutter test integration_test/ocr_reminders_test.dart -d "$DEVICE"
+stage "3d. OCR and reminders" flutter test integration_test/ocr_reminders_test.dart -d "$DEVICE"
 
-echo "== 3d2. Edit text (real PDFium on the pdfrx worker, bundled fonts)"
-flutter test integration_test/edit_text_test.dart -d "$DEVICE"
+stage "3d2. Edit text" flutter test integration_test/edit_text_test.dart -d "$DEVICE"
 
-echo "== 3e. Google Play Billing bridge (no licence key, app not on Play)"
-flutter test integration_test/billing_test.dart -d "$DEVICE"
+stage "3e. Google Play Billing bridge" flutter test integration_test/billing_test.dart -d "$DEVICE"
 
-echo "== 3f. Large vault performance (2000 documents)"
-flutter test integration_test/perf_test.dart -d "$DEVICE"
+stage "3f. Large vault performance" flutter test integration_test/perf_test.dart -d "$DEVICE"
 
-echo "== 4. True process restart"
-adb_ uninstall "$APP" >/dev/null 2>&1 || true
-flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall
-adb_ shell am force-stop "$APP"
-if adb_ shell pidof "$APP" >/dev/null 2>&1; then
-  echo "::error::$APP still running after force-stop"; exit 1
-fi
-echo "process stopped: OK"
-flutter test integration_test/restart/stage_b_test.dart -d "$DEVICE" --no-uninstall
+restart_check() {
+  adb_ uninstall "$APP" >/dev/null 2>&1 || true
+  flutter test integration_test/restart/stage_a_test.dart -d "$DEVICE" --no-uninstall || return 1
+  adb_ shell am force-stop "$APP"
+  if adb_ shell pidof "$APP" >/dev/null 2>&1; then
+    echo "$APP still running after force-stop"; return 1
+  fi
+  echo "process stopped: OK"
+  flutter test integration_test/restart/stage_b_test.dart -d "$DEVICE" --no-uninstall
+}
+stage "4. True process restart" restart_check
 
-echo "== 5. Device reboot, then verify again"
-adb_ reboot
-wait_boot
-if adb_ shell pidof "$APP" >/dev/null 2>&1; then echo "note: app process started after boot"; fi
-flutter test integration_test/restart/stage_b_test.dart -d "$DEVICE" --no-uninstall
+reboot_check() {
+  adb_ reboot
+  wait_boot
+  if adb_ shell pidof "$APP" >/dev/null 2>&1; then echo "note: app process started after boot"; fi
+  flutter test integration_test/restart/stage_b_test.dart -d "$DEVICE" --no-uninstall
+}
+stage "5. Device reboot, then verify again" reboot_check
 
 echo "== 6. Cold start of the release build (am start -W, 5 runs; first launch shows onboarding)"
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
@@ -69,4 +77,9 @@ done
 adb_ shell am force-stop "$APP"
 
 adb_ uninstall "$APP" >/dev/null 2>&1 || true
+if [ ${#FAILED[@]} -gt 0 ]; then
+  echo "::error::${#FAILED[@]} device stage(s) failed:"
+  printf '  - %s\n' "${FAILED[@]}"
+  exit 1
+fi
 echo "== all device tests passed"
