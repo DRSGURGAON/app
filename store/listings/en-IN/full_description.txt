@@ -1,37 +1,46 @@
-Document Scanner Pro keeps your important documents — ID cards, licences, insurance policies, bills, certificates and marksheets — encrypted on your own phone, ready when you need them.
+Document Scanner Pro is a document scanner and PDF maker that keeps your scans in an encrypted vault on your own phone. Scan documents to PDF, turn photos into PDF, read text with OCR, sign PDFs and get reminders before ID cards, insurance or certificates expire. No account, no cloud, works offline.
 
-PRIVATE BY DESIGN
-• Everything stays on your phone. No account, no sign-in, no Document Scanner Pro servers.
-• Document Scanner Pro has no internet permission, so it cannot upload your files.
-• No ads, no analytics, no tracking.
+📄 DOCUMENT SCANNER & PDF MAKER
+• Scan paper documents into clean PDFs with automatic cropping.
+• Photos to PDF: pick images from the gallery or take them with the camera and get one PDF.
+• Edit pages: rotate, reorder and remove pages before saving.
+• Import existing PDFs and images.
 
-STRONG PROTECTION
+🛠️ PDF TOOLS ON YOUR PHONE
+• Merge PDF, split PDF and compress PDF (Premium).
+• Sign PDF and annotate: add text, your signature, highlights or cover parts of a page (Premium).
+• Edit text in English PDFs in the document's own font (Premium).
+• Results are always saved as a new copy; your original stays untouched.
+
+🔍 OCR TEXT RECOGNITION – HINDI & ENGLISH
+• Read text from scanned documents on the phone, offline.
+• Suggests the category and expiry date for you.
+• Premium: keep the recognised text and search inside documents.
+
+🔒 PRIVATE, ENCRYPTED DOCUMENT VAULT
 • Every document is encrypted with its own key (AES-256-GCM), protected by the Android Keystore.
-• Names, tags and notes are kept in an encrypted database.
 • PIN lock with optional fingerprint or face unlock, and auto-lock.
+• No internet permission, so the app cannot upload your files. No ads, no analytics, no tracking.
 • Screenshots and the recent-apps preview are blocked inside the app.
 
-ORGANISED AND QUICK TO FIND
-• Categories, folders, tags, favourites and fast search.
-• Premium: advanced filters (type, expiry, date added, category, tag) and batch actions — select many documents to favourite, move, categorise, export or delete at once.
-• Issue and expiry dates with reminders before a document expires (Premium: automatically 7 days before every expiry date). Notifications don't show document names unless you turn that on.
-• Scan paper documents into clean PDFs with the camera.
-• Read text from a document on the phone (OCR, Hindi and English) to suggest the category and expiry date.
+🗂️ ORGANISE & FIND FAST
+• Categories with icons, folders, tags, favourites and quick search.
+• Premium: advanced filters (type, expiry, date added, category, tag) and batch actions.
 
-PDF TOOLS, ON THE PHONE
-• Free: Photos to PDF — pick photos from your gallery or take them with the camera and get one PDF; edit pages (rotate, reorder, remove).
-• Premium: Edit text — change the words in English PDFs in the document's own font; merge, split and compress PDFs; Annotate & Sign (add text, your signature, highlights or cover parts of a page). Results are always saved as a new copy.
+⏰ EXPIRY REMINDERS
+• Reminders before your licence, insurance policy, passport or certificate expires.
+• Premium: automatic reminder 7 days before every expiry date. Notifications hide document names unless you turn them on.
 
-YOUR BACKUP, YOUR CHOICE
-• Create an encrypted backup file protected by a password only you know, and save it wherever you like — Google Drive, a USB drive or a folder. Restore it on the same or a new phone.
-• A strength meter helps you pick a password that is hard to guess, and an optional reminder on the home screen tells you when a new backup is due.
+☁️ ENCRYPTED BACKUP & RESTORE
+• Save a password-protected backup to Google Drive, a USB drive or any folder and restore it on a new phone.
+• Premium: automatic backup to a file you choose once (for example in Google Drive). Uploading is done by the app that owns that location.
 
-HINDI AND ENGLISH
-• Document Scanner Pro follows your phone's language and can be switched anytime.
+🌐 HINDI AND ENGLISH
+• Follows your phone's language; switch anytime.
 
-PREMIUM
-Monthly or yearly subscription, or a one-time Lifetime purchase, through Google Play: Edit text, merge, split and compress PDFs, Annotate & Sign, search inside documents, advanced filters, batch actions and unlimited reminders. Prices are shown in the app before you buy. Cancel anytime in Google Play.
+⭐ PREMIUM
+Monthly or yearly subscription, or a one-time Lifetime purchase, through Google Play. Prices are shown in the app before you buy. Cancel a subscription anytime in Google Play.
 
 PLEASE NOTE
 • Document Scanner Pro is a private storage app. It is not DigiLocker, is not affiliated with any government, and does not verify documents.
-• Your keys never leave the phone. If you lose the phone, reset it or forget your PIN, documents stored only in Document Scanner Pro cannot be recovered — keep an encrypted backup.
+• Your keys never leave the phone. If you lose the phone, reset it or forget your PIN, documents stored only in Document Scanner Pro cannot be recovered, so keep an encrypted backup.
