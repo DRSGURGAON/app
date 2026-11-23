@@ -43,47 +43,67 @@ class _LogoPainter extends CustomPainter {
               ).createShader(Offset.zero & size)
             : Brand.heroGradient.createShader(Offset.zero & size),
     );
+    // Document Scanner Pro mark (same shapes as tool/brand/make_icon.py, which
+    // writes the Android launcher, splash and notification drawables): a page
+    // with a folded corner and text lines, gold scan-frame corners and a gold
+    // scan line.
     Offset p(double x, double y) => Offset(x * s, y * s);
-    final shield = Path()
-      ..moveTo(p(.24, .22).dx, p(.24, .22).dy)
-      ..lineTo(p(.60, .22).dx, p(.60, .22).dy)
-      ..lineTo(p(.76, .38).dx, p(.76, .38).dy)
-      ..lineTo(p(.76, .52).dx, p(.76, .52).dy)
-      ..cubicTo(
-        p(.76, .69).dx,
-        p(.76, .69).dy,
-        p(.64, .79).dx,
-        p(.64, .79).dy,
-        p(.50, .84).dx,
-        p(.50, .84).dy,
+    Rect r(double x0, double y0, double x1, double y1) =>
+        Rect.fromPoints(p(x0, y0), p(x1, y1));
+    const pl = .33, pt = .25, pr = .67, pb = .77, fold = .10, rad = .03;
+    final page = Path()
+      ..moveTo(p(pl + rad, pt).dx, p(pl + rad, pt).dy)
+      ..lineTo(p(pr - fold, pt).dx, p(pr - fold, pt).dy)
+      ..lineTo(p(pr, pt + fold).dx, p(pr, pt + fold).dy)
+      ..lineTo(p(pr, pb - rad).dx, p(pr, pb - rad).dy)
+      ..quadraticBezierTo(
+        p(pr, pb).dx,
+        p(pr, pb).dy,
+        p(pr - rad, pb).dx,
+        p(pr - rad, pb).dy,
       )
-      ..cubicTo(
-        p(.36, .79).dx,
-        p(.36, .79).dy,
-        p(.24, .69).dx,
-        p(.24, .69).dy,
-        p(.24, .52).dx,
-        p(.24, .52).dy,
+      ..lineTo(p(pl + rad, pb).dx, p(pl + rad, pb).dy)
+      ..quadraticBezierTo(
+        p(pl, pb).dx,
+        p(pl, pb).dy,
+        p(pl, pb - rad).dx,
+        p(pl, pb - rad).dy,
+      )
+      ..lineTo(p(pl, pt + rad).dx, p(pl, pt + rad).dy)
+      ..quadraticBezierTo(
+        p(pl, pt).dx,
+        p(pl, pt).dy,
+        p(pl + rad, pt).dx,
+        p(pl + rad, pt).dy,
       )
       ..close();
-    canvas.drawPath(shield, Paint()..color = Colors.white);
-    final fold = Path()
-      ..moveTo(p(.60, .22).dx, p(.60, .22).dy)
-      ..lineTo(p(.60, .38).dx, p(.60, .38).dy)
-      ..lineTo(p(.76, .38).dx, p(.76, .38).dy)
-      ..close();
-    canvas.drawPath(fold, Paint()..color = const Color(0xFFB9C1FF));
-    final key = Paint()..color = Brand.navy800;
-    canvas.drawCircle(p(.50, .50), s * .066, key);
+    canvas.drawPath(page, Paint()..color = Colors.white);
     canvas.drawPath(
       Path()
-        ..moveTo(p(.468, .54).dx, p(.468, .54).dy)
-        ..lineTo(p(.532, .54).dx, p(.532, .54).dy)
-        ..lineTo(p(.548, .67).dx, p(.548, .67).dy)
-        ..lineTo(p(.452, .67).dx, p(.452, .67).dy)
+        ..moveTo(p(pr - fold, pt).dx, p(pr - fold, pt).dy)
+        ..lineTo(p(pr - fold, pt + fold).dx, p(pr - fold, pt + fold).dy)
+        ..lineTo(p(pr, pt + fold).dx, p(pr, pt + fold).dy)
         ..close(),
-      key,
+      Paint()..color = const Color(0xFFB9C1FF),
     );
+    final lines = Paint()..color = const Color(0xFFC5CCF2);
+    canvas
+      ..drawRect(r(.39, .40, .61, .43), lines)
+      ..drawRect(r(.39, .62, .61, .65), lines)
+      ..drawRect(r(.39, .69, .53, .72), lines);
+    final gold = Paint()..color = Brand.gold;
+    canvas.drawRect(r(.24, .505, .76, .54), gold);
+    const l = .20, t = .16, rt = .80, b = .86, arm = .12, th = .045;
+    for (final (cx, cy, dx, dy) in [
+      (l, t, 1.0, 1.0),
+      (rt, t, -1.0, 1.0),
+      (l, b, 1.0, -1.0),
+      (rt, b, -1.0, -1.0),
+    ]) {
+      canvas
+        ..drawRect(r(cx, cy, cx + dx * arm, cy + dy * th), gold)
+        ..drawRect(r(cx, cy, cx + dx * th, cy + dy * arm), gold);
+    }
   }
 
   @override
