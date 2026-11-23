@@ -11,6 +11,12 @@
     <!-- Flutter adds INTERNET for debug builds only (hot reload). DocSafe makes no network calls. -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 
+    <!-- A library activity asks for portrait orientation, which Play turns into a required
+         "portrait screen" feature and hides the app from landscape-only devices. The app
+         works in any orientation, so the feature is optional. -->
+    <uses-feature android:name="android.hardware.screen.portrait" android:required="false" />
+    <uses-feature android:name="android.hardware.screen.landscape" android:required="false" />
+
     <application
         android:label="@string/app_name"
         android:name="${applicationName}"
