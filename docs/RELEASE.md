@@ -1,4 +1,4 @@
-# Releasing DocSafe on Google Play (Phase 8)
+# Releasing Document Scanner Pro on Google Play (Phase 8)
 
 Everything here is done by the **owner**. Nothing in this repository publishes the app,
 and no signing key or password is ever committed.
@@ -52,11 +52,33 @@ Expected permissions: USE_BIOMETRIC, USE_FINGERPRINT, POST_NOTIFICATIONS,
 RECEIVE_BOOT_COMPLETED, com.android.vending.BILLING, ACCESS_NETWORK_STATE (from Google
 libraries). **No INTERNET.**
 
+## 2b. Or build the signed bundle on GitHub (no Flutter on your PC)
+
+`.github/workflows/release-bundle.yml` builds the same signed `.aab` on GitHub and keeps it
+as a download for 3 days. It never uploads or publishes anything.
+
+1. Upload key on Windows (PowerShell; `keytool` comes with Java / Android Studio):
+   ```powershell
+   keytool -genkeypair -v -keystore $HOME\upload.jks -alias upload -keyalg RSA -keysize 4096 -validity 10000
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes("$HOME\upload.jks")) | Set-Clipboard
+   ```
+   Keep `upload.jks` and both passwords safe (e.g. a password manager + a second copy).
+2. GitHub → repository → Settings → Secrets and variables → Actions → New repository secret:
+   `UPLOAD_KEYSTORE_BASE64` (paste the clipboard), `UPLOAD_STORE_PASSWORD`,
+   `UPLOAD_KEY_ALIAS` (`upload`), `UPLOAD_KEY_PASSWORD`, `PLAY_LICENSE_KEY` (Play Console →
+   Monetize with Play → Monetization setup → Licensing).
+3. GitHub → Code → branch menu → type `docsafe-release` → **Create branch docsafe-release from
+   docsafe-main**. The workflow starts; when it is green, download
+   `document-scanner-pro-release-aab` from the run page (or
+   `gh run download <run id> -R DRSGURGAON/app -n document-scanner-pro-release-aab`).
+4. For the next upload, ask for a version bump on docsafe-main, then delete and re-create the
+   `docsafe-release` branch the same way (each upload needs a higher version code).
+
 ## 3. Play Console
 
 | Section | What to enter | Source in this repo |
 |---|---|---|
-| App details | Name **DocSafe**, app, free (with in-app subscription) | — |
+| App details | Name **Document Scanner Pro**, app, free (with in-app subscription and a one-time Lifetime purchase) | — |
 | Store listing (en-IN default; add en-US, en-GB, hi-IN) | Title, short and full description | `store/listings/<locale>/` |
 | Graphics | Icon 512×512, feature graphic 1024×500, 8 phone screenshots per language | `store/icon-512.png`, `store/feature_graphic.png`, `store/screenshots/<locale>/` |
 | Release notes | Per language | `store/release_notes/<locale>/1.txt` |
