@@ -1,5 +1,8 @@
-First release of Document Scanner Pro:
-• Encrypted document vault with PIN and fingerprint lock
-• Scanner, PDF tools, OCR in Hindi and English
-• Expiry reminders, encrypted backup and restore
-• Premium through Google Play
+Document Scanner Pro – scan documents to PDF and keep them in an encrypted vault.
+• Document scanner with auto crop; photos to PDF from gallery or camera
+• PDF tools: merge, split, compress, sign and annotate PDF
+• OCR text recognition in English and Hindi; search inside documents
+• Expiry reminders for ID cards, insurance and certificates
+• PIN and fingerprint lock; works offline, no account needed
+• Encrypted backup to Google Drive or any folder
+• Premium: monthly, yearly or lifetime
