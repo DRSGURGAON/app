@@ -67,8 +67,21 @@ jobs:
         run: |
           # The keystore only exists on this temporary runner and is deleted at the end.
           export DOCSAFE_UPLOAD_STORE_FILE="$RUNNER_TEMP/upload.jks"
-          echo "$KS" | base64 -d > "$DOCSAFE_UPLOAD_STORE_FILE"
           trap 'rm -f "$DOCSAFE_UPLOAD_STORE_FILE"' EXIT
+          # Spaces, tabs and Windows line breaks from copy/paste are ignored.
+          if ! printf '%s' "$KS" | tr -d ' \t\r\n' | base64 -d > "$DOCSAFE_UPLOAD_STORE_FILE" 2>/dev/null; then
+            echo "::error::UPLOAD_KEYSTORE_BASE64 is not valid base64. Re-create it with the PowerShell command in docs/RELEASE.md section 2b (it copies the text to the clipboard) and paste only that text."
+            exit 1
+          fi
+          # A Java keystore (JKS) or PKCS12 file must open with the store password.
+          if ! keytool -list -keystore "$DOCSAFE_UPLOAD_STORE_FILE" -storepass "$DOCSAFE_UPLOAD_STORE_PASSWORD" > /dev/null 2>&1; then
+            echo "::error::The decoded keystore does not open with UPLOAD_STORE_PASSWORD. Check that UPLOAD_KEYSTORE_BASE64 came from upload.jks and that the password is right."
+            exit 1
+          fi
+          if ! keytool -list -keystore "$DOCSAFE_UPLOAD_STORE_FILE" -storepass "$DOCSAFE_UPLOAD_STORE_PASSWORD" -alias "$DOCSAFE_UPLOAD_KEY_ALIAS" > /dev/null 2>&1; then
+            echo "::error::No key with alias UPLOAD_KEY_ALIAS in the keystore (it is usually: upload)."
+            exit 1
+          fi
           flutter build appbundle --release -PdocsafeRequireUploadKey=true
       - name: Permissions in the bundle (no INTERNET expected)
         run: |
