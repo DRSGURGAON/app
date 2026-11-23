@@ -3535,6 +3535,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.'**
   String get showNamesBody;
+
+  /// No description provided for @premiumLifetimeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime'**
+  String get premiumLifetimeLabel;
+
+  /// No description provided for @premiumOneTimePrice.
+  ///
+  /// In en, this message translates to:
+  /// **'{price} once'**
+  String premiumOneTimePrice(String price);
+
+  /// No description provided for @premiumLifetimeNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay once. No subscription, nothing renews.'**
+  String get premiumLifetimeNote;
+
+  /// No description provided for @premiumLifetimeActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Lifetime Premium: paid once, it never expires on this Google account.'**
+  String get premiumLifetimeActive;
+
+  /// No description provided for @premiumLifetimeLegal.
+  ///
+  /// In en, this message translates to:
+  /// **'One-time payment through Google Play to your Google account. It does not renew. Restore it on a new phone with Restore purchases.'**
+  String get premiumLifetimeLegal;
+
+  /// No description provided for @premiumLifetimeAlsoSub.
+  ///
+  /// In en, this message translates to:
+  /// **'You also have a subscription. Cancel it in Google Play so you are not charged again.'**
+  String get premiumLifetimeAlsoSub;
 }
 
 class _AppLocalizationsDelegate

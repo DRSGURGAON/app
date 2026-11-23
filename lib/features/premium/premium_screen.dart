@@ -136,7 +136,12 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
                 color: scheme.secondaryContainer,
                 onColor: scheme.onSecondaryContainer,
                 title: l.premiumActiveTitle,
-                body: status.autoRenewing
+                body: status.lifetime
+                    ? [
+                        l.premiumLifetimeActive,
+                        if (status.autoRenewing) l.premiumLifetimeAlsoSub,
+                      ].join('\n\n')
+                    : status.autoRenewing
                     ? l.premiumActiveBody
                     : l.premiumEndsNote,
               )
@@ -188,14 +193,15 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
               body: l.premiumRemindersDesc(freeActiveReminderLimit),
             ),
             const SizedBox(height: 12),
-            if (status.active)
+            if (status.active && !status.lifetime ||
+                status.lifetime && status.autoRenewing)
               OutlinedButton(
                 key: const Key('premium-manage'),
                 onPressed: () =>
                     ref.read(billingServiceProvider).openManageSubscriptions(),
                 child: Text(l.premiumManage),
               )
-            else
+            else if (!status.active)
               ..._purchaseSection(context, l),
             const SizedBox(height: 8),
             if (_availability == BillingAvailability.ready)
@@ -280,7 +286,10 @@ class _PremiumScreenState extends ConsumerState<PremiumScreen> {
               ),
       ),
       const SizedBox(height: 10),
-      Text(l.premiumLegal, style: theme.textTheme.bodySmall),
+      Text(
+        selected.oneTime ? l.premiumLifetimeLegal : l.premiumLegal,
+        style: theme.textTheme.bodySmall,
+      ),
     ];
   }
 }
@@ -329,12 +338,16 @@ class _PlanCard extends StatelessWidget {
     final theme = Theme.of(context);
     final yearly = _isYearly(plan);
     final monthly = _isMonthly(plan);
-    final name = yearly
+    final name = plan.oneTime
+        ? l.premiumLifetimeLabel
+        : yearly
         ? l.premiumYearlyLabel
         : monthly
         ? l.premiumMonthlyLabel
         : plan.basePlanId;
-    final price = yearly
+    final price = plan.oneTime
+        ? l.premiumOneTimePrice(plan.formattedPrice)
+        : yearly
         ? l.premiumPerYear(plan.formattedPrice)
         : monthly
         ? l.premiumPerMonth(plan.formattedPrice)
@@ -373,6 +386,13 @@ class _PlanCard extends StatelessWidget {
                       Text(name, style: theme.textTheme.titleMedium),
                       const SizedBox(height: 2),
                       Text(price, style: theme.textTheme.bodyLarge),
+                      if (plan.oneTime)
+                        Text(
+                          l.premiumLifetimeNote,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: const Color(0xFFFFD27A),
+                          ),
+                        ),
                       if (trial != null)
                         Text(
                           l.premiumFreeTrial(trial),

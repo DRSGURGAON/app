@@ -51,6 +51,7 @@ class PlanOffer {
     required this.currencyCode,
     required this.billingPeriod,
     this.freeTrialPeriod,
+    required this.oneTime,
   });
 
   String basePlanId;
@@ -66,6 +67,9 @@ class PlanOffer {
 
   /// ISO 8601 period of a free trial, e.g. P7D, if this offer has one.
   String? freeTrialPeriod;
+
+  /// One-time purchase (Lifetime): [billingPeriod] is empty, nothing renews.
+  bool oneTime;
 }
 
 class EntitlementInfo {
@@ -73,6 +77,7 @@ class EntitlementInfo {
     required this.active,
     required this.pending,
     required this.autoRenewing,
+    required this.lifetime,
   });
 
   bool active;
@@ -80,6 +85,9 @@ class EntitlementInfo {
   /// A purchase is waiting for payment (e.g. cash or slow UPI).
   bool pending;
   bool autoRenewing;
+
+  /// Premium comes from the one-time Lifetime purchase.
+  bool lifetime;
 }
 
 @HostApi()
@@ -87,7 +95,8 @@ abstract class BillingHostApi {
   @async
   BillingAvailability availability();
 
-  /// The Premium plans from Google Play, monthly first. Empty if none.
+  /// The Premium plans from Google Play: subscriptions (monthly first), then
+  /// the one-time Lifetime purchase if it exists. Empty if none.
   @async
   List<PlanOffer> plans();
 

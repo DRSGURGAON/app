@@ -7,14 +7,18 @@ class FakeBillingService implements BillingService {
     List<PlanOffer>? offers,
   }) : offers = offers ?? defaultPlans();
 
-  static List<PlanOffer> defaultPlans({String? yearlyTrial}) => [
+  static List<PlanOffer> defaultPlans({
+    String? yearlyTrial,
+    bool lifetime = true,
+  }) => [
     PlanOffer(
       basePlanId: 'monthly',
       offerToken: 'tok-monthly',
-      formattedPrice: '₹49.00',
-      priceMicros: 49000000,
+      formattedPrice: '₹29.00',
+      priceMicros: 29000000,
       currencyCode: 'INR',
       billingPeriod: 'P1M',
+      oneTime: false,
     ),
     PlanOffer(
       basePlanId: 'yearly',
@@ -24,7 +28,18 @@ class FakeBillingService implements BillingService {
       currencyCode: 'INR',
       billingPeriod: 'P1Y',
       freeTrialPeriod: yearlyTrial,
+      oneTime: false,
     ),
+    if (lifetime)
+      PlanOffer(
+        basePlanId: 'lifetime',
+        offerToken: '',
+        formattedPrice: '₹999.00',
+        priceMicros: 999000000,
+        currencyCode: 'INR',
+        billingPeriod: '',
+        oneTime: true,
+      ),
   ];
 
   BillingAvailability availabilityResult;
@@ -36,6 +51,7 @@ class FakeBillingService implements BillingService {
   bool active = false;
   bool pending = false;
   bool autoRenewing = true;
+  bool lifetime = false;
 
   final purchases = <String>[];
   int entitlementCalls = 0;
@@ -55,6 +71,10 @@ class FakeBillingService implements BillingService {
       case PurchaseResultCode.purchased:
         active = true;
         pending = false;
+        if (plan.oneTime) {
+          lifetime = true;
+          autoRenewing = false;
+        }
       case PurchaseResultCode.pending:
         pending = true;
       default:
@@ -70,6 +90,7 @@ class FakeBillingService implements BillingService {
       active: active,
       pending: pending && !active,
       autoRenewing: autoRenewing,
+      lifetime: lifetime && active,
     );
   }
 

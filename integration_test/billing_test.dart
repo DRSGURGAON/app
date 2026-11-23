@@ -46,6 +46,7 @@ void main() {
                   priceMicros: 0,
                   currencyCode: 'INR',
                   billingPeriod: 'P1Y',
+                  oneTime: false,
                 ),
               )
               .timeout(limit),

@@ -36,9 +36,9 @@ void main() {
     expect(trialDays('7 days'), isNull);
     expect(trialDays(null), isNull);
     final plans = FakeBillingService.defaultPlans();
-    // ₹299 against 12 × ₹49 = ₹588.
-    expect(savePercent(plans[0], plans[1]), 49);
-    plans[1].priceMicros = 588000000;
+    // ₹299 against 12 × ₹29 = ₹348.
+    expect(savePercent(plans[0], plans[1]), 14);
+    plans[1].priceMicros = 348000000;
     expect(savePercent(plans[0], plans[1]), isNull);
     plans[1]
       ..priceMicros = 1
@@ -58,9 +58,10 @@ void main() {
     expect(find.text(en.settingsPremiumInactive), findsOneWidget);
 
     await openPremiumFromSettings(tester);
-    expect(find.text(en.premiumPerMonth('₹49.00')), findsOneWidget);
+    expect(find.text(en.premiumPerMonth('₹29.00')), findsOneWidget);
     expect(find.text(en.premiumPerYear('₹299.00')), findsOneWidget);
-    expect(find.text(en.premiumSave(49)), findsOneWidget);
+    expect(find.text(en.premiumSave(14)), findsOneWidget);
+    expect(find.text(en.premiumOneTimePrice('₹999.00')), findsOneWidget);
     expect(find.text(en.premiumLegal), findsOneWidget);
 
     await tapKey(tester, 'premium-buy');
@@ -221,4 +222,26 @@ void main() {
     expect(find.byKey(const Key('premium-active')), findsOneWidget);
     await app.dispose();
   });
+
+  testWidgets(
+    'Lifetime: one-time purchase, no renewal text, nothing to manage',
+    (tester) async {
+      final billing = FakeBillingService();
+      final app = await pumpApp(tester, await unlockedFake(), billing: billing);
+      await openPremiumFromSettings(tester);
+      await tapKey(tester, 'plan-lifetime');
+      expect(find.text(en.premiumLifetimeLabel), findsOneWidget);
+      expect(find.text(en.premiumLifetimeNote), findsOneWidget);
+      expect(find.text(en.premiumLifetimeLegal), findsOneWidget);
+      expect(find.text(en.premiumLegal), findsNothing);
+
+      await tapKey(tester, 'premium-buy');
+      expect(billing.purchases, ['lifetime']);
+      expect(app.container.read(premiumUnlockedProvider), isTrue);
+      expect(app.container.read(premiumProvider).lifetime, isTrue);
+      expect(find.text(en.premiumLifetimeActive), findsOneWidget);
+      expect(find.byKey(const Key('premium-manage')), findsNothing);
+      await app.dispose();
+    },
+  );
 }

@@ -27,6 +27,7 @@ class PlayBillingService implements BillingService {
     active: false,
     pending: false,
     autoRenewing: false,
+    lifetime: false,
   );
 
   @override

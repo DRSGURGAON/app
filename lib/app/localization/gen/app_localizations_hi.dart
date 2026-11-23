@@ -2054,4 +2054,28 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get showNamesBody =>
       'बंद: “एक दस्तावेज़ पर ध्यान देना है”। चालू: जैसे “Driving Licence: 10 दिस॰ को समाप्त होगा”। लॉक स्क्रीन पर कभी नहीं दिखता। नाम इस फ़ोन की एक key से एन्क्रिप्ट रहते हैं ताकि DocSafe लॉक होने पर भी सूचना में दिख सकें।';
+
+  @override
+  String get premiumLifetimeLabel => 'लाइफ़टाइम';
+
+  @override
+  String premiumOneTimePrice(String price) {
+    return '$price एक बार';
+  }
+
+  @override
+  String get premiumLifetimeNote =>
+      'एक बार भुगतान। कोई सदस्यता नहीं, कुछ रिन्यू नहीं होता।';
+
+  @override
+  String get premiumLifetimeActive =>
+      'लाइफ़टाइम प्रीमियम: एक बार भुगतान, इस Google खाते पर कभी समाप्त नहीं होता।';
+
+  @override
+  String get premiumLifetimeLegal =>
+      'Google Play के ज़रिए आपके Google खाते से एक बार का भुगतान। यह रिन्यू नहीं होता। नए फ़ोन पर \'खरीदारी बहाल करें\' से इसे वापस पाएँ।';
+
+  @override
+  String get premiumLifetimeAlsoSub =>
+      'आपकी एक सदस्यता भी है। दोबारा पैसे न कटें, इसलिए उसे Google Play में रद्द करें।';
 }

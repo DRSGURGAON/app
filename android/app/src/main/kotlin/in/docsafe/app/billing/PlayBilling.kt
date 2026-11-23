@@ -42,8 +42,9 @@ import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 
 /**
- * Google Play Billing for the single "DocSafe Premium" subscription
- * (product [PRODUCT_ID], base plans "monthly" and "yearly", set up in Play Console).
+ * Google Play Billing for DocSafe Premium: the subscription [PRODUCT_ID]
+ * (base plans "monthly" and "yearly") and the one-time, never-consumed
+ * product [LIFETIME_ID], all set up in Play Console.
  *
  * - No server: a purchase counts only if Play's signature verifies with the
  *   Play licence key compiled into this build ([BuildConfig.PLAY_LICENSE_KEY]).
@@ -60,6 +61,12 @@ class PlayBilling(
 ) : BillingHostApi, PurchasesUpdatedListener {
     companion object {
         const val PRODUCT_ID = "docsafe_premium"
+
+        /** One-time (non-consumable) in-app product: Premium for life. */
+        const val LIFETIME_ID = "docsafe_lifetime"
+
+        /** Plan id the Dart side uses for the one-time product. */
+        const val LIFETIME_PLAN = "lifetime"
         private const val TAG = "DocSafe"
         private const val CONNECT_TIMEOUT_MS = 10_000L
     }
@@ -69,6 +76,7 @@ class PlayBilling(
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
     private val connectLock = Mutex()
     private var details: ProductDetails? = null
+    private var lifetimeDetails: ProductDetails? = null
     private var pendingFlow: CancellableContinuation<PurchaseResultCode>? = null
 
     private val client: BillingClient = BillingClient.newBuilder(appContext)
@@ -123,7 +131,47 @@ class PlayBilling(
         return found
     }
 
-    override suspend fun plans(): List<PlanOffer> {
+    private suspend fun lifetimeProduct(): ProductDetails? {
+        if (connect() != BillingResponseCode.OK) return null
+        val params = QueryProductDetailsParams.newBuilder()
+            .setProductList(
+                listOf(
+                    QueryProductDetailsParams.Product.newBuilder()
+                        .setProductId(LIFETIME_ID)
+                        .setProductType(BillingClient.ProductType.INAPP)
+                        .build(),
+                ),
+            )
+            .build()
+        val found = suspendCancellableCoroutine { cont ->
+            client.queryProductDetailsAsync(params) { result, queried ->
+                if (result.responseCode != BillingResponseCode.OK) {
+                    Log.w(TAG, "billing: lifetime query failed (${result.responseCode})")
+                }
+                if (cont.isActive) cont.resume(queried.productDetailsList.firstOrNull { it.productId == LIFETIME_ID })
+            }
+        }
+        lifetimeDetails = found
+        return found
+    }
+
+    override suspend fun plans(): List<PlanOffer> = subscriptionPlans() + listOfNotNull(lifetimePlan())
+
+    private suspend fun lifetimePlan(): PlanOffer? {
+        val offer = lifetimeProduct()?.oneTimePurchaseOfferDetails ?: return null
+        return PlanOffer(
+            basePlanId = LIFETIME_PLAN,
+            offerToken = "",
+            formattedPrice = offer.formattedPrice,
+            priceMicros = offer.priceAmountMicros,
+            currencyCode = offer.priceCurrencyCode,
+            billingPeriod = "",
+            freeTrialPeriod = null,
+            oneTime = true,
+        )
+    }
+
+    private suspend fun subscriptionPlans(): List<PlanOffer> {
         val product = productDetails() ?: return emptyList()
         val offers = product.subscriptionOfferDetails ?: return emptyList()
         return offers.groupBy { it.basePlanId }.mapNotNull { (basePlanId, planOffers) ->
@@ -142,6 +190,7 @@ class PlayBilling(
                 currencyCode = recurring.priceCurrencyCode,
                 billingPeriod = recurring.billingPeriod,
                 freeTrialPeriod = phases.firstOrNull { it.priceAmountMicros == 0L }?.billingPeriod,
+                oneTime = false,
             )
         }.sortedBy { periodDays(it.billingPeriod) }
     }
@@ -149,6 +198,7 @@ class PlayBilling(
     override suspend fun purchase(basePlanId: String, offerToken: String): PurchaseResultCode {
         if (key == null) return PurchaseResultCode.UNAVAILABLE
         val activity = activityProvider() ?: return PurchaseResultCode.FAILED
+        if (basePlanId == LIFETIME_PLAN) return purchaseLifetime(activity)
         fun ProductDetails.offers(token: String) = subscriptionOfferDetails?.any { it.offerToken == token } == true
         // The cached details may be stale (e.g. an offer ended): query again once.
         val product = details?.takeIf { it.offers(offerToken) }
@@ -163,6 +213,25 @@ class PlayBilling(
                         .setOfferToken(offerToken)
                         .build(),
                 ),
+            )
+            .build()
+        return suspendCancellableCoroutine { cont ->
+            pendingFlow = cont
+            cont.invokeOnCancellation { pendingFlow = null }
+            val launched = client.launchBillingFlow(activity, params)
+            if (launched.responseCode != BillingResponseCode.OK) {
+                pendingFlow = null
+                if (cont.isActive) cont.resume(codeFor(launched.responseCode))
+            }
+        }
+    }
+
+    private suspend fun purchaseLifetime(activity: Activity): PurchaseResultCode {
+        val product = lifetimeDetails ?: lifetimeProduct() ?: return PurchaseResultCode.UNAVAILABLE
+        if (pendingFlow != null) return PurchaseResultCode.FAILED
+        val params = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(
+                listOf(BillingFlowParams.ProductDetailsParams.newBuilder().setProductDetails(product).build()),
             )
             .build()
         return suspendCancellableCoroutine { cont ->
@@ -196,9 +265,15 @@ class PlayBilling(
     }
 
     override suspend fun entitlement(): EntitlementInfo {
-        if (key == null || connect() != BillingResponseCode.OK) return EntitlementInfo(false, false, false)
-        val params = QueryPurchasesParams.newBuilder().setProductType(BillingClient.ProductType.SUBS).build()
-        val purchases = suspendCancellableCoroutine { cont ->
+        if (key == null || connect() != BillingResponseCode.OK) return EntitlementInfo(false, false, false, false)
+        val purchases = queryPurchases(BillingClient.ProductType.SUBS) + queryPurchases(BillingClient.ProductType.INAPP)
+        val decision = decide(purchases)
+        return EntitlementInfo(decision.active, decision.pending, decision.autoRenewing, decision.lifetime)
+    }
+
+    private suspend fun queryPurchases(type: String): List<Purchase> {
+        val params = QueryPurchasesParams.newBuilder().setProductType(type).build()
+        return suspendCancellableCoroutine { cont ->
             client.queryPurchasesAsync(params) { result, list ->
                 if (result.responseCode != BillingResponseCode.OK) {
                     Log.w(TAG, "billing: purchase query failed (${result.responseCode})")
@@ -206,8 +281,6 @@ class PlayBilling(
                 if (cont.isActive) cont.resume(list)
             }
         }
-        val decision = decide(purchases)
-        return EntitlementInfo(decision.active, decision.pending, decision.autoRenewing)
     }
 
     /** Verifies signatures, acknowledges new purchases, returns the decision. */
@@ -227,7 +300,7 @@ class PlayBilling(
                 signature = it.signature,
             )
         }
-        val decision = withContext(Dispatchers.Default) { Entitlement.evaluate(records, PRODUCT_ID, key) }
+        val decision = withContext(Dispatchers.Default) { Entitlement.evaluate(records, PRODUCT_ID, LIFETIME_ID, key) }
         for (token in decision.toAcknowledge) acknowledge(token)
         return decision
     }

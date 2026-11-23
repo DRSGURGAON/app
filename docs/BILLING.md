@@ -11,15 +11,20 @@
 | Save recognised text for search ("Inside documents") | — | Yes |
 | Advanced filters (type, expiry, date added, category, tag) | — | Yes |
 | Batch actions (select many: favourite, move, category, export, delete) | — | Yes |
-| Active reminders | 3 | Unlimited |
+| Active reminders | 3 | Unlimited + automatic 7 days before every expiry |
 
 Locked tools show the Premium screen; after a successful purchase the tool continues.
 
 ## How it works
 
 - One subscription product **`docsafe_premium`** with base plans **`monthly`** (P1M) and
-  **`yearly`** (P1Y). Prices are never hard-coded: the app shows the price Google Play
+  **`yearly`** (P1Y), plus one **one-time in-app product `docsafe_lifetime`** (non-consumable:
+  DocSafe never consumes it, so Google Play keeps returning it on every device signed in to
+  that Google account). Prices are never hard-coded: the app shows the price Google Play
   returns, formatted for the user's country (₹, $, £ …).
+- Lifetime: shown as a third plan ("₹999 once"); verified and acknowledged like a
+  subscription; `EntitlementInfo.lifetime` tells the UI (no renewal text, no "Manage" button
+  unless a subscription is also active, in which case the user is asked to cancel it).
 - Google Play Billing Library 8 (`com.android.billingclient:billing`) in Kotlin
   (`android/app/src/main/kotlin/in/docsafe/app/billing/PlayBilling.kt`), reached through
   the Pigeon bridge `pigeons/billing_api.dart`. It talks to the Play Store app over IPC;
@@ -63,8 +68,10 @@ build" and nothing can be bought. Debug builds keep the in-memory developer swit
 2. Upload a release-signed App Bundle to the **Internal testing** track (Phase 8 sets up
    release signing; billing does not work for an app Play has never seen).
 3. Monetize → Products → Subscriptions → create **`docsafe_premium`**:
-   - base plan **`monthly`**, auto-renewing, 1 month — India ₹49;
+   - base plan **`monthly`**, auto-renewing, 1 month — India ₹29;
    - base plan **`yearly`**, auto-renewing, 1 year — India ₹299;
+   Then Monetize → Products → **In-app products** → create **`docsafe_lifetime`**
+   (name "DocSafe Premium – Lifetime"), India ₹999, activate it.
    - United States and United Kingdom: set prices per base plan (Play suggests converted
      prices; round them by hand, e.g. $1.99 / $11.99 and £1.79 / £10.99 — owner's decision).
    - Optional free trial: add an offer to the yearly plan with a free phase (e.g. 7 days,

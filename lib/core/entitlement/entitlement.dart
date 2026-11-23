@@ -12,6 +12,7 @@ class PremiumStatus {
     this.active = false,
     this.pending = false,
     this.autoRenewing = false,
+    this.lifetime = false,
     this.debugUnlocked = false,
     this.checked = false,
   });
@@ -22,6 +23,9 @@ class PremiumStatus {
   /// A purchase is waiting for payment.
   final bool pending;
   final bool autoRenewing;
+
+  /// Premium from the one-time Lifetime purchase (nothing to manage or renew).
+  final bool lifetime;
 
   /// Debug builds only: developer switch in Settings (memory only).
   final bool debugUnlocked;
@@ -35,12 +39,14 @@ class PremiumStatus {
     bool? active,
     bool? pending,
     bool? autoRenewing,
+    bool? lifetime,
     bool? debugUnlocked,
     bool? checked,
   }) => PremiumStatus(
     active: active ?? this.active,
     pending: pending ?? this.pending,
     autoRenewing: autoRenewing ?? this.autoRenewing,
+    lifetime: lifetime ?? this.lifetime,
     debugUnlocked: debugUnlocked ?? this.debugUnlocked,
     checked: checked ?? this.checked,
   );
@@ -61,6 +67,7 @@ class PremiumController extends Notifier<PremiumStatus> {
       active: info.active,
       pending: info.pending,
       autoRenewing: info.autoRenewing,
+      lifetime: info.lifetime,
       checked: true,
     );
   }

@@ -129,6 +129,7 @@ class PlanOffer {
     required this.currencyCode,
     required this.billingPeriod,
     this.freeTrialPeriod,
+    required this.oneTime,
   });
 
   String basePlanId;
@@ -148,6 +149,9 @@ class PlanOffer {
   /// ISO 8601 period of a free trial, e.g. P7D, if this offer has one.
   String? freeTrialPeriod;
 
+  /// One-time purchase (Lifetime): [billingPeriod] is empty, nothing renews.
+  bool oneTime;
+
   List<Object?> _toList() {
     return <Object?>[
       basePlanId,
@@ -157,6 +161,7 @@ class PlanOffer {
       currencyCode,
       billingPeriod,
       freeTrialPeriod,
+      oneTime,
     ];
   }
 
@@ -174,6 +179,7 @@ class PlanOffer {
       currencyCode: result[4]! as String,
       billingPeriod: result[5]! as String,
       freeTrialPeriod: result[6] as String?,
+      oneTime: result[7]! as bool,
     );
   }
 
@@ -192,7 +198,8 @@ class PlanOffer {
         _deepEquals(priceMicros, other.priceMicros) &&
         _deepEquals(currencyCode, other.currencyCode) &&
         _deepEquals(billingPeriod, other.billingPeriod) &&
-        _deepEquals(freeTrialPeriod, other.freeTrialPeriod);
+        _deepEquals(freeTrialPeriod, other.freeTrialPeriod) &&
+        _deepEquals(oneTime, other.oneTime);
   }
 
   @override
@@ -201,7 +208,7 @@ class PlanOffer {
 
   @override
   String toString() {
-    return 'PlanOffer(basePlanId: $basePlanId, offerToken: $offerToken, formattedPrice: $formattedPrice, priceMicros: $priceMicros, currencyCode: $currencyCode, billingPeriod: $billingPeriod, freeTrialPeriod: $freeTrialPeriod)';
+    return 'PlanOffer(basePlanId: $basePlanId, offerToken: $offerToken, formattedPrice: $formattedPrice, priceMicros: $priceMicros, currencyCode: $currencyCode, billingPeriod: $billingPeriod, freeTrialPeriod: $freeTrialPeriod, oneTime: $oneTime)';
   }
 }
 
@@ -210,6 +217,7 @@ class EntitlementInfo {
     required this.active,
     required this.pending,
     required this.autoRenewing,
+    required this.lifetime,
   });
 
   bool active;
@@ -219,8 +227,11 @@ class EntitlementInfo {
 
   bool autoRenewing;
 
+  /// Premium comes from the one-time Lifetime purchase.
+  bool lifetime;
+
   List<Object?> _toList() {
-    return <Object?>[active, pending, autoRenewing];
+    return <Object?>[active, pending, autoRenewing, lifetime];
   }
 
   Object encode() {
@@ -233,6 +244,7 @@ class EntitlementInfo {
       active: result[0]! as bool,
       pending: result[1]! as bool,
       autoRenewing: result[2]! as bool,
+      lifetime: result[3]! as bool,
     );
   }
 
@@ -247,7 +259,8 @@ class EntitlementInfo {
     }
     return _deepEquals(active, other.active) &&
         _deepEquals(pending, other.pending) &&
-        _deepEquals(autoRenewing, other.autoRenewing);
+        _deepEquals(autoRenewing, other.autoRenewing) &&
+        _deepEquals(lifetime, other.lifetime);
   }
 
   @override
@@ -256,7 +269,7 @@ class EntitlementInfo {
 
   @override
   String toString() {
-    return 'EntitlementInfo(active: $active, pending: $pending, autoRenewing: $autoRenewing)';
+    return 'EntitlementInfo(active: $active, pending: $pending, autoRenewing: $autoRenewing, lifetime: $lifetime)';
   }
 }
 
@@ -339,7 +352,8 @@ class BillingHostApi {
     return pigeonVar_replyValue! as BillingAvailability;
   }
 
-  /// The Premium plans from Google Play, monthly first. Empty if none.
+  /// The Premium plans from Google Play: subscriptions (monthly first), then
+  /// the one-time Lifetime purchase if it exists. Empty if none.
   Future<List<PlanOffer>> plans() async {
     final pigeonVar_channelName =
         'dev.flutter.pigeon.docsafe.BillingHostApi.plans$pigeonVar_messageChannelSuffix';

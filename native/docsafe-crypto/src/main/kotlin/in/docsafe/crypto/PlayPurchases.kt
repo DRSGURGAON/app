@@ -62,6 +62,8 @@ data class EntitlementDecision(
     val autoRenewing: Boolean,
     /** Verified, purchased and not yet acknowledged: must be acknowledged (Play refunds after 3 days). */
     val toAcknowledge: List<String>,
+    /** Active because of a verified one-time Lifetime purchase. */
+    val lifetime: Boolean = false,
 )
 
 object Entitlement {
@@ -71,23 +73,39 @@ object Entitlement {
      * subscriptions from the purchases it returns, so no dates are checked here.
      * Without a key nothing is ever active.
      */
-    fun evaluate(records: List<PurchaseRecord>, productId: String, key: PublicKey?): EntitlementDecision {
+    fun evaluate(records: List<PurchaseRecord>, productId: String, key: PublicKey?): EntitlementDecision =
+        evaluate(records, productId, null, key)
+
+    /**
+     * Same rule for the subscription [productId] and the one-time
+     * [lifetimeProductId] (never consumed, so Play keeps returning it).
+     */
+    fun evaluate(
+        records: List<PurchaseRecord>,
+        productId: String,
+        lifetimeProductId: String?,
+        key: PublicKey?,
+    ): EntitlementDecision {
         var active = false
+        var lifetime = false
         var pending = false
         var autoRenewing = false
         val toAcknowledge = mutableListOf<String>()
         for (r in records) {
-            if (productId !in r.products) continue
+            val isSub = productId in r.products
+            val isLifetime = lifetimeProductId != null && lifetimeProductId in r.products
+            if (!isSub && !isLifetime) continue
             when (r.state) {
                 PurchaseRecord.PENDING -> pending = true
                 PurchaseRecord.PURCHASED -> {
                     if (key == null || !PurchaseSignature.verify(key, r.originalJson, r.signature)) continue
                     active = true
-                    autoRenewing = autoRenewing || r.autoRenewing
+                    if (isLifetime) lifetime = true
+                    if (isSub) autoRenewing = autoRenewing || r.autoRenewing
                     if (!r.acknowledged) toAcknowledge += r.purchaseToken
                 }
             }
         }
-        return EntitlementDecision(active, pending && !active, autoRenewing, toAcknowledge)
+        return EntitlementDecision(active, pending && !active, autoRenewing, toAcknowledge, lifetime)
     }
 }

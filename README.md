@@ -101,6 +101,7 @@ tested** (needs the Play Console internal-testing setup in docs/BILLING.md).
 | Subscription `docsafe_premium`, monthly + yearly base plans; prices, currency and free trial come from Google Play | Implemented; host-tested with a fake Play |
 | Premium screen: plans, Save N%, buy, pending payment, restore purchases, manage subscription; Settings row with status | Implemented, tested (English + Hindi 320x480) |
 | Offline signature check with the Play licence key (no server), acknowledge, re-check on unlock/resume | Implemented; verification JVM-tested; native bridge emulator-tested without a key |
+| Lifetime Premium (one-time `docsafe_lifetime`, non-consumable) next to monthly/yearly; same signature check | Implemented; JVM + widget tested; **real purchase needs Play Console** |
 | Merge, Split, Compress, Annotate & Sign, OCR search, advanced filters, batch actions, >3 reminders gated; tool continues after purchase | Implemented, tested |
 
 Builds without `-PdocsafePlayLicenseKey` (all CI builds) cannot sell Premium. Debug builds keep a

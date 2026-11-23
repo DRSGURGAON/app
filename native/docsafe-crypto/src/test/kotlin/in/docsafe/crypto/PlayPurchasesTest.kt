@@ -95,4 +95,30 @@ class PlayPurchasesTest {
         assertTrue(d.active)
         assertFalse(d.pending)
     }
+
+    @Test
+    fun lifetimeOneTimePurchaseUnlocksAndIsAcknowledged() {
+        val life = record(product = "docsafe_lifetime", autoRenewing = false, acknowledged = false, token = "life-1")
+        val d = Entitlement.evaluate(listOf(life), "docsafe_premium", "docsafe_lifetime", key)
+        assertTrue(d.active)
+        assertTrue(d.lifetime)
+        assertFalse(d.autoRenewing, "a one-time purchase never renews")
+        assertEquals(listOf("life-1"), d.toAcknowledge)
+
+        // Forged or pending lifetime purchases never unlock.
+        val forged = record(product = "docsafe_lifetime", signature = sign("x", other))
+        assertFalse(Entitlement.evaluate(listOf(forged), "docsafe_premium", "docsafe_lifetime", key).active)
+        val pending = record(product = "docsafe_lifetime", state = PurchaseRecord.PENDING)
+        val p = Entitlement.evaluate(listOf(pending), "docsafe_premium", "docsafe_lifetime", key)
+        assertFalse(p.active)
+        assertTrue(p.pending)
+
+        // Lifetime is ignored when no lifetime product is configured.
+        assertFalse(Entitlement.evaluate(listOf(life), "docsafe_premium", key).active)
+
+        // Subscription + lifetime: active, lifetime, still reports the renewing sub.
+        val both = Entitlement.evaluate(listOf(record(), life), "docsafe_premium", "docsafe_lifetime", key)
+        assertTrue(both.active && both.lifetime && both.autoRenewing)
+    }
 }
+

@@ -2087,4 +2087,28 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get showNamesBody =>
       'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.';
+
+  @override
+  String get premiumLifetimeLabel => 'Lifetime';
+
+  @override
+  String premiumOneTimePrice(String price) {
+    return '$price once';
+  }
+
+  @override
+  String get premiumLifetimeNote =>
+      'Pay once. No subscription, nothing renews.';
+
+  @override
+  String get premiumLifetimeActive =>
+      'Lifetime Premium: paid once, it never expires on this Google account.';
+
+  @override
+  String get premiumLifetimeLegal =>
+      'One-time payment through Google Play to your Google account. It does not renew. Restore it on a new phone with Restore purchases.';
+
+  @override
+  String get premiumLifetimeAlsoSub =>
+      'You also have a subscription. Cancel it in Google Play so you are not charged again.';
 }

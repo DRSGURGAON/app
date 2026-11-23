@@ -245,7 +245,9 @@ data class PlanOffer (
   /** ISO 8601 period of the recurring price, e.g. P1M or P1Y. */
   val billingPeriod: String,
   /** ISO 8601 period of a free trial, e.g. P7D, if this offer has one. */
-  val freeTrialPeriod: String? = null
+  val freeTrialPeriod: String? = null,
+  /** One-time purchase (Lifetime): [billingPeriod] is empty, nothing renews. */
+  val oneTime: Boolean
 )
  {
   companion object {
@@ -257,7 +259,8 @@ data class PlanOffer (
       val currencyCode = pigeonVar_list[4] as String
       val billingPeriod = pigeonVar_list[5] as String
       val freeTrialPeriod = pigeonVar_list[6] as String?
-      return PlanOffer(basePlanId, offerToken, formattedPrice, priceMicros, currencyCode, billingPeriod, freeTrialPeriod)
+      val oneTime = pigeonVar_list[7] as Boolean
+      return PlanOffer(basePlanId, offerToken, formattedPrice, priceMicros, currencyCode, billingPeriod, freeTrialPeriod, oneTime)
     }
   }
   fun toList(): List<Any?> {
@@ -269,6 +272,7 @@ data class PlanOffer (
       currencyCode,
       billingPeriod,
       freeTrialPeriod,
+      oneTime,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -279,7 +283,7 @@ data class PlanOffer (
       return true
     }
     val other = other as PlanOffer
-    return BillingApiPigeonUtils.deepEquals(this.basePlanId, other.basePlanId) && BillingApiPigeonUtils.deepEquals(this.offerToken, other.offerToken) && BillingApiPigeonUtils.deepEquals(this.formattedPrice, other.formattedPrice) && BillingApiPigeonUtils.deepEquals(this.priceMicros, other.priceMicros) && BillingApiPigeonUtils.deepEquals(this.currencyCode, other.currencyCode) && BillingApiPigeonUtils.deepEquals(this.billingPeriod, other.billingPeriod) && BillingApiPigeonUtils.deepEquals(this.freeTrialPeriod, other.freeTrialPeriod)
+    return BillingApiPigeonUtils.deepEquals(this.basePlanId, other.basePlanId) && BillingApiPigeonUtils.deepEquals(this.offerToken, other.offerToken) && BillingApiPigeonUtils.deepEquals(this.formattedPrice, other.formattedPrice) && BillingApiPigeonUtils.deepEquals(this.priceMicros, other.priceMicros) && BillingApiPigeonUtils.deepEquals(this.currencyCode, other.currencyCode) && BillingApiPigeonUtils.deepEquals(this.billingPeriod, other.billingPeriod) && BillingApiPigeonUtils.deepEquals(this.freeTrialPeriod, other.freeTrialPeriod) && BillingApiPigeonUtils.deepEquals(this.oneTime, other.oneTime)
   }
 
   override fun hashCode(): Int {
@@ -291,10 +295,11 @@ data class PlanOffer (
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.currencyCode)
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.billingPeriod)
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.freeTrialPeriod)
+    result = 31 * result + BillingApiPigeonUtils.deepHash(this.oneTime)
     return result
   }
   override fun toString(): String {
-    return "PlanOffer(basePlanId=$basePlanId, offerToken=$offerToken, formattedPrice=$formattedPrice, priceMicros=$priceMicros, currencyCode=$currencyCode, billingPeriod=$billingPeriod, freeTrialPeriod=$freeTrialPeriod)"
+    return "PlanOffer(basePlanId=$basePlanId, offerToken=$offerToken, formattedPrice=$formattedPrice, priceMicros=$priceMicros, currencyCode=$currencyCode, billingPeriod=$billingPeriod, freeTrialPeriod=$freeTrialPeriod, oneTime=$oneTime)"
   }
 }
 
@@ -303,7 +308,9 @@ data class EntitlementInfo (
   val active: Boolean,
   /** A purchase is waiting for payment (e.g. cash or slow UPI). */
   val pending: Boolean,
-  val autoRenewing: Boolean
+  val autoRenewing: Boolean,
+  /** Premium comes from the one-time Lifetime purchase. */
+  val lifetime: Boolean
 )
  {
   companion object {
@@ -311,7 +318,8 @@ data class EntitlementInfo (
       val active = pigeonVar_list[0] as Boolean
       val pending = pigeonVar_list[1] as Boolean
       val autoRenewing = pigeonVar_list[2] as Boolean
-      return EntitlementInfo(active, pending, autoRenewing)
+      val lifetime = pigeonVar_list[3] as Boolean
+      return EntitlementInfo(active, pending, autoRenewing, lifetime)
     }
   }
   fun toList(): List<Any?> {
@@ -319,6 +327,7 @@ data class EntitlementInfo (
       active,
       pending,
       autoRenewing,
+      lifetime,
     )
   }
   override fun equals(other: Any?): Boolean {
@@ -329,7 +338,7 @@ data class EntitlementInfo (
       return true
     }
     val other = other as EntitlementInfo
-    return BillingApiPigeonUtils.deepEquals(this.active, other.active) && BillingApiPigeonUtils.deepEquals(this.pending, other.pending) && BillingApiPigeonUtils.deepEquals(this.autoRenewing, other.autoRenewing)
+    return BillingApiPigeonUtils.deepEquals(this.active, other.active) && BillingApiPigeonUtils.deepEquals(this.pending, other.pending) && BillingApiPigeonUtils.deepEquals(this.autoRenewing, other.autoRenewing) && BillingApiPigeonUtils.deepEquals(this.lifetime, other.lifetime)
   }
 
   override fun hashCode(): Int {
@@ -337,10 +346,11 @@ data class EntitlementInfo (
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.active)
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.pending)
     result = 31 * result + BillingApiPigeonUtils.deepHash(this.autoRenewing)
+    result = 31 * result + BillingApiPigeonUtils.deepHash(this.lifetime)
     return result
   }
   override fun toString(): String {
-    return "EntitlementInfo(active=$active, pending=$pending, autoRenewing=$autoRenewing)"
+    return "EntitlementInfo(active=$active, pending=$pending, autoRenewing=$autoRenewing, lifetime=$lifetime)"
   }
 }
 private open class BillingApiPigeonCodec : StandardMessageCodec() {
@@ -396,7 +406,10 @@ private open class BillingApiPigeonCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface BillingHostApi {
   suspend fun availability(): BillingAvailability
-  /** The Premium plans from Google Play, monthly first. Empty if none. */
+  /**
+   * The Premium plans from Google Play: subscriptions (monthly first), then
+   * the one-time Lifetime purchase if it exists. Empty if none.
+   */
   suspend fun plans(): List<PlanOffer>
   /** Opens Google Play's purchase sheet and waits for the result. */
   suspend fun purchase(basePlanId: String, offerToken: String): PurchaseResultCode
