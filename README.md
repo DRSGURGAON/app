@@ -1,5 +1,8 @@
 # DocSafe
 
+> **App name:** *Document Scanner Pro* (shown in the app, launcher, notifications, Play listing and privacy policy, in English for both languages). "DocSafe" remains the internal codename: package `in.docsafe.app`, Play product ids `docsafe_premium` / `docsafe_lifetime`, source code and the bundled fallback font family names ("DocSafe Sans" etc.).
+
+
 **Your Documents. Your Privacy. One Secure Place.**
 
 DocSafe is a privacy-first, offline document vault for Android, built for Indian users

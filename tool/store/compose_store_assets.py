@@ -20,12 +20,12 @@ BOTTOM = (0x07, 0x10, 0x3A)
 
 SHOTS = [
     ("01-home", "Your documents, encrypted on your phone", "आपके दस्तावेज़, आपके फ़ोन पर एन्क्रिप्टेड"),
+    ("02-home-scrolled", "Categories at a glance", "एक नज़र में सभी श्रेणियाँ"),
     ("03-vault", "Organised by category, folder and tag", "श्रेणी, फ़ोल्डर और टैग से व्यवस्थित"),
     ("04-details", "Expiry dates and reminders", "समाप्ति तारीख और रिमाइंडर"),
     ("06-tools", "PDF tools that work offline", "बिना इंटरनेट चलने वाले PDF टूल्स"),
     ("07-reminders", "Never miss a renewal", "कोई रिन्यूअल न छूटे"),
     ("11-lock", "PIN and fingerprint lock", "PIN और फ़िंगरप्रिंट लॉक"),
-    ("10-onboarding", "No account. No cloud. No ads.", "न खाता, न क्लाउड, न विज्ञापन"),
     ("21-premium-plans", "Premium: merge, split and sign PDFs", "प्रीमियम: PDF जोड़ें, अलग करें, साइन करें"),
 ]
 
@@ -123,9 +123,10 @@ def feature_graphic(out):
     ImageDraw.Draw(mask).rounded_rectangle((0, 0, 300, 300), radius=72, fill=255)
     canvas.paste(icon, (90, 100), mask)
     draw = ImageDraw.Draw(canvas)
-    draw.text((450, 150), "DocSafe", font=font(False, 96), fill="white")
-    draw.text((452, 270), "Your documents. Your privacy.", font=font(False, 34), fill=(0xC9, 0xD2, 0xFF))
-    draw.text((452, 318), "One secure place.", font=font(False, 34), fill=(0xC9, 0xD2, 0xFF))
+    draw.text((450, 120), "Document", font=font(False, 76), fill="white")
+    draw.text((450, 205), "Scanner Pro", font=font(False, 76), fill="white")
+    draw.text((452, 310), "Scan, encrypt and keep your", font=font(False, 32), fill=(0xC9, 0xD2, 0xFF))
+    draw.text((452, 354), "documents on your phone.", font=font(False, 32), fill=(0xC9, 0xD2, 0xFF))
     canvas.save(out, optimize=True)
 
 

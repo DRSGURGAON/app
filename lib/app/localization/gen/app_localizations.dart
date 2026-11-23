@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appName.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe'**
+  /// **'Document Scanner Pro'**
   String get appName;
 
   /// No description provided for @tagline.
@@ -137,7 +137,7 @@ abstract class AppLocalizations {
   /// No description provided for @startupErrorTitle.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe could not start securely'**
+  /// **'Document Scanner Pro could not start securely'**
   String get startupErrorTitle;
 
   /// No description provided for @startupErrorBody.
@@ -173,7 +173,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingLockBody.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe locks itself when you leave it. Unlock with your PIN or fingerprint.'**
+  /// **'Document Scanner Pro locks itself when you leave it. Unlock with your PIN or fingerprint.'**
   String get onboardingLockBody;
 
   /// No description provided for @onboardingBackupTitle.
@@ -185,13 +185,13 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingBackupBody.
   ///
   /// In en, this message translates to:
-  /// **'The encryption keys never leave this phone. If the phone is lost or reset, the app is uninstalled or its data is cleared, documents stored only in DocSafe cannot be recovered — not even with your PIN.'**
+  /// **'The encryption keys never leave this phone. If the phone is lost or reset, the app is uninstalled or its data is cleared, documents stored only in Document Scanner Pro cannot be recovered — not even with your PIN.'**
   String get onboardingBackupBody;
 
   /// No description provided for @onboardingNotDigiLocker.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe is a private storage app. It is not DigiLocker and does not verify documents.'**
+  /// **'Document Scanner Pro is a private storage app. It is not DigiLocker and does not verify documents.'**
   String get onboardingNotDigiLocker;
 
   /// No description provided for @onboardingAcknowledge.
@@ -215,7 +215,7 @@ abstract class AppLocalizations {
   /// No description provided for @pinCreateSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'You will use it to open DocSafe.'**
+  /// **'You will use it to open Document Scanner Pro.'**
   String get pinCreateSubtitle;
 
   /// No description provided for @pinConfirmTitle.
@@ -335,7 +335,7 @@ abstract class AppLocalizations {
   /// No description provided for @biometricPromptUnlockTitle.
   ///
   /// In en, this message translates to:
-  /// **'Unlock DocSafe'**
+  /// **'Unlock Document Scanner Pro'**
   String get biometricPromptUnlockTitle;
 
   /// No description provided for @biometricPromptEnableTitle.
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// No description provided for @vaultImportedDuplicate.
   ///
   /// In en, this message translates to:
-  /// **'Saved. You already have an identical document in DocSafe.'**
+  /// **'Saved. You already have an identical document in Document Scanner Pro.'**
   String get vaultImportedDuplicate;
 
   /// No description provided for @vaultLoadError.
@@ -533,7 +533,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorLocked.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe is locked. Unlock it and try again.'**
+  /// **'Document Scanner Pro is locked. Unlock it and try again.'**
   String get errorLocked;
 
   /// No description provided for @errorBusy.
@@ -1247,7 +1247,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyLocalOnly.
   ///
   /// In en, this message translates to:
-  /// **'Everything stays on this phone. DocSafe has no account, no servers, no ads and no analytics.'**
+  /// **'Everything stays on this phone. Document Scanner Pro has no account, no servers, no ads and no analytics.'**
   String get privacyLocalOnly;
 
   /// No description provided for @privacyEncryption.
@@ -1265,7 +1265,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyScreen.
   ///
   /// In en, this message translates to:
-  /// **'Screenshots and the recent-apps preview are blocked inside DocSafe.'**
+  /// **'Screenshots and the recent-apps preview are blocked inside Document Scanner Pro.'**
   String get privacyScreen;
 
   /// No description provided for @privacyKeyProtection.
@@ -1283,7 +1283,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyLimitRoot.
   ///
   /// In en, this message translates to:
-  /// **'On a rooted or compromised phone, malware could reach your documents while DocSafe is unlocked.'**
+  /// **'On a rooted or compromised phone, malware could reach your documents while Document Scanner Pro is unlocked.'**
   String get privacyLimitRoot;
 
   /// No description provided for @privacyLimitExport.
@@ -1391,7 +1391,7 @@ abstract class AppLocalizations {
   /// No description provided for @eraseBody.
   ///
   /// In en, this message translates to:
-  /// **'This permanently deletes every document, folder, tag and setting in DocSafe, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.'**
+  /// **'This permanently deletes every document, folder, tag and setting in Document Scanner Pro, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.'**
   String get eraseBody;
 
   /// No description provided for @eraseTypeToConfirm.
@@ -1421,7 +1421,7 @@ abstract class AppLocalizations {
   /// No description provided for @eraseForgotBody.
   ///
   /// In en, this message translates to:
-  /// **'Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.'**
+  /// **'Without the PIN, Document Scanner Pro cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.'**
   String get eraseForgotBody;
 
   /// No description provided for @erasing.
@@ -1595,7 +1595,7 @@ abstract class AppLocalizations {
   /// No description provided for @scanPrivacyNote.
   ///
   /// In en, this message translates to:
-  /// **'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when DocSafe locks.'**
+  /// **'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when Document Scanner Pro locks.'**
   String get scanPrivacyNote;
 
   /// No description provided for @scanPreviewTitle.
@@ -2063,7 +2063,7 @@ abstract class AppLocalizations {
   /// No description provided for @annotateAckBody.
   ///
   /// In en, this message translates to:
-  /// **'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocSafe saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.'**
+  /// **'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocument Scanner Pro saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.'**
   String get annotateAckBody;
 
   /// No description provided for @annotateAckCheck.
@@ -2129,7 +2129,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumTitle.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe Premium'**
+  /// **'Premium'**
   String get premiumTitle;
 
   /// No description provided for @premiumLocked.
@@ -2177,7 +2177,7 @@ abstract class AppLocalizations {
   /// No description provided for @annotatedNote.
   ///
   /// In en, this message translates to:
-  /// **'Annotated copy of “{title}”, made in DocSafe. This is not the original document.'**
+  /// **'Annotated copy of “{title}”, made in Document Scanner Pro. This is not the original document.'**
   String annotatedNote(String title);
 
   /// No description provided for @navReminders.
@@ -2459,13 +2459,13 @@ abstract class AppLocalizations {
   /// No description provided for @backupIntro.
   ///
   /// In en, this message translates to:
-  /// **'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install DocSafe and restore it with your backup password.'**
+  /// **'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install Document Scanner Pro and restore it with your backup password.'**
   String get backupIntro;
 
   /// No description provided for @backupPasswordWarning.
   ///
   /// In en, this message translates to:
-  /// **'The backup is locked with a separate backup password (not your PIN). DocSafe cannot recover it: if you forget it, the backup can never be opened.'**
+  /// **'The backup is locked with a separate backup password (not your PIN). Document Scanner Pro cannot recover it: if you forget it, the backup can never be opened.'**
   String get backupPasswordWarning;
 
   /// No description provided for @backupNotIncluded.
@@ -2561,7 +2561,7 @@ abstract class AppLocalizations {
   /// No description provided for @errorBackupInvalid.
   ///
   /// In en, this message translates to:
-  /// **'This is not a DocSafe backup, or it was made by a newer version of DocSafe.'**
+  /// **'This is not a Document Scanner Pro backup, or it was made by a newer version of Document Scanner Pro.'**
   String get errorBackupInvalid;
 
   /// No description provided for @backupLast.
@@ -2591,7 +2591,7 @@ abstract class AppLocalizations {
   /// No description provided for @restoreSummary.
   ///
   /// In en, this message translates to:
-  /// **'{restored} documents restored. {duplicates} were already in DocSafe.'**
+  /// **'{restored} documents restored. {duplicates} were already in Document Scanner Pro.'**
   String restoreSummary(int restored, int duplicates);
 
   /// No description provided for @restoreMissing.
@@ -2711,7 +2711,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumPrivacy.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe has no server and never sees your payment details. Your documents stay on this phone.'**
+  /// **'Document Scanner Pro has no server and never sees your payment details. Your documents stay on this phone.'**
   String get premiumPrivacy;
 
   /// No description provided for @premiumActiveTitle.
@@ -2723,7 +2723,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumActiveBody.
   ///
   /// In en, this message translates to:
-  /// **'Thank you for supporting DocSafe.'**
+  /// **'Thank you for supporting Document Scanner Pro.'**
   String get premiumActiveBody;
 
   /// No description provided for @premiumEndsNote.
@@ -2753,7 +2753,7 @@ abstract class AppLocalizations {
   /// No description provided for @premiumNotConfigured.
   ///
   /// In en, this message translates to:
-  /// **'Purchases aren\'t enabled in this build of DocSafe.'**
+  /// **'Purchases aren\'t enabled in this build of Document Scanner Pro.'**
   String get premiumNotConfigured;
 
   /// No description provided for @premiumNoPlans.
@@ -2795,7 +2795,7 @@ abstract class AppLocalizations {
   /// No description provided for @settingsPremium.
   ///
   /// In en, this message translates to:
-  /// **'DocSafe Premium'**
+  /// **'Premium'**
   String get settingsPremium;
 
   /// No description provided for @settingsPremiumActive.
@@ -2969,7 +2969,7 @@ abstract class AppLocalizations {
   /// No description provided for @editTextFontInvalid.
   ///
   /// In en, this message translates to:
-  /// **'This file is not a font DocSafe can use.'**
+  /// **'This file is not a font Document Scanner Pro can use.'**
   String get editTextFontInvalid;
 
   /// No description provided for @editTextNoUserFonts.
@@ -3473,13 +3473,13 @@ abstract class AppLocalizations {
   /// No description provided for @photosDiscardBody.
   ///
   /// In en, this message translates to:
-  /// **'The pages will be deleted from DocSafe. Photos in your gallery are not changed. Nothing has been saved.'**
+  /// **'The pages will be deleted from Document Scanner Pro. Photos in your gallery are not changed. Nothing has been saved.'**
   String get photosDiscardBody;
 
   /// No description provided for @photosPrivacyNote.
   ///
   /// In en, this message translates to:
-  /// **'Photos are copied into DocSafe and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when DocSafe locks.'**
+  /// **'Photos are copied into Document Scanner Pro and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when Document Scanner Pro locks.'**
   String get photosPrivacyNote;
 
   /// No description provided for @photosSaveTitle.
@@ -3533,7 +3533,7 @@ abstract class AppLocalizations {
   /// No description provided for @showNamesBody.
   ///
   /// In en, this message translates to:
-  /// **'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.'**
+  /// **'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while Document Scanner Pro is locked.'**
   String get showNamesBody;
 
   /// No description provided for @premiumLifetimeLabel.

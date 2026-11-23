@@ -33,7 +33,9 @@ class _ExportAllScreenState extends ConsumerState<ExportAllScreen> {
       final r = await ref
           .read(lockControllerProvider.notifier)
           .runWithoutAutoLock(
-            () => repo.exportAll('DocSafe export ${isoDate(DateTime.now())}'),
+            () => repo.exportAll(
+              'Document Scanner Pro export ${isoDate(DateTime.now())}',
+            ),
           );
       if (mounted) setState(() => _result = r);
     } on SecurityFailure catch (e) {

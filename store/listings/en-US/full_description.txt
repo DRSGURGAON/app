@@ -1,8 +1,8 @@
-DocSafe keeps your important documents — ID cards, licenses, insurance policies, bills, certificates and marksheets — encrypted on your own phone, ready when you need them.
+Document Scanner Pro keeps your important documents — ID cards, licenses, insurance policies, bills, certificates and marksheets — encrypted on your own phone, ready when you need them.
 
 PRIVATE BY DESIGN
-• Everything stays on your phone. No account, no sign-in, no DocSafe servers.
-• DocSafe has no internet permission, so it cannot upload your files.
+• Everything stays on your phone. No account, no sign-in, no Document Scanner Pro servers.
+• Document Scanner Pro has no internet permission, so it cannot upload your files.
 • No ads, no analytics, no tracking.
 
 STRONG PROTECTION
@@ -27,11 +27,11 @@ YOUR BACKUP, YOUR CHOICE
 • A strength meter helps you pick a password that is hard to guess, and an optional reminder on the home screen tells you when a new backup is due.
 
 HINDI AND ENGLISH
-• DocSafe follows your phone's language and can be switched anytime.
+• Document Scanner Pro follows your phone's language and can be switched anytime.
 
-DOCSAFE PREMIUM
+PREMIUM
 Monthly or yearly subscription, or a one-time Lifetime purchase, through Google Play: Edit text, merge, split and compress PDFs, Annotate & Sign, search inside documents, advanced filters, batch actions and unlimited reminders. Prices are shown in the app before you buy. Cancel anytime in Google Play.
 
 PLEASE NOTE
-• DocSafe is a private storage app. It is not DigiLocker, is not affiliated with any government, and does not verify documents.
-• Your keys never leave the phone. If you lose the phone, reset it or forget your PIN, documents stored only in DocSafe cannot be recovered — keep an encrypted backup.
+• Document Scanner Pro is a private storage app. It is not DigiLocker, is not affiliated with any government, and does not verify documents.
+• Your keys never leave the phone. If you lose the phone, reset it or forget your PIN, documents stored only in Document Scanner Pro cannot be recovered — keep an encrypted backup.

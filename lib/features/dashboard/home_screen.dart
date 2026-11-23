@@ -173,9 +173,17 @@ class _Hero extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          l.appName,
-                          style: text.titleLarge?.copyWith(color: Colors.white),
+                        // One line: shrinks on small screens / large text.
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: AlignmentDirectional.centerStart,
+                          child: Text(
+                            l.appName,
+                            maxLines: 1,
+                            style: text.titleLarge?.copyWith(
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                         if (documentCount != null)
                           Text(

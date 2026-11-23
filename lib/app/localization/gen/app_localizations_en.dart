@@ -10,7 +10,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appName => 'DocSafe';
+  String get appName => 'Document Scanner Pro';
 
   @override
   String get tagline => 'Your Documents. Your Privacy. One Secure Place.';
@@ -28,7 +28,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashLoading => 'Securing your vault…';
 
   @override
-  String get startupErrorTitle => 'DocSafe could not start securely';
+  String get startupErrorTitle =>
+      'Document Scanner Pro could not start securely';
 
   @override
   String get startupErrorBody =>
@@ -49,18 +50,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get onboardingLockBody =>
-      'DocSafe locks itself when you leave it. Unlock with your PIN or fingerprint.';
+      'Document Scanner Pro locks itself when you leave it. Unlock with your PIN or fingerprint.';
 
   @override
   String get onboardingBackupTitle => 'Keep your own copies';
 
   @override
   String get onboardingBackupBody =>
-      'The encryption keys never leave this phone. If the phone is lost or reset, the app is uninstalled or its data is cleared, documents stored only in DocSafe cannot be recovered — not even with your PIN.';
+      'The encryption keys never leave this phone. If the phone is lost or reset, the app is uninstalled or its data is cleared, documents stored only in Document Scanner Pro cannot be recovered — not even with your PIN.';
 
   @override
   String get onboardingNotDigiLocker =>
-      'DocSafe is a private storage app. It is not DigiLocker and does not verify documents.';
+      'Document Scanner Pro is a private storage app. It is not DigiLocker and does not verify documents.';
 
   @override
   String get onboardingAcknowledge =>
@@ -73,7 +74,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pinCreateTitle => 'Create a 6-digit PIN';
 
   @override
-  String get pinCreateSubtitle => 'You will use it to open DocSafe.';
+  String get pinCreateSubtitle =>
+      'You will use it to open Document Scanner Pro.';
 
   @override
   String get pinConfirmTitle => 'Confirm your PIN';
@@ -141,7 +143,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get biometricFailed => 'Biometric unlock did not work. Use your PIN.';
 
   @override
-  String get biometricPromptUnlockTitle => 'Unlock DocSafe';
+  String get biometricPromptUnlockTitle => 'Unlock Document Scanner Pro';
 
   @override
   String get biometricPromptEnableTitle => 'Enable biometric unlock';
@@ -209,7 +211,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get vaultImportedDuplicate =>
-      'Saved. You already have an identical document in DocSafe.';
+      'Saved. You already have an identical document in Document Scanner Pro.';
 
   @override
   String get vaultLoadError => 'Your documents could not be loaded.';
@@ -261,7 +263,8 @@ class AppLocalizationsEn extends AppLocalizations {
       'This phone\'s security keys are unavailable, so documents cannot be decrypted.';
 
   @override
-  String get errorLocked => 'DocSafe is locked. Unlock it and try again.';
+  String get errorLocked =>
+      'Document Scanner Pro is locked. Unlock it and try again.';
 
   @override
   String get errorBusy => 'Another file picker is already open.';
@@ -659,7 +662,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyLocalOnly =>
-      'Everything stays on this phone. DocSafe has no account, no servers, no ads and no analytics.';
+      'Everything stays on this phone. Document Scanner Pro has no account, no servers, no ads and no analytics.';
 
   @override
   String get privacyEncryption =>
@@ -671,7 +674,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyScreen =>
-      'Screenshots and the recent-apps preview are blocked inside DocSafe.';
+      'Screenshots and the recent-apps preview are blocked inside Document Scanner Pro.';
 
   @override
   String get privacyKeyProtection => 'Key protection on this phone';
@@ -681,7 +684,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyLimitRoot =>
-      'On a rooted or compromised phone, malware could reach your documents while DocSafe is unlocked.';
+      'On a rooted or compromised phone, malware could reach your documents while Document Scanner Pro is unlocked.';
 
   @override
   String get privacyLimitExport => 'Exported files are not encrypted.';
@@ -746,7 +749,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eraseBody =>
-      'This permanently deletes every document, folder, tag and setting in DocSafe, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.';
+      'This permanently deletes every document, folder, tag and setting in Document Scanner Pro, your PIN, biometric unlock and the encryption keys. It cannot be undone. Export anything you want to keep first.';
 
   @override
   String eraseTypeToConfirm(String word) {
@@ -764,7 +767,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eraseForgotBody =>
-      'Without the PIN, DocSafe cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.';
+      'Without the PIN, Document Scanner Pro cannot be unlocked and its documents cannot be recovered. You can erase everything and start again.';
 
   @override
   String get erasing => 'Erasing…';
@@ -869,7 +872,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get scanPrivacyNote =>
-      'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when DocSafe locks.';
+      'Scanning runs on this phone through Google Play services. Pages are encrypted when you save; unsaved pages are deleted when Document Scanner Pro locks.';
 
   @override
   String scanPreviewTitle(int number, int total) {
@@ -1141,7 +1144,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get annotateAckBody =>
-      'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocSafe saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.';
+      'Use this only on your own forms and documents. Changing official or government documents, certificates, or anyone else\'s signature can be illegal.\n\nDocument Scanner Pro saves a NEW copy labelled as annotated; the original stays unchanged. On pages you marked, text can no longer be selected, and anything under a Cover mark is permanently removed from the copy.';
 
   @override
   String get annotateAckCheck => 'I understand, and this is my own document';
@@ -1176,7 +1179,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signatureChange => 'Change signature';
 
   @override
-  String get premiumTitle => 'DocSafe Premium';
+  String get premiumTitle => 'Premium';
 
   @override
   String premiumLocked(String feature) {
@@ -1207,7 +1210,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String annotatedNote(String title) {
-    return 'Annotated copy of “$title”, made in DocSafe. This is not the original document.';
+    return 'Annotated copy of “$title”, made in Document Scanner Pro. This is not the original document.';
   }
 
   @override
@@ -1375,11 +1378,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupIntro =>
-      'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install DocSafe and restore it with your backup password.';
+      'Make one encrypted backup file of all your documents and their details. In the next step choose where to keep it — Google Drive, a USB drive or any folder. On a new phone, install Document Scanner Pro and restore it with your backup password.';
 
   @override
   String get backupPasswordWarning =>
-      'The backup is locked with a separate backup password (not your PIN). DocSafe cannot recover it: if you forget it, the backup can never be opened.';
+      'The backup is locked with a separate backup password (not your PIN). Document Scanner Pro cannot recover it: if you forget it, the backup can never be opened.';
 
   @override
   String get backupNotIncluded =>
@@ -1431,7 +1434,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get errorBackupInvalid =>
-      'This is not a DocSafe backup, or it was made by a newer version of DocSafe.';
+      'This is not a Document Scanner Pro backup, or it was made by a newer version of Document Scanner Pro.';
 
   @override
   String backupLast(String date) {
@@ -1467,7 +1470,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String restoreSummary(int restored, int duplicates) {
-    return '$restored documents restored. $duplicates were already in DocSafe.';
+    return '$restored documents restored. $duplicates were already in Document Scanner Pro.';
   }
 
   @override
@@ -1550,13 +1553,14 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumPrivacy =>
-      'DocSafe has no server and never sees your payment details. Your documents stay on this phone.';
+      'Document Scanner Pro has no server and never sees your payment details. Your documents stay on this phone.';
 
   @override
   String get premiumActiveTitle => 'Premium is active';
 
   @override
-  String get premiumActiveBody => 'Thank you for supporting DocSafe.';
+  String get premiumActiveBody =>
+      'Thank you for supporting Document Scanner Pro.';
 
   @override
   String get premiumEndsNote =>
@@ -1575,7 +1579,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get premiumNotConfigured =>
-      'Purchases aren\'t enabled in this build of DocSafe.';
+      'Purchases aren\'t enabled in this build of Document Scanner Pro.';
 
   @override
   String get premiumNoPlans =>
@@ -1599,7 +1603,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'No active Premium subscription was found for this Google account.';
 
   @override
-  String get settingsPremium => 'DocSafe Premium';
+  String get settingsPremium => 'Premium';
 
   @override
   String get settingsPremiumActive => 'Active';
@@ -1706,7 +1710,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get editTextFontInvalid => 'This file is not a font DocSafe can use.';
+  String get editTextFontInvalid =>
+      'This file is not a font Document Scanner Pro can use.';
 
   @override
   String get editTextNoUserFonts => 'No fonts added yet.';
@@ -2044,11 +2049,11 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get photosDiscardBody =>
-      'The pages will be deleted from DocSafe. Photos in your gallery are not changed. Nothing has been saved.';
+      'The pages will be deleted from Document Scanner Pro. Photos in your gallery are not changed. Nothing has been saved.';
 
   @override
   String get photosPrivacyNote =>
-      'Photos are copied into DocSafe and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when DocSafe locks.';
+      'Photos are copied into Document Scanner Pro and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when Document Scanner Pro locks.';
 
   @override
   String get photosSaveTitle => 'Save PDF';
@@ -2086,7 +2091,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get showNamesBody =>
-      'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.';
+      'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while Document Scanner Pro is locked.';
 
   @override
   String get premiumLifetimeLabel => 'Lifetime';

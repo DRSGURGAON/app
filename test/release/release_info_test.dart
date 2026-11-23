@@ -63,7 +63,9 @@ void main() {
       expect(find.byType(PrivacyPolicyScreen), findsOneWidget);
       expect(
         find.text(
-          lang == 'hi' ? 'DocSafe गोपनीयता नीति' : 'DocSafe Privacy Policy',
+          lang == 'hi'
+              ? 'Document Scanner Pro गोपनीयता नीति'
+              : 'Document Scanner Pro Privacy Policy',
         ),
         findsOneWidget,
       );

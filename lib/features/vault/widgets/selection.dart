@@ -385,7 +385,7 @@ class _BatchBar extends ConsumerWidget {
           .read(lockControllerProvider.notifier)
           .runWithoutAutoLock(
             () => repo.exportMany(
-              'DocSafe export ${isoDate(DateTime.now())}',
+              'Document Scanner Pro export ${isoDate(DateTime.now())}',
               docs,
             ),
           );

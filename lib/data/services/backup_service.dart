@@ -157,7 +157,7 @@ class BackupService {
   Future<BackupSummary?> create(Uint8List password) async {
     final meta = await buildMetadata();
     final now = _clock();
-    final name = 'DocSafe-backup-${isoDate(now)}';
+    final name = 'DocumentScannerPro-backup-${isoDate(now)}';
     try {
       final summary = await _security.createBackup(
         name,
