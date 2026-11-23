@@ -1496,11 +1496,11 @@ class AppLocalizationsEn extends AppLocalizations {
       'Keep the recognised text so search finds words inside your documents.';
 
   @override
-  String get premiumReminders => 'Unlimited reminders';
+  String get premiumReminders => 'Unlimited and automatic reminders';
 
   @override
   String premiumRemindersDesc(int count) {
-    return 'The free plan has $count active reminders.';
+    return 'Automatic reminder 7 days before every expiry date. The free plan has $count active reminders you add yourself.';
   }
 
   @override
@@ -2062,4 +2062,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String photosLimitReached(int count) {
     return 'A document can have up to $count pages.';
   }
+
+  @override
+  String reminderNotifyExpiry(String title, String date) {
+    return '$title: expires on $date';
+  }
+
+  @override
+  String reminderNotifyCustom(String title) {
+    return '$title: reminder';
+  }
+
+  @override
+  String get autoExpiryTitle => 'Automatic expiry reminders';
+
+  @override
+  String autoExpiryBody(int days) {
+    return 'A notification $days days before every expiry date, without adding a reminder.';
+  }
+
+  @override
+  String get showNamesTitle => 'Show document names in notifications';
+
+  @override
+  String get showNamesBody =>
+      'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.';
 }

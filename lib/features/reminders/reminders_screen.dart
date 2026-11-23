@@ -11,12 +11,25 @@ import '../../core/entitlement/entitlement.dart';
 import '../../core/security/lock_controller.dart';
 import '../../data/repositories/reminder_repository.dart';
 import '../../data/repositories/text_rules.dart';
+import '../premium/premium_screen.dart';
 import 'reminder_widgets.dart';
 
 /// Whether notifications can be shown; re-checked when the app resumes.
 final notificationsEnabledProvider = FutureProvider.autoDispose<bool>(
   (ref) => ref.read(securityServiceProvider).notificationsEnabled(),
 );
+
+/// Reminder settings: automatic expiry reminders, document names in notifications.
+final reminderSettingsProvider =
+    FutureProvider.autoDispose<({bool autoExpiry, bool showNames})>((
+      ref,
+    ) async {
+      final repo = await ref.watch(reminderRepositoryProvider.future);
+      return (
+        autoExpiry: await repo.autoExpiryEnabled(),
+        showNames: await repo.showNamesInNotifications(),
+      );
+    });
 
 class RemindersScreen extends ConsumerStatefulWidget {
   const RemindersScreen({super.key});
@@ -76,6 +89,9 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
     final notificationsOn =
         ref.watch(notificationsEnabledProvider).value ?? true;
     final premium = ref.watch(premiumUnlockedProvider);
+    final settings = ref.watch(reminderSettingsProvider).value;
+    final autoOn = premium && (settings?.autoExpiry ?? true);
+    final namesOn = settings?.showNames ?? false;
     final today = isoDate(DateTime.now());
     final active = reminders
         .where((r) => r.date != null && r.date!.compareTo(today) >= 0)
@@ -88,7 +104,8 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
         children: [
-          if (reminders.isNotEmpty && !notificationsOn)
+          if ((reminders.isNotEmpty || (autoOn && upcoming.isNotEmpty)) &&
+              !notificationsOn)
             Card(
               margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
               color: theme.colorScheme.errorContainer,
@@ -110,15 +127,75 @@ class _RemindersScreenState extends ConsumerState<RemindersScreen>
                 ),
               ),
             ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Text(
-              l.remindersPrivacyNote,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+          Card(
+            margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            child: Column(
+              children: [
+                SwitchListTile(
+                  key: const Key('auto-expiry-switch'),
+                  secondary: Icon(
+                    premium
+                        ? Icons.notifications_active_outlined
+                        : Icons.lock_outline,
+                  ),
+                  title: Text(l.autoExpiryTitle),
+                  subtitle: Text(
+                    premium
+                        ? l.autoExpiryBody(autoExpiryReminderDays)
+                        : '${l.autoExpiryBody(autoExpiryReminderDays)} '
+                              '${l.premiumBadge}',
+                  ),
+                  value: autoOn,
+                  onChanged: (on) async {
+                    if (!premium) {
+                      await Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              PremiumScreen(feature: l.autoExpiryTitle),
+                        ),
+                      );
+                      return;
+                    }
+                    final repo = await ref.read(
+                      reminderRepositoryProvider.future,
+                    );
+                    await repo.setAutoExpiry(on);
+                    ref.invalidate(reminderSettingsProvider);
+                    if (on && context.mounted) {
+                      await ensureNotifications(context, ref);
+                      ref.invalidate(notificationsEnabledProvider);
+                    }
+                  },
+                ),
+                const Divider(height: 1),
+                SwitchListTile(
+                  key: const Key('show-names-switch'),
+                  secondary: const Icon(Icons.badge_outlined),
+                  title: Text(l.showNamesTitle),
+                  subtitle: Text(l.showNamesBody),
+                  isThreeLine: true,
+                  value: namesOn,
+                  onChanged: (on) async {
+                    final repo = await ref.read(
+                      reminderRepositoryProvider.future,
+                    );
+                    await repo.setShowNames(on);
+                    ref.invalidate(reminderSettingsProvider);
+                  },
+                ),
+              ],
             ),
           ),
+          if (!namesOn)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+              child: Text(
+                l.remindersPrivacyNote,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+            ),
           if (!premium)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),

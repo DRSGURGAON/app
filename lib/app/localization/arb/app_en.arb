@@ -759,8 +759,8 @@
   "premiumPdfToolsDesc": "Combine files, pull out pages and shrink PDFs, all on this phone.",
   "premiumOcrSearch": "Search inside documents",
   "premiumOcrSearchDesc": "Keep the recognised text so search finds words inside your documents.",
-  "premiumReminders": "Unlimited reminders",
-  "premiumRemindersDesc": "The free plan has {count} active reminders.",
+  "premiumReminders": "Unlimited and automatic reminders",
+  "premiumRemindersDesc": "Automatic reminder 7 days before every expiry date. The free plan has {count} active reminders you add yourself.",
   "premiumChoosePlan": "Choose a plan",
   "premiumMonthlyLabel": "Monthly",
   "premiumYearlyLabel": "Yearly",
@@ -1110,5 +1110,35 @@
         "type": "int"
       }
     }
-  }
+  },
+  "reminderNotifyExpiry": "{title}: expires on {date}",
+  "@reminderNotifyExpiry": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNotifyCustom": "{title}: reminder",
+  "@reminderNotifyCustom": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "autoExpiryTitle": "Automatic expiry reminders",
+  "autoExpiryBody": "A notification {days} days before every expiry date, without adding a reminder.",
+  "@autoExpiryBody": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "showNamesTitle": "Show document names in notifications",
+  "showNamesBody": "Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked."
 }

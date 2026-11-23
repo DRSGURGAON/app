@@ -32,6 +32,13 @@ object KeystoreKeys {
     const val KEK_ALIAS = "docsafe.kek.v1"
     const val HMAC_ALIAS = "docsafe.hmac.v1"
     const val BIOMETRIC_ALIAS = "docsafe.bio.v1"
+
+    /**
+     * AES-256-GCM key for reminder notification labels (document names, only if
+     * the user opts in). No user authentication: alarms fire while DocSafe is
+     * locked. Keeps the labels encrypted at rest outside the vault.
+     */
+    const val NOTIFY_ALIAS = "docsafe.notify.v1"
     private const val PROVIDER = "AndroidKeyStore"
 
     private val keyStore: KeyStore by lazy { KeyStore.getInstance(PROVIDER).apply { load(null) } }
@@ -56,6 +63,17 @@ object KeystoreKeys {
     }
 
     /** Creates a fresh biometric-bound key, replacing any previous one. */
+    @Synchronized
+    fun notifyKey(): SecretKey = existing(NOTIFY_ALIAS) ?: generate(NOTIFY_ALIAS, KeyProperties.KEY_ALGORITHM_AES) { strongBox ->
+        KeyGenParameterSpec.Builder(NOTIFY_ALIAS, KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+            .setKeySize(256)
+            .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+            .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+            .setRandomizedEncryptionRequired(true)
+            .apply { if (strongBox) setIsStrongBoxBacked(true) }
+            .build()
+    }
+
     @Synchronized
     fun newBiometricKey(): SecretKey {
         deleteBiometricKey()
@@ -90,7 +108,7 @@ object KeystoreKeys {
     /** Erase-all: destroys every DocSafe key. Data encrypted under them becomes unrecoverable. */
     @Synchronized
     fun deleteAll() {
-        for (alias in listOf(KEK_ALIAS, HMAC_ALIAS, BIOMETRIC_ALIAS)) {
+        for (alias in listOf(KEK_ALIAS, HMAC_ALIAS, BIOMETRIC_ALIAS, NOTIFY_ALIAS)) {
             if (keyStore.containsAlias(alias)) keyStore.deleteEntry(alias)
         }
     }

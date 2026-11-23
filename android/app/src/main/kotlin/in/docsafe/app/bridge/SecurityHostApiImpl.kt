@@ -414,11 +414,12 @@ class SecurityHostApiImpl(
         }
     }
 
-    override suspend fun setReminderSchedule(epochMillis: List<Long>) = guard {
+    override suspend fun setReminderSchedule(alarms: List<ReminderAlarm>) = guard {
         io {
             session.requireUnlocked()
-            if (epochMillis.size > ReminderScheduler.MAX_TIMES) throw InvalidInputException("Too many reminders")
-            reminders.setSchedule(epochMillis)
+            if (alarms.size > ReminderScheduler.MAX_TIMES) throw InvalidInputException("Too many reminders")
+            if (alarms.any { (it.label?.length ?: 0) > ReminderScheduler.MAX_LABEL }) throw InvalidInputException("Label too long")
+            reminders.setAlarms(alarms.map { ReminderScheduler.Alarm(it.at, it.label) })
         }
     }
 

@@ -759,8 +759,8 @@
   "premiumPdfToolsDesc": "फ़ाइलें जोड़ें, पेज निकालें और PDF छोटे करें — सब इसी फ़ोन पर।",
   "premiumOcrSearch": "दस्तावेज़ों के अंदर खोजें",
   "premiumOcrSearchDesc": "पहचाना गया टेक्स्ट सहेजें ताकि खोज दस्तावेज़ों के अंदर के शब्द भी ढूँढ सके।",
-  "premiumReminders": "असीमित रिमाइंडर",
-  "premiumRemindersDesc": "फ़्री प्लान में {count} सक्रिय रिमाइंडर होते हैं।",
+  "premiumReminders": "असीमित और अपने-आप रिमाइंडर",
+  "premiumRemindersDesc": "हर समाप्ति तारीख से 7 दिन पहले अपने-आप रिमाइंडर। फ़्री प्लान में आप खुद {count} सक्रिय रिमाइंडर जोड़ सकते हैं।",
   "premiumChoosePlan": "प्लान चुनें",
   "premiumMonthlyLabel": "मासिक",
   "premiumYearlyLabel": "सालाना",
@@ -1002,5 +1002,11 @@
   "photosPrivacyNote": "फ़ोटो DocSafe में कॉपी होती हैं और सेव करने पर एन्क्रिप्ट होती हैं। असली फ़ोटो आपकी गैलरी में रहती हैं (कुछ कैमरा ऐप भी एक कॉपी रखते हैं) — अगर फ़ोन पर नहीं चाहिए तो उन्हें वहाँ से हटाएँ। बिना सेव किए पेज DocSafe लॉक होने पर हट जाते हैं।",
   "photosSaveTitle": "PDF सेव करें",
   "photosDefaultTitle": "फ़ोटो {date}",
-  "photosLimitReached": "एक दस्तावेज़ में ज़्यादा से ज़्यादा {count} पेज हो सकते हैं।"
+  "photosLimitReached": "एक दस्तावेज़ में ज़्यादा से ज़्यादा {count} पेज हो सकते हैं।",
+  "reminderNotifyExpiry": "{title}: {date} को समाप्त होगा",
+  "reminderNotifyCustom": "{title}: रिमाइंडर",
+  "autoExpiryTitle": "समाप्ति के अपने-आप रिमाइंडर",
+  "autoExpiryBody": "हर समाप्ति तारीख से {days} दिन पहले सूचना, बिना रिमाइंडर जोड़े।",
+  "showNamesTitle": "सूचना में दस्तावेज़ का नाम दिखाएँ",
+  "showNamesBody": "बंद: “एक दस्तावेज़ पर ध्यान देना है”। चालू: जैसे “Driving Licence: 10 दिस॰ को समाप्त होगा”। लॉक स्क्रीन पर कभी नहीं दिखता। नाम इस फ़ोन की एक key से एन्क्रिप्ट रहते हैं ताकि DocSafe लॉक होने पर भी सूचना में दिख सकें।"
 }

@@ -8,6 +8,7 @@ import 'package:docsafe/app/app.dart';
 import 'package:docsafe/app/localization/gen/app_localizations_hi.dart';
 import 'package:docsafe/core/security/lock_controller.dart';
 import 'package:docsafe/core/security/security_failure.dart';
+import 'package:docsafe/core/security/security_service.dart';
 import 'package:docsafe/data/models/vault_document.dart';
 import 'package:docsafe/data/repositories/document_repository.dart';
 import 'package:docsafe/data/repositories/document_text_repository.dart';
@@ -126,7 +127,9 @@ void main() {
     await container.read(lockControllerProvider.notifier).lock();
     await settleFor(tester, seconds: 2);
     await expectLater(
-      security.setReminderSchedule(times),
+      security.setReminderSchedule([
+        for (final t in times) ReminderAlarm(at: t),
+      ]),
       throwsA(
         isA<SecurityFailure>().having(
           (e) => e.code,

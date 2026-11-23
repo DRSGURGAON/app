@@ -14,7 +14,7 @@ STRONG PROTECTION
 ORGANIZED AND QUICK TO FIND
 • Categories, folders, tags, favorites and fast search.
 • Premium: advanced filters (type, expiry, date added, category, tag) and batch actions — select many documents to favorite, move, categorize, export or delete at once.
-• Issue and expiry dates with reminders before a document expires. Reminder notifications never show the document name.
+• Issue and expiry dates with reminders before a document expires (Premium: automatically 7 days before every expiry date). Notifications don't show document names unless you turn that on.
 • Scan paper documents into clean PDFs with the camera.
 • Read text from a document on the phone (OCR, Hindi and English) to suggest the category and expiry date.
 

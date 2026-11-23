@@ -154,6 +154,13 @@ class ExportSummary {
   int failed;
 }
 
+/// One reminder notification time (epoch ms) with an optional label.
+class ReminderAlarm {
+  ReminderAlarm({required this.at, this.label});
+  int at;
+  String? label;
+}
+
 /// A page produced by the document scanner (a JPEG in app-private cache).
 class ScannedPage {
   ScannedPage({required this.path, required this.width, required this.height});
@@ -395,10 +402,12 @@ abstract class SecurityHostApi {
   @async
   OcrResult recognizeText(String fileId, String mimeType, int maxPages);
 
-  /// Replaces the reminder schedule: epoch milliseconds only (the sole
-  /// reminder data kept outside the encrypted database). Requires unlock.
+  /// Replaces the reminder schedule. Each alarm is a time and, only if the
+  /// user turned on "Show document names in notifications", a short label
+  /// (stored encrypted with a Keystore key that needs no unlock, so it can be
+  /// shown while DocSafe is locked). Requires unlock.
   @async
-  void setReminderSchedule(List<int> epochMillis);
+  void setReminderSchedule(List<ReminderAlarm> alarms);
 
   /// Whether DocSafe may post notifications (permission + system switch).
   bool notificationsEnabled();

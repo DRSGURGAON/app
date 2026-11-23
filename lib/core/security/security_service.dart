@@ -11,6 +11,7 @@ export 'native/security_api.g.dart'
         BackupSummary,
         CompressionLevel,
         ImagePageSpec,
+        ReminderAlarm,
         DatabaseConfig,
         ExportItem,
         ExportSummary,
@@ -74,7 +75,7 @@ abstract interface class SecurityService {
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level);
   Future<ImportedFile> flattenPages(String fileId, List<PageOverlay> overlays);
   Future<OcrResult> recognizeText(String fileId, String mimeType, int maxPages);
-  Future<void> setReminderSchedule(List<int> epochMillis);
+  Future<void> setReminderSchedule(List<ReminderAlarm> alarms);
   Future<bool> notificationsEnabled();
   Future<bool> requestNotificationPermission();
   Future<void> openNotificationSettings();
@@ -259,8 +260,8 @@ class PigeonSecurityService implements SecurityService {
   ) => _guard(() => _api.recognizeText(fileId, mimeType, maxPages));
 
   @override
-  Future<void> setReminderSchedule(List<int> epochMillis) =>
-      _guard(() => _api.setReminderSchedule(epochMillis));
+  Future<void> setReminderSchedule(List<ReminderAlarm> alarms) =>
+      _guard(() => _api.setReminderSchedule(alarms));
 
   @override
   Future<bool> notificationsEnabled() => _guard(_api.notificationsEnabled);

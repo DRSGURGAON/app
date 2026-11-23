@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app/localization/display_names.dart' show formatIsoDate;
+import '../../app/localization/gen/app_localizations.dart';
+import '../../app/localization/locale_controller.dart';
 import '../../core/database/app_database.dart';
 import '../../core/database/database_provider.dart';
 import '../../core/entitlement/entitlement.dart';
@@ -16,6 +19,14 @@ const freeActiveReminderLimit = 3;
 
 /// Notifications fire at this local time on the reminder date.
 const reminderHour = 9;
+
+/// Premium: every document with an expiry date is reminded about this many
+/// days before it, without the user adding a reminder (can be turned off).
+const autoExpiryReminderDays = 7;
+
+/// Builds the notification text for one reminder when the user chose to show
+/// document names: ([title], expiry date or null for a custom reminder).
+typedef ReminderLabeler = String Function(String title, String? expiryIso);
 
 /// Lead times offered for expiry reminders (days before the expiry date).
 const expiryReminderOffsets = [30, 7, 1, 0];
@@ -221,7 +232,21 @@ class ReminderRepository {
   Stream<List<ExpiryItem>> watchUpcomingExpiry() =>
       _watchExpiry(expired: false);
 
-  Stream<List<ExpiryItem>> _watchExpiry({required bool expired}) {
+  Stream<List<ExpiryItem>> _watchExpiry({required bool expired}) =>
+      _expiryQuery(expired: expired).watch().map(_expiryItems);
+
+  List<ExpiryItem> _expiryItems(List<TypedResult> rows) => [
+    for (final r in rows)
+      ExpiryItem(
+        documentId: r.readTable(_db.documents).id,
+        title: r.readTable(_db.documents).title,
+        expiryDate: r.readTable(_db.documentMetadata).expiryDate!,
+      ),
+  ];
+
+  JoinedSelectStatement<HasResultSet, dynamic> _expiryQuery({
+    required bool expired,
+  }) {
     final today = _today;
     final q =
         _db.select(_db.documents).join([
@@ -248,41 +273,105 @@ class ReminderRepository {
                 ? OrderingTerm.desc(_db.documentMetadata.expiryDate)
                 : OrderingTerm.asc(_db.documentMetadata.expiryDate),
           ]);
-    return q.watch().map(
-      (rows) => [
-        for (final r in rows)
-          ExpiryItem(
-            documentId: r.readTable(_db.documents).id,
-            title: r.readTable(_db.documents).title,
-            expiryDate: r.readTable(_db.documentMetadata).expiryDate!,
-          ),
-      ],
-    );
+    return q;
+  }
+
+  // ------------------------------------------------------------- settings
+
+  static const _autoExpiryKey = 'reminders.autoExpiry';
+  static const _showNamesKey = 'reminders.showNames';
+
+  Future<bool> _flag(String key, bool fallback) async {
+    final row = await (_db.select(
+      _db.appSettings,
+    )..where((t) => t.key.equals(key))).getSingleOrNull();
+    return row == null ? fallback : row.value == '1';
+  }
+
+  Future<void> _setFlag(String key, bool value) => _db
+      .into(_db.appSettings)
+      .insertOnConflictUpdate(
+        AppSettingsCompanion.insert(key: key, value: value ? '1' : '0'),
+      );
+
+  /// Premium automatic reminders before every expiry date (default on).
+  Future<bool> autoExpiryEnabled() => _flag(_autoExpiryKey, true);
+
+  Future<void> setAutoExpiry(bool on) => _setFlag(_autoExpiryKey, on);
+
+  /// Show document names in notifications (default off).
+  Future<bool> showNamesInNotifications() => _flag(_showNamesKey, false);
+
+  Future<void> setShowNames(bool on) => _setFlag(_showNamesKey, on);
+
+  // ------------------------------------------------------------- schedule
+
+  /// Every future notification: the user's reminders plus, with Premium and
+  /// the setting on, one [autoExpiryReminderDays] before each expiry date.
+  /// Labels only if the user turned on names and a [labeler] is given.
+  Future<List<ReminderAlarm>> scheduleAlarms({ReminderLabeler? labeler}) async {
+    final now = _clock();
+    final names = labeler != null && await showNamesInNotifications();
+    final byTime = <int, Set<String>>{};
+    final seen = <(int, int)>{}; // (time, document): one line per document
+    void add(String date, int documentId, String title, String? expiry) {
+      final d = parseIsoDate(date);
+      final at = DateTime(d.year, d.month, d.day, reminderHour);
+      if (!at.isAfter(now)) return;
+      final t = at.millisecondsSinceEpoch;
+      final labels = byTime.putIfAbsent(t, () => {});
+      if (names && seen.add((t, documentId))) {
+        labels.add(labeler(title, expiry));
+      }
+    }
+
+    for (final r in await _all()) {
+      if (r.date == null) continue;
+      final expiry = r.kind == ReminderKind.expiry
+          ? _addDays(r.date!, r.offsetDays ?? 0)
+          : null;
+      add(r.date!, r.documentId, r.documentTitle, expiry);
+    }
+    if (isPremium() && await autoExpiryEnabled()) {
+      final rows = await _expiryQuery(expired: false).get();
+      for (final e in _expiryItems(rows)) {
+        add(
+          _minusDays(e.expiryDate, autoExpiryReminderDays),
+          e.documentId,
+          e.title,
+          e.expiryDate,
+        );
+      }
+    }
+    final times = byTime.keys.toList()..sort();
+    return [
+      for (final t in times)
+        ReminderAlarm(
+          at: t,
+          label: byTime[t]!.isEmpty ? null : byTime[t]!.join('\n'),
+        ),
+    ];
   }
 
   /// Epoch milliseconds (local [reminderHour]:00) of every future reminder.
-  Future<List<int>> scheduleTimes() async {
-    final now = _clock();
-    final times = <int>{};
-    for (final r in await _all()) {
-      if (r.date == null) continue;
-      final d = parseIsoDate(r.date!);
-      final at = DateTime(d.year, d.month, d.day, reminderHour);
-      if (at.isAfter(now)) times.add(at.millisecondsSinceEpoch);
-    }
-    return times.toList()..sort();
+  Future<List<int>> scheduleTimes() async => [
+    for (final a in await scheduleAlarms()) a.at,
+  ];
+
+  /// Hands the current schedule to the native scheduler.
+  Future<void> syncSchedule({ReminderLabeler? labeler}) async {
+    await _security.setReminderSchedule(await scheduleAlarms(labeler: labeler));
   }
 
-  /// Hands the current times to the native scheduler.
-  Future<void> syncSchedule() async {
-    await _security.setReminderSchedule(await scheduleTimes());
-  }
+  static String _addDays(String iso, int days) =>
+      isoDate(parseIsoDate(iso).add(Duration(days: days)));
 
   /// Tables whose changes can change the schedule.
   Stream<void> watchScheduleInputs() => _db
       .tableUpdates(
         TableUpdateQuery.onAllTables([
           _db.reminders,
+          _db.appSettings,
           _db.documentMetadata,
           _db.recentlyDeleted,
           _db.documents,
@@ -310,9 +399,22 @@ final reminderScheduleSyncProvider = Provider.autoDispose<void>((ref) {
   StreamSubscription<void>? sub;
   Timer? debounce;
   var disposed = false;
+  // Notification texts (only used if the user turned names on), in the app's
+  // language; dates formatted for that language.
+  String label(String title, String? expiry) {
+    final locale = ref.read(localeControllerProvider);
+    final l = lookupAppLocalizations(locale);
+    return expiry == null
+        ? l.reminderNotifyCustom(title)
+        : l.reminderNotifyExpiry(
+            title,
+            formatIsoDate(expiry, locale.toLanguageTag()),
+          );
+  }
+
   Future<void> sync(ReminderRepository repo) async {
     try {
-      await repo.syncSchedule();
+      await repo.syncSchedule(labeler: label);
     } catch (_) {
       // Locked meanwhile or DB closed: the next unlock syncs again.
     }
@@ -329,6 +431,14 @@ final reminderScheduleSyncProvider = Provider.autoDispose<void>((ref) {
       debounce = Timer(const Duration(milliseconds: 300), () => sync(repo));
     });
   }, fireImmediately: true);
+  // Premium (automatic reminders) and the language (labels) change the schedule.
+  void resync() {
+    final repo = ref.read(reminderRepositoryProvider).value;
+    if (repo != null && !disposed) unawaited(sync(repo));
+  }
+
+  ref.listen(premiumUnlockedProvider, (_, _) => resync());
+  ref.listen(localeControllerProvider, (_, _) => resync());
   ref.onDispose(() {
     disposed = true;
     debounce?.cancel();

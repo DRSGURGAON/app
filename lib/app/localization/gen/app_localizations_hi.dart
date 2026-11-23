@@ -1497,11 +1497,11 @@ class AppLocalizationsHi extends AppLocalizations {
       'पहचाना गया टेक्स्ट सहेजें ताकि खोज दस्तावेज़ों के अंदर के शब्द भी ढूँढ सके।';
 
   @override
-  String get premiumReminders => 'असीमित रिमाइंडर';
+  String get premiumReminders => 'असीमित और अपने-आप रिमाइंडर';
 
   @override
   String premiumRemindersDesc(int count) {
-    return 'फ़्री प्लान में $count सक्रिय रिमाइंडर होते हैं।';
+    return 'हर समाप्ति तारीख से 7 दिन पहले अपने-आप रिमाइंडर। फ़्री प्लान में आप खुद $count सक्रिय रिमाइंडर जोड़ सकते हैं।';
   }
 
   @override
@@ -2029,4 +2029,29 @@ class AppLocalizationsHi extends AppLocalizations {
   String photosLimitReached(int count) {
     return 'एक दस्तावेज़ में ज़्यादा से ज़्यादा $count पेज हो सकते हैं।';
   }
+
+  @override
+  String reminderNotifyExpiry(String title, String date) {
+    return '$title: $date को समाप्त होगा';
+  }
+
+  @override
+  String reminderNotifyCustom(String title) {
+    return '$title: रिमाइंडर';
+  }
+
+  @override
+  String get autoExpiryTitle => 'समाप्ति के अपने-आप रिमाइंडर';
+
+  @override
+  String autoExpiryBody(int days) {
+    return 'हर समाप्ति तारीख से $days दिन पहले सूचना, बिना रिमाइंडर जोड़े।';
+  }
+
+  @override
+  String get showNamesTitle => 'सूचना में दस्तावेज़ का नाम दिखाएँ';
+
+  @override
+  String get showNamesBody =>
+      'बंद: “एक दस्तावेज़ पर ध्यान देना है”। चालू: जैसे “Driving Licence: 10 दिस॰ को समाप्त होगा”। लॉक स्क्रीन पर कभी नहीं दिखता। नाम इस फ़ोन की एक key से एन्क्रिप्ट रहते हैं ताकि DocSafe लॉक होने पर भी सूचना में दिख सकें।';
 }

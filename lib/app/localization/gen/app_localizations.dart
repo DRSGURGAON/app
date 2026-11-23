@@ -2627,13 +2627,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumReminders.
   ///
   /// In en, this message translates to:
-  /// **'Unlimited reminders'**
+  /// **'Unlimited and automatic reminders'**
   String get premiumReminders;
 
   /// No description provided for @premiumRemindersDesc.
   ///
   /// In en, this message translates to:
-  /// **'The free plan has {count} active reminders.'**
+  /// **'Automatic reminder 7 days before every expiry date. The free plan has {count} active reminders you add yourself.'**
   String premiumRemindersDesc(int count);
 
   /// No description provided for @premiumChoosePlan.
@@ -3499,6 +3499,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A document can have up to {count} pages.'**
   String photosLimitReached(int count);
+
+  /// No description provided for @reminderNotifyExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}: expires on {date}'**
+  String reminderNotifyExpiry(String title, String date);
+
+  /// No description provided for @reminderNotifyCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'{title}: reminder'**
+  String reminderNotifyCustom(String title);
+
+  /// No description provided for @autoExpiryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic expiry reminders'**
+  String get autoExpiryTitle;
+
+  /// No description provided for @autoExpiryBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A notification {days} days before every expiry date, without adding a reminder.'**
+  String autoExpiryBody(int days);
+
+  /// No description provided for @showNamesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Show document names in notifications'**
+  String get showNamesTitle;
+
+  /// No description provided for @showNamesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Off: “A document needs attention”. On: e.g. “Driving Licence: expires on 10 Dec”. Never shown on the lock screen. Names are kept encrypted with a key on this phone so the alert can show them while DocSafe is locked.'**
+  String get showNamesBody;
 }
 
 class _AppLocalizationsDelegate

@@ -296,6 +296,16 @@ documents beyond the time itself — the time can reveal that *some* reminder ex
 - Notifications are **generic** ("A document in your vault needs attention") in the app's language,
   `VISIBILITY_PRIVATE` with a title-only public version: no document name, category, date or
   content, on the lock screen or anywhere. Several reminders on one day produce one notification.
+- **Opt-in names** (Reminders → "Show document names in notifications", default off): each time
+  then carries a short label ("Driving Licence: expires on 10 Dec 2026") built while unlocked,
+  stored on the same line of `schedule.v1` **encrypted** with the Keystore key `docsafe.notify.v1`
+  (AES-256-GCM, no user-auth requirement so it works while locked; deleted by Erase all). Shown in
+  the notification body only, never in the lock-screen public version. If sealing fails the label
+  is dropped (generic notification), never stored in plaintext. Instrumented test checks the file
+  has no plaintext name.
+- **Automatic expiry reminders** (Premium, default on, can be turned off): one notification
+  `autoExpiryReminderDays` (7) days before every expiry date, computed from the encrypted DB at
+  sync time; no extra rows are stored.
 - Tapping it opens DocSafe; the PIN/biometric lock still applies, then the Reminders tab opens.
 - Android 13+: `POST_NOTIFICATIONS` is requested when the first reminder is added; if refused,
   the Reminders tab shows a banner with a shortcut to the system settings.

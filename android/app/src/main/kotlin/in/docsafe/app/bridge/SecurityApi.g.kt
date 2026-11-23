@@ -668,6 +668,51 @@ data class ExportSummary (
 }
 
 /**
+ * One reminder notification time (epoch ms) with an optional label.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class ReminderAlarm (
+  val at: Long,
+  val label: String? = null
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ReminderAlarm {
+      val at = pigeonVar_list[0] as Long
+      val label = pigeonVar_list[1] as String?
+      return ReminderAlarm(at, label)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      at,
+      label,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as ReminderAlarm
+    return SecurityApiPigeonUtils.deepEquals(this.at, other.at) && SecurityApiPigeonUtils.deepEquals(this.label, other.label)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.at)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.label)
+    return result
+  }
+  override fun toString(): String {
+    return "ReminderAlarm(at=$at, label=$label)"
+  }
+}
+
+/**
  * A page produced by the document scanner (a JPEG in app-private cache).
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -1121,40 +1166,45 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       143.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ScannedPage.fromList(it)
+          ReminderAlarm.fromList(it)
         }
       }
       144.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ScanPageSpec.fromList(it)
+          ScannedPage.fromList(it)
         }
       }
       145.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          ImagePageSpec.fromList(it)
+          ScanPageSpec.fromList(it)
         }
       }
       146.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          PageOverlay.fromList(it)
+          ImagePageSpec.fromList(it)
         }
       }
       147.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          OcrResult.fromList(it)
+          PageOverlay.fromList(it)
         }
       }
       148.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          BackupSummary.fromList(it)
+          OcrResult.fromList(it)
         }
       }
       149.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          RestoredFile.fromList(it)
+          BackupSummary.fromList(it)
         }
       }
       150.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          RestoredFile.fromList(it)
+        }
+      }
+      151.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
           RestoreResult.fromList(it)
         }
@@ -1220,36 +1270,40 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         stream.write(142)
         writeValue(stream, value.toList())
       }
-      is ScannedPage -> {
+      is ReminderAlarm -> {
         stream.write(143)
         writeValue(stream, value.toList())
       }
-      is ScanPageSpec -> {
+      is ScannedPage -> {
         stream.write(144)
         writeValue(stream, value.toList())
       }
-      is ImagePageSpec -> {
+      is ScanPageSpec -> {
         stream.write(145)
         writeValue(stream, value.toList())
       }
-      is PageOverlay -> {
+      is ImagePageSpec -> {
         stream.write(146)
         writeValue(stream, value.toList())
       }
-      is OcrResult -> {
+      is PageOverlay -> {
         stream.write(147)
         writeValue(stream, value.toList())
       }
-      is BackupSummary -> {
+      is OcrResult -> {
         stream.write(148)
         writeValue(stream, value.toList())
       }
-      is RestoredFile -> {
+      is BackupSummary -> {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is RestoreResult -> {
+      is RestoredFile -> {
         stream.write(150)
+        writeValue(stream, value.toList())
+      }
+      is RestoreResult -> {
+        stream.write(151)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1372,10 +1426,12 @@ interface SecurityHostApi {
    */
   suspend fun recognizeText(fileId: String, mimeType: String, maxPages: Long): OcrResult
   /**
-   * Replaces the reminder schedule: epoch milliseconds only (the sole
-   * reminder data kept outside the encrypted database). Requires unlock.
+   * Replaces the reminder schedule. Each alarm is a time and, only if the
+   * user turned on "Show document names in notifications", a short label
+   * (stored encrypted with a Keystore key that needs no unlock, so it can be
+   * shown while DocSafe is locked). Requires unlock.
    */
-  suspend fun setReminderSchedule(epochMillis: List<Long>)
+  suspend fun setReminderSchedule(alarms: List<ReminderAlarm>)
   /** Whether DocSafe may post notifications (permission + system switch). */
   fun notificationsEnabled(): Boolean
   /** Android 13+: shows the system permission dialog. Returns the result. */
@@ -2031,10 +2087,10 @@ interface SecurityHostApi {
         if (api != null) {
           channel.setMessageHandler { message, reply ->
             val args = message as List<Any?>
-            val epochMillisArg = args[0] as List<Long>
+            val alarmsArg = args[0] as List<ReminderAlarm>
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
-                api.setReminderSchedule(epochMillisArg)
+                api.setReminderSchedule(alarmsArg)
                 listOf(null)
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)

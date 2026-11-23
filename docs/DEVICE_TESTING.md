@@ -282,6 +282,16 @@ utility PDF, one scanned PDF.
 | P9 | Phone without a camera app (rare / work profile) → Take photo | Error message; pages kept |
 | P10 | PDF Tools → Images to PDF with a sideways-stored camera photo already in the vault | Page upright |
 
+## 18. Automatic expiry reminders and names in notifications
+
+| # | Step | Expected |
+|---|---|---|
+| A1 | Premium (debug switch). Add a document with an expiry date 8 days from today. Set the phone date 1 day ahead, 09:05 | One notification "DocSafe reminder", generic text |
+| A2 | Reminders → Show document names → on; repeat A1 with another document | Notification text "<name>: expires on <date>"; lock screen shows only "DocSafe reminder" |
+| A3 | Reminders → Automatic expiry reminders → off; repeat A1 | No notification |
+| A4 | Free plan: tap the automatic switch | Premium screen |
+| A5 | Erase all data | No more notifications |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

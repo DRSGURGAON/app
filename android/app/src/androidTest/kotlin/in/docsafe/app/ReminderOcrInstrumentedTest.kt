@@ -151,4 +151,43 @@ class ReminderOcrInstrumentedTest {
         }
         assertTrue("notification removed by clear()", active() == null)
     }
+
+    @Test
+    fun optInLabelsAreStoredEncryptedAndShownWhenDue() {
+        val ui = InstrumentationRegistry.getInstrumentation().uiAutomation
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            ui.executeShellCommand("pm grant ${context.packageName} android.permission.POST_NOTIFICATIONS").close()
+            Thread.sleep(500)
+        }
+        var now = System.currentTimeMillis()
+        val s = ReminderScheduler(context) { now }
+        val label = "Driving Licence: expires on 10 Dec 2026"
+        s.setAlarms(
+            listOf(
+                ReminderScheduler.Alarm(now + 1000, label),
+                ReminderScheduler.Alarm(now + 86_400_000, null),
+            ),
+        )
+        assertEquals(listOf(label, null), s.labels())
+        val stored = File(context.noBackupFilesDir, "reminders/schedule.v1").readText()
+        assertFalse("label is not stored in plaintext", stored.contains("Driving"))
+        assertFalse(stored.contains("Licence"))
+
+        now += 2000
+        s.onAlarm()
+        val nm = context.getSystemService(NotificationManager::class.java)
+        fun active() = nm.activeNotifications.firstOrNull { it.id == ReminderScheduler.NOTIFICATION_ID }
+        var posted = active()
+        for (i in 0 until 30) {
+            if (posted != null) break
+            Thread.sleep(100)
+            posted = active()
+        }
+        assertTrue("notification posted", posted != null)
+        val text = "${posted!!.notification.extras.getCharSequence("android.text")}"
+        assertEquals(label, text)
+        assertEquals(android.app.Notification.VISIBILITY_PRIVATE, posted.notification.visibility)
+        assertTrue("public version hides the label", posted.notification.publicVersion?.extras?.getCharSequence("android.text") == null)
+        s.clear()
+    }
 }

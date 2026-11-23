@@ -37,7 +37,7 @@ All of this is stored only on your phone. Each document is encrypted with its ow
 ## Permissions
 
 - Biometric: to unlock with your fingerprint or face, if you turn it on.
-- Notifications: for reminders. Reminder notifications never show document names.
+- Notifications: for reminders. By default reminder notifications never show document names. If you turn on "Show document names in notifications", the name and expiry date appear in the notification (never on the lock screen); to allow this while DocSafe is locked, those names are kept encrypted with a key on your phone outside the vault.
 - Run at startup: to restore your reminders after the phone restarts.
 - Google Play billing: to buy DocSafe Premium.
 - Network state: added by Google's libraries; DocSafe itself has no internet access.

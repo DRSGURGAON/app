@@ -62,6 +62,9 @@ class FakeSecurityService implements SecurityService {
   final List<(String, int)> ocrCalls = [];
   final Set<String> ocrFailures = {};
   List<int>? reminderSchedule;
+
+  /// Labels sent with [reminderSchedule] (null = generic notification).
+  List<String?>? reminderLabels;
   int scheduleCalls = 0;
   bool notificationsOn = true;
   bool grantOnRequest = true;
@@ -466,10 +469,11 @@ class FakeSecurityService implements SecurityService {
   }
 
   @override
-  Future<void> setReminderSchedule(List<int> epochMillis) async {
+  Future<void> setReminderSchedule(List<ReminderAlarm> alarms) async {
     _requireUnlocked();
     scheduleCalls++;
-    reminderSchedule = List.of(epochMillis);
+    reminderSchedule = [for (final a in alarms) a.at];
+    reminderLabels = [for (final a in alarms) a.label];
   }
 
   @override

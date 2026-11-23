@@ -122,6 +122,13 @@ void main() {
     expect(find.text(en.remindersFreeUsage(1, 3)), findsOneWidget);
 
     // Deleting removes it from the schedule.
+    await tester.scrollUntilVisible(
+      find.byTooltip(en.reminderDelete),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+    await settle(tester);
     await tester.tap(find.byTooltip(en.reminderDelete));
     await settle(tester);
     await tester.pump(const Duration(seconds: 1));
@@ -209,9 +216,19 @@ void main() {
     await setExpiry(app, 'Old Permit', isoIn(-10));
     await setExpiry(app, 'New Permit', isoIn(400));
     await goTab(tester, en.navReminders);
+    await tester.scrollUntilVisible(
+      find.text(en.remindersExpiredDocs.toUpperCase()),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(en.remindersExpiredDocs.toUpperCase()), findsOneWidget);
     expect(find.text('Old Permit'), findsOneWidget);
     expect(find.text('New Permit'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.text(en.remindersEmpty),
+      -200,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(en.remindersEmpty), findsOneWidget);
     await app.dispose();
   });
@@ -327,6 +344,11 @@ void main() {
     fake.ocrText[id] = 'ड्राइविंग लाइसेंस\nवैधता १४.०८.२०३१';
     await setExpiry(app, 'ड्राइविंग लाइसेंस', isoIn(45));
     await goTab(tester, hi.navReminders);
+    await tester.scrollUntilVisible(
+      find.text(hi.remindersPrivacyNote),
+      150,
+      scrollable: find.byType(Scrollable).first,
+    );
     expect(find.text(hi.remindersPrivacyNote), findsOneWidget);
 
     await goTab(tester, hi.navVault);
@@ -340,4 +362,56 @@ void main() {
     expect(find.text(hi.ocrTitle), findsOneWidget);
     await app.dispose();
   });
+
+  testWidgets(
+    'automatic expiry reminders (Premium) and names in notifications',
+    (tester) async {
+      final fake = await unlockedFake();
+      final engine = FakePdfEngine();
+      final app = await pumpApp(tester, fake, pdfEngine: engine);
+      await importDoc(tester, fake, engine, 'Licence.pdf');
+      final expiry = isoIn(60);
+      await setExpiry(app, 'Licence', expiry);
+      await tester.pump(const Duration(seconds: 1));
+      await settle(tester);
+      // Free: nothing scheduled automatically; the switch leads to Premium.
+      expect(fake.reminderSchedule, isEmpty);
+      await goTab(tester, en.navReminders);
+      await tester.tap(find.byKey(const Key('auto-expiry-switch')));
+      await settle(tester);
+      expect(find.byType(PremiumScreen), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await settle(tester);
+
+      // Premium: on by default, 7 days before at 9:00, generic text.
+      app.container.read(premiumProvider.notifier).setDebugUnlocked(true);
+      await tester.pump(const Duration(seconds: 1));
+      await settle(tester);
+      final d = parseIsoDate(expiry).subtract(const Duration(days: 7));
+      final at = DateTime(d.year, d.month, d.day, 9).millisecondsSinceEpoch;
+      expect(fake.reminderSchedule, [at]);
+      expect(fake.reminderLabels, [null]);
+      expect(
+        tester
+            .widget<SwitchListTile>(find.byKey(const Key('auto-expiry-switch')))
+            .value,
+        isTrue,
+      );
+
+      // Names on: the label carries the title and the expiry date.
+      expect(find.text(en.remindersPrivacyNote), findsOneWidget);
+      await tester.tap(find.byKey(const Key('show-names-switch')));
+      await tester.pump(const Duration(seconds: 1));
+      await settle(tester);
+      expect(fake.reminderLabels!.single, startsWith('Licence: '));
+      expect(find.text(en.remindersPrivacyNote), findsNothing);
+
+      // Automatic off: nothing left to schedule.
+      await tester.tap(find.byKey(const Key('auto-expiry-switch')));
+      await tester.pump(const Duration(seconds: 1));
+      await settle(tester);
+      expect(fake.reminderSchedule, isEmpty);
+      await app.dispose();
+    },
+  );
 }

@@ -597,6 +597,49 @@ class ExportSummary {
   }
 }
 
+/// One reminder notification time (epoch ms) with an optional label.
+class ReminderAlarm {
+  ReminderAlarm({required this.at, this.label});
+
+  int at;
+
+  String? label;
+
+  List<Object?> _toList() {
+    return <Object?>[at, label];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static ReminderAlarm decode(Object result) {
+    result as List<Object?>;
+    return ReminderAlarm(at: result[0]! as int, label: result[1] as String?);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! ReminderAlarm || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(at, other.at) && _deepEquals(label, other.label);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'ReminderAlarm(at: $at, label: $label)';
+  }
+}
+
 /// A page produced by the document scanner (a JPEG in app-private cache).
 class ScannedPage {
   ScannedPage({required this.path, required this.width, required this.height});
@@ -1061,29 +1104,32 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is ExportSummary) {
       buffer.putUint8(142);
       writeValue(buffer, value.encode());
-    } else if (value is ScannedPage) {
+    } else if (value is ReminderAlarm) {
       buffer.putUint8(143);
       writeValue(buffer, value.encode());
-    } else if (value is ScanPageSpec) {
+    } else if (value is ScannedPage) {
       buffer.putUint8(144);
       writeValue(buffer, value.encode());
-    } else if (value is ImagePageSpec) {
+    } else if (value is ScanPageSpec) {
       buffer.putUint8(145);
       writeValue(buffer, value.encode());
-    } else if (value is PageOverlay) {
+    } else if (value is ImagePageSpec) {
       buffer.putUint8(146);
       writeValue(buffer, value.encode());
-    } else if (value is OcrResult) {
+    } else if (value is PageOverlay) {
       buffer.putUint8(147);
       writeValue(buffer, value.encode());
-    } else if (value is BackupSummary) {
+    } else if (value is OcrResult) {
       buffer.putUint8(148);
       writeValue(buffer, value.encode());
-    } else if (value is RestoredFile) {
+    } else if (value is BackupSummary) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is RestoreResult) {
+    } else if (value is RestoredFile) {
       buffer.putUint8(150);
+      writeValue(buffer, value.encode());
+    } else if (value is RestoreResult) {
+      buffer.putUint8(151);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1128,20 +1174,22 @@ class _PigeonCodec extends StandardMessageCodec {
       case 142:
         return ExportSummary.decode(readValue(buffer)!);
       case 143:
-        return ScannedPage.decode(readValue(buffer)!);
+        return ReminderAlarm.decode(readValue(buffer)!);
       case 144:
-        return ScanPageSpec.decode(readValue(buffer)!);
+        return ScannedPage.decode(readValue(buffer)!);
       case 145:
-        return ImagePageSpec.decode(readValue(buffer)!);
+        return ScanPageSpec.decode(readValue(buffer)!);
       case 146:
-        return PageOverlay.decode(readValue(buffer)!);
+        return ImagePageSpec.decode(readValue(buffer)!);
       case 147:
-        return OcrResult.decode(readValue(buffer)!);
+        return PageOverlay.decode(readValue(buffer)!);
       case 148:
-        return BackupSummary.decode(readValue(buffer)!);
+        return OcrResult.decode(readValue(buffer)!);
       case 149:
-        return RestoredFile.decode(readValue(buffer)!);
+        return BackupSummary.decode(readValue(buffer)!);
       case 150:
+        return RestoredFile.decode(readValue(buffer)!);
+      case 151:
         return RestoreResult.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -1887,9 +1935,11 @@ class SecurityHostApi {
     return pigeonVar_replyValue! as OcrResult;
   }
 
-  /// Replaces the reminder schedule: epoch milliseconds only (the sole
-  /// reminder data kept outside the encrypted database). Requires unlock.
-  Future<void> setReminderSchedule(List<int> epochMillis) async {
+  /// Replaces the reminder schedule. Each alarm is a time and, only if the
+  /// user turned on "Show document names in notifications", a short label
+  /// (stored encrypted with a Keystore key that needs no unlock, so it can be
+  /// shown while DocSafe is locked). Requires unlock.
+  Future<void> setReminderSchedule(List<ReminderAlarm> alarms) async {
     final pigeonVar_channelName =
         'dev.flutter.pigeon.docsafe.SecurityHostApi.setReminderSchedule$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -1898,7 +1948,7 @@ class SecurityHostApi {
       binaryMessenger: pigeonVar_binaryMessenger,
     );
     final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
-      <Object?>[epochMillis],
+      <Object?>[alarms],
     );
     final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
 

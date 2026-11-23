@@ -243,4 +243,71 @@ void main() {
       await expectLater(texts.read(d), throwsA(isA<Object>()));
     });
   });
+
+  test('Premium: automatic reminder 7 days before every expiry date', () async {
+    final dl = await add('Licence.pdf', expiry: '2026-12-10');
+    await add('Passport.pdf', expiry: '2026-11-10'); // 7 days before = past
+    await add('Notes.pdf');
+    final t3 = DateTime(2026, 12, 3, 9).millisecondsSinceEpoch;
+
+    // Free: nothing automatic.
+    expect(await reminders.scheduleTimes(), isEmpty);
+    premium = true;
+    expect(await reminders.autoExpiryEnabled(), isTrue);
+    expect(await reminders.scheduleTimes(), [t3]);
+
+    // Same day as a reminder the user added: one time, not two.
+    await reminders.addExpiryReminder(dl.id, 7);
+    expect(await reminders.scheduleTimes(), [t3]);
+
+    // Expiry moves -> the automatic time moves.
+    await docs.saveMetadata(dl.id, expiryDate: '2027-01-20');
+    final t13 = DateTime(2027, 1, 13, 9).millisecondsSinceEpoch;
+    expect(await reminders.scheduleTimes(), [t13]);
+
+    // Turned off: only the user's own reminder remains (same date).
+    await reminders.addCustomReminder(dl.id, '2026-12-01');
+    await reminders.setAutoExpiry(false);
+    final t1 = DateTime(2026, 12, 1, 9).millisecondsSinceEpoch;
+    expect(await reminders.scheduleTimes(), [t1, t13]);
+    await reminders.setAutoExpiry(true);
+
+    // Trash: no automatic reminder for a deleted document.
+    await docs.moveToTrash(dl.id);
+    expect(await reminders.scheduleTimes(), isEmpty);
+  });
+
+  test('labels only when names are on; one line per document', () async {
+    premium = true;
+    final a = await add('Licence.pdf', expiry: '2026-12-10');
+    final b = await add('Insurance.pdf', expiry: '2026-12-10');
+    await reminders.addCustomReminder(b.id, '2026-11-20');
+    await reminders.addExpiryReminder(a.id, 7); // same time as automatic
+    String labeler(String title, String? expiry) =>
+        expiry == null ? '$title: reminder' : '$title: expires $expiry';
+
+    var alarms = await reminders.scheduleAlarms(labeler: labeler);
+    expect([for (final x in alarms) x.label], [null, null]);
+
+    await reminders.setShowNames(true);
+    alarms = await reminders.scheduleAlarms(labeler: labeler);
+    expect(
+      [for (final x in alarms) x.at],
+      [
+        DateTime(2026, 11, 20, 9).millisecondsSinceEpoch,
+        DateTime(2026, 12, 3, 9).millisecondsSinceEpoch,
+      ],
+    );
+    expect(alarms.first.label, 'Insurance: reminder');
+    expect(alarms.last.label!.split('\n')..sort(), [
+      'Insurance: expires 2026-12-10',
+      'Licence: expires 2026-12-10',
+    ]);
+
+    await reminders.syncSchedule(labeler: labeler);
+    expect(fake.reminderLabels, hasLength(2));
+    // Without a labeler nothing is labelled even with names on.
+    await reminders.syncSchedule();
+    expect(fake.reminderLabels, [null, null]);
+  });
 }
