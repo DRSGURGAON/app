@@ -25,6 +25,7 @@ All of this is stored only on your phone. Each document is encrypted with its ow
 ## Services provided by Google
 
 - **Document scanner:** the camera screen is provided by Google Play services on your phone. The pages are processed on the phone and handed to DocSafe, which encrypts them. Google Play services is covered by Google's privacy policy.
+- **Photos to PDF:** photos you pick in Android's photo picker, or take with your phone's camera app, are copied into DocSafe and encrypted when you save. DocSafe has no camera or photo permission. The originals stay in your gallery, and some camera apps keep their own copy.
 - **Text recognition (OCR):** runs inside DocSafe on your phone with a model included in the app. No image or text leaves the phone.
 - **DocSafe Premium:** subscriptions are bought and managed through Google Play. Google processes the payment under Google's privacy policy. DocSafe only learns whether a valid subscription exists; it never sees your payment details.
 
@@ -84,6 +85,7 @@ DocSafe एक दस्तावेज़ तिजोरी है जो प�
 ## Google द्वारा दी जाने वाली सेवाएँ
 
 - **दस्तावेज़ स्कैनर:** कैमरा स्क्रीन आपके फ़ोन पर Google Play services द्वारा दी जाती है। पेज फ़ोन पर ही प्रोसेस होकर DocSafe को मिलते हैं, जो उन्हें एन्क्रिप्ट करता है। Google Play services पर Google की गोपनीयता नीति लागू होती है।
+- **फ़ोटो से PDF:** Android के फ़ोटो पिकर में आप जो फ़ोटो चुनते हैं, या फ़ोन के कैमरा ऐप से खींचते हैं, वे DocSafe में कॉपी होती हैं और सेव करने पर एन्क्रिप्ट होती हैं। DocSafe के पास कैमरा या फ़ोटो की कोई अनुमति नहीं है। असली फ़ोटो आपकी गैलरी में रहती हैं, और कुछ कैमरा ऐप अपनी एक कॉपी भी रखते हैं।
 - **टेक्स्ट पहचान (OCR):** ऐप में शामिल मॉडल से DocSafe के अंदर आपके फ़ोन पर ही चलती है। कोई इमेज या टेक्स्ट फ़ोन से बाहर नहीं जाता।
 - **DocSafe प्रीमियम:** सदस्यता Google Play के ज़रिए खरीदी और प्रबंधित की जाती है। भुगतान Google अपनी गोपनीयता नीति के तहत प्रोसेस करता है। DocSafe को केवल यह पता चलता है कि वैध सदस्यता है या नहीं; वह आपकी भुगतान जानकारी कभी नहीं देखता।
 

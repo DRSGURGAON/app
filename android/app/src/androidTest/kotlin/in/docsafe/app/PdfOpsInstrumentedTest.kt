@@ -93,6 +93,25 @@ class PdfOpsInstrumentedTest {
     }
 
     @Test
+    fun imagesToPdfTurnsExifRotatedPhotosUpright() {
+        // A camera photo stored landscape with an EXIF "rotate 90°" note.
+        val bytes = image(900, 600, Bitmap.CompressFormat.JPEG)
+        val f = File(context.cacheDir, "exif-${System.nanoTime()}.jpg")
+        try {
+            f.writeBytes(bytes)
+            android.media.ExifInterface(f.path).apply {
+                setAttribute(android.media.ExifInterface.TAG_ORIENTATION, android.media.ExifInterface.ORIENTATION_ROTATE_90.toString())
+                saveAttributes()
+            }
+            val id = store(f.readBytes())
+            val pdf = ops.imagesToPdf(listOf(PdfOps.ImageSpec(id, "image/jpeg", 0)))
+            render(pdf.fileId) { r -> r.openPage(0).use { p -> assertTrue("upright: portrait", p.height > p.width) } }
+        } finally {
+            f.delete()
+        }
+    }
+
+    @Test
     fun compressionShrinksAHeavyPdfAndKeepsPageCount() {
         val heavy = (0 until 3).map { store(image(2480, 3508, Bitmap.CompressFormat.JPEG, noise = true)) }
         val original = ops.imagesToPdf(heavy.map { PdfOps.ImageSpec(it, "image/jpeg", 0) })

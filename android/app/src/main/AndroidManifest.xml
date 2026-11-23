@@ -56,5 +56,17 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- Photos to PDF: lets the camera app write one photo into DocSafe's private
+             cache (cache/docsafe-photos/ only). Not exported; access is granted per
+             capture. No CAMERA or storage permission is needed. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.photos"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/photo_paths" />
+        </provider>
     </application>
 </manifest>

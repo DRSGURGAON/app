@@ -1083,5 +1083,32 @@
       }
     }
   },
-  "backupReminderHelp": "A card on Home reminds you when a backup is due. Nothing is backed up automatically."
+  "backupReminderHelp": "A card on Home reminds you when a backup is due. Nothing is backed up automatically.",
+  "photosToPdf": "Photos to PDF",
+  "photosToPdfDesc": "Pick photos from your gallery or take them with the camera, arrange them and save one PDF",
+  "photosFromGallery": "Choose photos",
+  "photosTakePhoto": "Take photo",
+  "photosOpening": "Opening…",
+  "photosNoPages": "No photos yet",
+  "photosNoPagesBody": "Choose photos from your gallery or take one with the camera.",
+  "photosDiscardTitle": "Discard these pages?",
+  "photosDiscardBody": "The pages will be deleted from DocSafe. Photos in your gallery are not changed. Nothing has been saved.",
+  "photosPrivacyNote": "Photos are copied into DocSafe and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don't want them on the phone. Unsaved pages are deleted when DocSafe locks.",
+  "photosSaveTitle": "Save PDF",
+  "photosDefaultTitle": "Photos {date}",
+  "@photosDefaultTitle": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "photosLimitReached": "A document can have up to {count} pages.",
+  "@photosLimitReached": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

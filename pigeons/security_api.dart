@@ -339,6 +339,21 @@ abstract class SecurityHostApi {
   @async
   List<ScannedPage>? startScan(int pageLimit, bool allowGalleryImport);
 
+  /// Photos to PDF: the Android photo picker (no storage permission) for up
+  /// to [limit] photos. Each photo is turned upright (EXIF orientation),
+  /// converted to JPEG if needed (HEIC, WebP…), scaled to at most 4000 px and
+  /// kept as a page like a scanned one ([saveScan] / [discardScan]). Null if
+  /// the user cancelled.
+  @async
+  List<ScannedPage>? pickPhotos(int limit);
+
+  /// Photos to PDF: one photo from the phone's camera app (no CAMERA
+  /// permission; the camera app writes into DocSafe's private cache through a
+  /// FileProvider). Prepared like [pickPhotos]. Null if cancelled.
+  /// Errors: IO if no camera app is available.
+  @async
+  ScannedPage? takePhoto();
+
   /// Encrypts the pages into the vault without writing any plaintext file:
   /// one PDF (pages embedded unchanged, rotation as page metadata) or one
   /// JPEG document per page. Source pages are NOT deleted here, so a failed

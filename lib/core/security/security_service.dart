@@ -62,6 +62,8 @@ abstract interface class SecurityService {
     required int pageLimit,
     required bool allowGalleryImport,
   });
+  Future<List<ScannedPage>?> pickPhotos(int limit);
+  Future<ScannedPage?> takePhoto();
   Future<List<ImportedFile>> saveScan(
     List<ScanPageSpec> pages,
     ScanSaveFormat format,
@@ -213,6 +215,13 @@ class PigeonSecurityService implements SecurityService {
     required int pageLimit,
     required bool allowGalleryImport,
   }) => _guard(() => _api.startScan(pageLimit, allowGalleryImport));
+
+  @override
+  Future<List<ScannedPage>?> pickPhotos(int limit) =>
+      _guard(() => _api.pickPhotos(limit));
+
+  @override
+  Future<ScannedPage?> takePhoto() => _guard(_api.takePhoto);
 
   @override
   Future<List<ImportedFile>> saveScan(

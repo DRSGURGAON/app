@@ -267,6 +267,21 @@ utility PDF, one scanned PDF.
 | R5 | Back up now → create a backup → Home | Card gone |
 | R6 | Backup screen → Backup reminder → Off | Card never shown |
 
+## 17. Photos to PDF
+
+| # | Step | Expected |
+|---|---|---|
+| P1 | Home → Photos to PDF → pick 5 photos (mix portrait and landscape camera photos) | Android photo picker (no permission prompt); 5 pages, all upright |
+| P2 | Add pages → Take photo | Phone camera opens (no permission prompt); photo added upright |
+| P3 | Add pages → Scan document | ML Kit scanner; scanned pages join the same list |
+| P4 | Reorder, rotate one, delete one → Continue → Save | One PDF; open it: order, rotation and pages correct |
+| P5 | Pick a HEIC photo (Samsung/Pixel "High efficiency" setting) | Added and saved like a JPEG |
+| P6 | Pick 60 photos | Only 50 kept; "up to 50 pages" note |
+| P7 | Start, then press back → Discard | Pages gone; gallery photos untouched |
+| P8 | Start, lock the phone (or wait for auto-lock), unlock | Unsaved pages wiped |
+| P9 | Phone without a camera app (rare / work profile) → Take photo | Error message; pages kept |
+| P10 | PDF Tools → Images to PDF with a sideways-stored camera photo already in the vault | Page upright |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

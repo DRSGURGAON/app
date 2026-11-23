@@ -1659,6 +1659,55 @@ class SecurityHostApi {
     return (pigeonVar_replyValue as List<Object?>?)?.cast<ScannedPage>();
   }
 
+  /// Photos to PDF: the Android photo picker (no storage permission) for up
+  /// to [limit] photos. Each photo is turned upright (EXIF orientation),
+  /// converted to JPEG if needed (HEIC, WebP…), scaled to at most 4000 px and
+  /// kept as a page like a scanned one ([saveScan] / [discardScan]). Null if
+  /// the user cancelled.
+  Future<List<ScannedPage>?> pickPhotos(int limit) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.pickPhotos$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[limit],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return (pigeonVar_replyValue as List<Object?>?)?.cast<ScannedPage>();
+  }
+
+  /// Photos to PDF: one photo from the phone's camera app (no CAMERA
+  /// permission; the camera app writes into DocSafe's private cache through a
+  /// FileProvider). Prepared like [pickPhotos]. Null if cancelled.
+  /// Errors: IO if no camera app is available.
+  Future<ScannedPage?> takePhoto() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.takePhoto$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+    return pigeonVar_replyValue as ScannedPage?;
+  }
+
   /// Encrypts the pages into the vault without writing any plaintext file:
   /// one PDF (pages embedded unchanged, rotation as page metadata) or one
   /// JPEG document per page. Source pages are NOT deleted here, so a failed

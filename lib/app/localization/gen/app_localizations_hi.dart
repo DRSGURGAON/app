@@ -1982,4 +1982,51 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get backupReminderHelp =>
       'बैकअप का समय होने पर होम पर एक कार्ड याद दिलाता है। अपने-आप कोई बैकअप नहीं होता।';
+
+  @override
+  String get photosToPdf => 'फ़ोटो से PDF';
+
+  @override
+  String get photosToPdfDesc =>
+      'गैलरी से फ़ोटो चुनें या कैमरे से खींचें, क्रम ठीक करें और एक PDF बनाएँ';
+
+  @override
+  String get photosFromGallery => 'फ़ोटो चुनें';
+
+  @override
+  String get photosTakePhoto => 'फ़ोटो खींचें';
+
+  @override
+  String get photosOpening => 'खुल रहा है…';
+
+  @override
+  String get photosNoPages => 'अभी कोई फ़ोटो नहीं';
+
+  @override
+  String get photosNoPagesBody =>
+      'गैलरी से फ़ोटो चुनें या कैमरे से एक फ़ोटो खींचें।';
+
+  @override
+  String get photosDiscardTitle => 'ये पेज हटाएँ?';
+
+  @override
+  String get photosDiscardBody =>
+      'ये पेज DocSafe से हट जाएँगे। आपकी गैलरी की फ़ोटो नहीं बदलेंगी। अभी कुछ सेव नहीं हुआ है।';
+
+  @override
+  String get photosPrivacyNote =>
+      'फ़ोटो DocSafe में कॉपी होती हैं और सेव करने पर एन्क्रिप्ट होती हैं। असली फ़ोटो आपकी गैलरी में रहती हैं (कुछ कैमरा ऐप भी एक कॉपी रखते हैं) — अगर फ़ोन पर नहीं चाहिए तो उन्हें वहाँ से हटाएँ। बिना सेव किए पेज DocSafe लॉक होने पर हट जाते हैं।';
+
+  @override
+  String get photosSaveTitle => 'PDF सेव करें';
+
+  @override
+  String photosDefaultTitle(String date) {
+    return 'फ़ोटो $date';
+  }
+
+  @override
+  String photosLimitReached(int count) {
+    return 'एक दस्तावेज़ में ज़्यादा से ज़्यादा $count पेज हो सकते हैं।';
+  }
 }

@@ -23,6 +23,7 @@ All of this is stored only on your phone. Each document is encrypted with its ow
 ## Services provided by Google
 
 - **Document scanner:** the camera screen is provided by Google Play services on your phone. The pages are processed on the phone and handed to DocSafe, which encrypts them. Google Play services is covered by Google's privacy policy.
+- **Photos to PDF:** photos you pick in Android's photo picker, or take with your phone's camera app, are copied into DocSafe and encrypted when you save. DocSafe has no camera or photo permission. The originals stay in your gallery, and some camera apps keep their own copy.
 - **Text recognition (OCR):** runs inside DocSafe on your phone with a model included in the app. No image or text leaves the phone.
 - **DocSafe Premium:** subscriptions are bought and managed through Google Play. Google processes the payment under Google's privacy policy. DocSafe only learns whether a valid subscription exists; it never sees your payment details.
 

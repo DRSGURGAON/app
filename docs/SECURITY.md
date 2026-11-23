@@ -170,6 +170,22 @@ suggestions/autocorrect so IMEs are not taught document names.
   app cache during review (best-effort wipe, flash caveats as in §4). Devices without the Play
   services module cannot scan (clear error message).
 
+## 10a. Photos to PDF
+
+- **Gallery:** the Android photo picker (`PickMultipleVisualMedia`, images only, up to 50). No
+  READ_MEDIA_IMAGES / storage permission; DocSafe gets read access to the chosen photos only.
+- **Camera:** the phone's own camera app via `ACTION_IMAGE_CAPTURE`. DocSafe declares no CAMERA
+  permission. The camera app writes one file into `cache/docsafe-photos/<random>/` through a
+  non-exported `FileProvider` (`${applicationId}.photos`, only that folder) with a one-off
+  write grant. Some camera apps also save their own copy in the gallery (stated in the app and
+  the privacy policy).
+- **Preparation** (`PhotoPages`): decoded with Android's decoders, EXIF orientation applied,
+  HEIC/WebP converted, longest side capped at 4000 px, transparency on white, written as a JPEG
+  page next to the capture; the capture is wiped immediately. Pages then follow the scanner path
+  (`ScanStore`: registered, encrypted on save, wiped on discard / lock / erase / next start).
+- The existing *Images to PDF* (images already in the vault) now also applies EXIF orientation,
+  so camera photos are no longer embedded sideways.
+
 ## 11. Where plaintext can exist (inventory)
 
 | # | Plaintext item | Location | Created | Removed | In backups? |
@@ -178,6 +194,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 2 | Partial decryption | `cache/vault_tmp/<random>.part` | During decrypt | On failure immediately; next start | No |
 | 3 | Scanner pages | ML Kit output directory under `cache/` (copies of non-file results: `cache/docscan_pages/`) | Scan returns | Save confirmed, discard, page delete, lock/auto-lock, erase, next start | No |
 | 4 | Other scanner output in the same directory | as 3 | ML Kit | When the scan session ends, lock, erase, next start (recorded scan directories) | No |
+| 4a | Photos to PDF pages and camera capture | `cache/docsafe-photos/<random>/` (upright JPEG pages; the camera's original `capture.jpg` only until it is prepared) | Photo picker / camera returns | Capture: right after preparing (or on failure/cancel). Pages: as #3. Whole folder on lock, erase, next start | No |
 | 5 | Decoded images in memory | Flutter image cache | Viewer / thumbnails | Viewer close (cache cleared) | — |
 | 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |
 | 7 | PDF tool inputs / output | inputs as #1; output PDF in memory only | Tool runs | When the tool finishes | No |

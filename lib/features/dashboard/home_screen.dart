@@ -71,6 +71,13 @@ class HomeScreen extends ConsumerWidget {
                         onTap: () => context.push(Routes.scan),
                       ),
                       _QuickAction(
+                        key: const Key('home-photos-to-pdf'),
+                        icon: Icons.photo_library_outlined,
+                        color: const Color(0xFFC792EA),
+                        label: l.photosToPdf,
+                        onTap: () => context.push(Routes.photosToPdf()),
+                      ),
+                      _QuickAction(
                         icon: Icons.picture_as_pdf_outlined,
                         color: const Color(0xFFFF8A94),
                         label: l.homeImportPdf,
@@ -474,6 +481,7 @@ class _SecurityPill extends StatelessWidget {
 
 class _QuickAction extends StatelessWidget {
   const _QuickAction({
+    super.key,
     required this.icon,
     required this.color,
     required this.label,

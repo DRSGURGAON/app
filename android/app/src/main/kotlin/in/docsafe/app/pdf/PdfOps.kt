@@ -3,12 +3,15 @@ package `in`.docsafe.app.pdf
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.Matrix
 import android.graphics.pdf.PdfRenderer
+import android.media.ExifInterface
 import android.os.ParcelFileDescriptor
 import `in`.docsafe.crypto.FormatException
 import `in`.docsafe.crypto.InvalidInputException
 import `in`.docsafe.crypto.JpegInfo
 import `in`.docsafe.crypto.JpegPdfWriter
+import `in`.docsafe.crypto.PhotoGeometry
 import `in`.docsafe.crypto.VaultStore
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -210,11 +213,45 @@ class PdfOps(private val vault: VaultStore) {
         }
 
     /** JPEGs are embedded as-is when their coding is DCTDecode-compatible, else re-encoded. */
-    private fun embeddableJpeg(bytes: ByteArray): ByteArray = try {
-        JpegInfo.read(ByteArrayInputStream(bytes))
-        bytes
-    } catch (_: FormatException) {
-        reencode(bytes)
+    private fun embeddableJpeg(bytes: ByteArray): ByteArray {
+        // Camera photos are often stored sideways with an EXIF "rotate" note that
+        // PDF viewers ignore: draw those upright instead of embedding as is.
+        val orientation = runCatching {
+            ExifInterface(ByteArrayInputStream(bytes)).getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
+        }.getOrDefault(1)
+        if (orientation in 2..8) return reencodeUpright(bytes, PhotoGeometry.forExifOrientation(orientation))
+        return try {
+            JpegInfo.read(ByteArrayInputStream(bytes))
+            bytes
+        } catch (_: FormatException) {
+            reencode(bytes)
+        }
+    }
+
+    private fun reencodeUpright(bytes: ByteArray, t: PhotoGeometry.Transform): ByteArray {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw InvalidInputException("Unreadable image")
+        val opts = BitmapFactory.Options().apply {
+            inSampleSize = PhotoGeometry.sampleSize(bounds.outWidth, bounds.outHeight)
+        }
+        val src = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
+            ?: throw InvalidInputException("Unreadable image")
+        val (w, h) = PhotoGeometry.fit(src.width, src.height)
+        val m = Matrix().apply {
+            postScale(w.toFloat() / src.width, h.toFloat() / src.height)
+            postRotate(t.degrees.toFloat())
+            if (t.mirror) postScale(-1f, 1f)
+        }
+        val upright = Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, true)
+        try {
+            val out = ByteArrayOutputStream()
+            upright.compress(Bitmap.CompressFormat.JPEG, 90, out)
+            return out.toByteArray()
+        } finally {
+            if (upright !== src) upright.recycle()
+            src.recycle()
+        }
     }
 
     private fun reencode(bytes: ByteArray): ByteArray {

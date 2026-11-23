@@ -3,6 +3,7 @@ package `in`.docsafe.app.bridge
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
 import `in`.docsafe.app.security.BiometricAuthenticator
 import `in`.docsafe.app.security.BiometricAvailabilityState
@@ -13,6 +14,7 @@ import `in`.docsafe.app.ocr.OcrFailedException
 import `in`.docsafe.app.pdf.PdfOps
 import `in`.docsafe.app.reminders.ReminderScheduler
 import `in`.docsafe.app.pdf.PdfUnreadableException
+import `in`.docsafe.app.scanner.PhotoPages
 import `in`.docsafe.app.scanner.ScanStore
 import `in`.docsafe.app.scanner.ScannerLauncher
 import `in`.docsafe.app.scanner.ScannerUnavailableException
@@ -28,11 +30,16 @@ import `in`.docsafe.crypto.IntegrityException
 import `in`.docsafe.crypto.InvalidInputException
 import `in`.docsafe.crypto.KeyUnavailableException
 import `in`.docsafe.crypto.PinManager
+import `in`.docsafe.crypto.SecureFiles
 import `in`.docsafe.crypto.VaultIoException
 import `in`.docsafe.crypto.VaultStore
+import java.io.File
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+
+/** Photos per pick (the photo picker's limit is fixed when it is registered). */
+const val MAX_PICK_PHOTOS = 50
 
 /** System Storage Access Framework dialogs. Each resolves with null if the user cancelled. */
 interface SystemDocumentUi {
@@ -44,6 +51,12 @@ interface SystemDocumentUi {
 
     /** Android 13+ POST_NOTIFICATIONS runtime request; true if granted. */
     suspend fun requestNotificationPermission(): Boolean
+
+    /** Android photo picker, images only, up to [MAX_PICK_PHOTOS]; empty if cancelled. */
+    suspend fun pickImages(): List<Uri>
+
+    /** Camera app writes one photo to [output]; false if cancelled. */
+    suspend fun takePicture(output: Uri): Boolean
 
     /** Launches an IntentSender (ML Kit scanner); null if it could not deliver a result. */
     suspend fun launchIntentSender(sender: android.content.IntentSender): androidx.activity.result.ActivityResult?
@@ -280,6 +293,52 @@ class SecurityHostApiImpl(
         ) ?: return@guard null
         io {
             session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+        }
+    }
+
+    override suspend fun pickPhotos(limit: Long): List<ScannedPage>? = guard {
+        session.requireUnlocked()
+        if (limit < 1) throw InvalidInputException("No pages left")
+        val uris = documentUi.pickImages().take(limit.toInt())
+        if (uris.isEmpty()) return@guard null
+        io {
+            session.requireUnlocked()
+            val photos = PhotoPages(appContext.contentResolver, appContext.cacheDir)
+            val dir = photos.newBatchDir()
+            val files = mutableListOf<File>()
+            try {
+                uris.forEachIndexed { i, uri -> files += photos.prepare(uri, dir, i) }
+                session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+            } catch (e: Exception) {
+                files.forEach { SecureFiles.bestEffortWipe(it) }
+                dir.delete()
+                throw e
+            }
+        }
+    }
+
+    override suspend fun takePhoto(): ScannedPage? = guard {
+        session.requireUnlocked()
+        val photos = PhotoPages(appContext.contentResolver, appContext.cacheDir)
+        val dir = io { photos.newBatchDir() }
+        val capture = File(dir, "capture.jpg")
+        try {
+            val uri = FileProvider.getUriForFile(appContext, "${appContext.packageName}.photos", capture)
+            val taken = documentUi.takePicture(uri)
+            if (!taken || !capture.isFile || capture.length() == 0L) return@guard null
+            io {
+                session.requireUnlocked()
+                val page = photos.prepare(Uri.fromFile(capture), dir, 0)
+                session.scanStore.register(listOf(page)).single().let {
+                    ScannedPage(it.path, it.width.toLong(), it.height.toLong())
+                }
+            }
+        } finally {
+            // The camera's full-size original never stays: only the prepared page does.
+            io {
+                SecureFiles.bestEffortWipe(capture)
+                if (dir.listFiles().isNullOrEmpty()) dir.delete()
+            }
         }
     }
 

@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -16,6 +17,7 @@ import `in`.docsafe.app.bridge.BillingHostApi
 import `in`.docsafe.app.bridge.SecurityBridgeError
 import `in`.docsafe.app.bridge.SecurityHostApi
 import `in`.docsafe.app.bridge.LaunchTarget
+import `in`.docsafe.app.bridge.MAX_PICK_PHOTOS
 import `in`.docsafe.app.bridge.SecurityHostApiImpl
 import `in`.docsafe.app.reminders.ReminderScheduler
 import `in`.docsafe.app.bridge.SystemDocumentUi
@@ -49,6 +51,27 @@ class MainActivity : FlutterFragmentActivity() {
         if (cont?.isActive == true) cont.resume(result)
     }
 
+    private var pendingPhotos: CancellableContinuation<List<Uri>>? = null
+
+    // Android photo picker (system UI, no storage permission). Falls back to the
+    // document picker on devices without it.
+    private val photoLauncher = registerForActivityResult(
+        ActivityResultContracts.PickMultipleVisualMedia(MAX_PICK_PHOTOS),
+    ) { uris ->
+        val cont = pendingPhotos
+        pendingPhotos = null
+        if (cont?.isActive == true) cont.resume(uris)
+    }
+
+    private var pendingCamera: CancellableContinuation<Boolean>? = null
+
+    // The phone's camera app (no CAMERA permission: DocSafe never sees the camera).
+    private val cameraLauncher = registerForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        val cont = pendingCamera
+        pendingCamera = null
+        if (cont?.isActive == true) cont.resume(taken)
+    }
+
     private var pendingPermission: CancellableContinuation<Boolean>? = null
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -68,6 +91,31 @@ class MainActivity : FlutterFragmentActivity() {
                 cont.invokeOnCancellation { pendingPermission = null }
                 permissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
             }
+
+        override suspend fun pickImages(): List<Uri> = suspendCancellableCoroutine { cont ->
+            if (pendingPhotos != null || pending != null) {
+                cont.resumeWith(Result.failure(SecurityBridgeError(SecurityHostApiImpl.ERR_BUSY, SecurityHostApiImpl.ERR_BUSY)))
+                return@suspendCancellableCoroutine
+            }
+            pendingPhotos = cont
+            cont.invokeOnCancellation { pendingPhotos = null }
+            photoLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+        }
+
+        override suspend fun takePicture(output: Uri): Boolean = suspendCancellableCoroutine { cont ->
+            if (pendingCamera != null || pending != null) {
+                cont.resumeWith(Result.failure(SecurityBridgeError(SecurityHostApiImpl.ERR_BUSY, SecurityHostApiImpl.ERR_BUSY)))
+                return@suspendCancellableCoroutine
+            }
+            pendingCamera = cont
+            cont.invokeOnCancellation { pendingCamera = null }
+            try {
+                cameraLauncher.launch(output)
+            } catch (e: android.content.ActivityNotFoundException) {
+                pendingCamera = null
+                cont.resumeWith(Result.failure(SecurityBridgeError(SecurityHostApiImpl.ERR_IO, SecurityHostApiImpl.ERR_IO)))
+            }
+        }
 
         override suspend fun launchIntentSender(sender: IntentSender): ActivityResult? =
             suspendCancellableCoroutine { cont ->

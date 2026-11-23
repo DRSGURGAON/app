@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Only the camera capture folder is shareable (see PhotoPages.ROOT_DIR). -->
+<paths>
+    <cache-path name="photos" path="docsafe-photos/" />
+</paths>

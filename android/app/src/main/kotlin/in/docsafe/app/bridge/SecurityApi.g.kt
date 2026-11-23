@@ -1318,6 +1318,21 @@ interface SecurityHostApi {
    */
   suspend fun startScan(pageLimit: Long, allowGalleryImport: Boolean): List<ScannedPage>?
   /**
+   * Photos to PDF: the Android photo picker (no storage permission) for up
+   * to [limit] photos. Each photo is turned upright (EXIF orientation),
+   * converted to JPEG if needed (HEIC, WebP…), scaled to at most 4000 px and
+   * kept as a page like a scanned one ([saveScan] / [discardScan]). Null if
+   * the user cancelled.
+   */
+  suspend fun pickPhotos(limit: Long): List<ScannedPage>?
+  /**
+   * Photos to PDF: one photo from the phone's camera app (no CAMERA
+   * permission; the camera app writes into DocSafe's private cache through a
+   * FileProvider). Prepared like [pickPhotos]. Null if cancelled.
+   * Errors: IO if no camera app is available.
+   */
+  suspend fun takePhoto(): ScannedPage?
+  /**
    * Encrypts the pages into the vault without writing any plaintext file:
    * one PDF (pages embedded unchanged, rotation as page metadata) or one
    * JPEG document per page. Source pages are NOT deleted here, so a failed
@@ -1826,6 +1841,42 @@ interface SecurityHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.startScan(pageLimitArg, allowGalleryImportArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.pickPhotos$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val limitArg = args[0] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.pickPhotos(limitArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.takePhoto$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.takePhoto())
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)
               }

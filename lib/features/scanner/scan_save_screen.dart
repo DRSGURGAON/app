@@ -16,10 +16,18 @@ import 'scan_controller.dart';
 
 /// Title, format, category, folder and tags for the scanned pages, then save.
 class ScanSaveScreen extends ConsumerStatefulWidget {
-  const ScanSaveScreen({super.key, this.folderId, this.categoryId});
+  const ScanSaveScreen({
+    super.key,
+    this.folderId,
+    this.categoryId,
+    this.photos = false,
+  });
 
   final int? folderId;
   final int? categoryId;
+
+  /// Started from Photos to PDF: photo wording for the title.
+  final bool photos;
 
   @override
   ConsumerState<ScanSaveScreen> createState() => _ScanSaveScreenState();
@@ -42,7 +50,10 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
       _titleInitialised = true;
       final locale = Localizations.localeOf(context).toLanguageTag();
       final stamp = DateFormat.yMMMd(locale).add_Hm().format(DateTime.now());
-      _title.text = AppLocalizations.of(context).scanDefaultTitle(stamp);
+      final l = AppLocalizations.of(context);
+      _title.text = widget.photos
+          ? l.photosDefaultTitle(stamp)
+          : l.scanDefaultTitle(stamp);
     }
   }
 
@@ -116,7 +127,9 @@ class _ScanSaveScreenState extends ConsumerState<ScanSaveScreen> {
       );
     }
     return Scaffold(
-      appBar: AppBar(title: Text(l.scanSaveTitle)),
+      appBar: AppBar(
+        title: Text(widget.photos ? l.photosSaveTitle : l.scanSaveTitle),
+      ),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [

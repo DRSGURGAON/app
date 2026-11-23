@@ -31,6 +31,12 @@ class FakeSecurityService implements SecurityService {
   /// Scanner simulation: next result of [startScan] (null = user cancelled).
   List<ScannedPage>? nextScan;
   SecurityFailure? nextScanFailure;
+
+  /// Photos to PDF simulation: next picker / camera result (null = cancelled).
+  List<ScannedPage>? nextPhotos;
+  ScannedPage? nextCameraPhoto;
+  SecurityFailure? nextPhotoFailure;
+  int? lastPhotoLimit;
   SecurityFailure? nextSaveScanFailure;
   final Set<String> pendingScanPages = {};
   List<ScanPageSpec>? lastSavedScan;
@@ -315,6 +321,31 @@ class FakeSecurityService implements SecurityService {
     nextScan = null;
     if (pages != null) pendingScanPages.addAll(pages.map((p) => p.path));
     return pages;
+  }
+
+  @override
+  Future<List<ScannedPage>?> pickPhotos(int limit) async {
+    _requireUnlocked();
+    lastPhotoLimit = limit;
+    final failure = nextPhotoFailure;
+    nextPhotoFailure = null;
+    if (failure != null) throw failure;
+    final pages = nextPhotos?.take(limit).toList();
+    nextPhotos = null;
+    if (pages != null) pendingScanPages.addAll(pages.map((p) => p.path));
+    return pages;
+  }
+
+  @override
+  Future<ScannedPage?> takePhoto() async {
+    _requireUnlocked();
+    final failure = nextPhotoFailure;
+    nextPhotoFailure = null;
+    if (failure != null) throw failure;
+    final page = nextCameraPhoto;
+    nextCameraPhoto = null;
+    if (page != null) pendingScanPages.add(page.path);
+    return page;
   }
 
   @override

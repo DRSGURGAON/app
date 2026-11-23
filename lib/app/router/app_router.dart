@@ -10,6 +10,7 @@ import '../../features/onboarding/onboarding_screen.dart';
 import '../../features/pdf_tools/pdf_tools_screen.dart';
 import '../../features/reminders/reminders_screen.dart';
 import '../../features/onboarding/splash_screen.dart';
+import '../../features/scanner/scan_controller.dart' show PageSource;
 import '../../features/scanner/scan_review_screen.dart';
 import '../../features/search/search_screen.dart';
 import '../../features/security/biometric_setup_screen.dart';
@@ -61,13 +62,25 @@ abstract final class Routes {
   // Full-screen routes.
   static const search = '/search';
   static const scan = '/scan';
-  static String scanInto({int? folderId, int? categoryId}) => Uri(
+  static String scanInto({
+    int? folderId,
+    int? categoryId,
+    PageSource source = PageSource.scanner,
+  }) => Uri(
     path: scan,
     queryParameters: {
       if (folderId != null) 'folder': '$folderId',
       if (categoryId != null) 'category': '$categoryId',
+      if (source != PageSource.scanner) 'source': source.name,
     },
   ).toString();
+
+  /// Photos to PDF, starting with the gallery or the camera.
+  static String photosToPdf({
+    PageSource source = PageSource.gallery,
+    int? folderId,
+    int? categoryId,
+  }) => scanInto(folderId: folderId, categoryId: categoryId, source: source);
   static String details(int id) => '/doc/$id';
   static String viewer(int id) => '/doc/$id/view';
 }
@@ -221,6 +234,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, s) => ScanReviewScreen(
           folderId: int.tryParse(s.uri.queryParameters['folder'] ?? ''),
           categoryId: int.tryParse(s.uri.queryParameters['category'] ?? ''),
+          source:
+              PageSource.values.asNameMap()[s.uri.queryParameters['source']] ??
+              PageSource.scanner,
         ),
       ),
       GoRoute(

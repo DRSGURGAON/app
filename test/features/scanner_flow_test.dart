@@ -116,7 +116,12 @@ void main() {
     fake.nextScan = scanPages(1);
     await startScan(tester);
     fake.nextScan = scanPages(2, prefix: 'q');
+    // Add pages offers the scanner, the gallery and the camera.
     await tester.tap(find.byTooltip(en.scanAddPages));
+    await settle(tester);
+    expect(find.text(en.photosFromGallery), findsOneWidget);
+    expect(find.text(en.photosTakePhoto), findsOneWidget);
+    await tester.tap(find.text(en.scanDocument).last);
     await settle(tester);
     expect(find.text(en.scanPageCount(3)), findsOneWidget);
     await app.dispose();

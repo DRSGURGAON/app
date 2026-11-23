@@ -77,17 +77,26 @@ void main() {
     final fake = await unlockedFake();
     final app = await pumpApp(tester, fake);
     await goTab(tester, en.navTools);
+    var badges = 0;
     for (final t in [
       en.toolEditPages,
+      en.photosToPdf,
       en.toolImagesToPdf,
       en.toolMerge,
       en.toolSplit,
       en.toolCompress,
+      en.toolEditText,
       en.toolAnnotate,
     ]) {
+      await tester.scrollUntilVisible(find.text(t), 200);
       expect(find.text(t), findsOneWidget);
+      final tile = find.ancestor(of: find.text(t), matching: find.byType(Card));
+      badges += find
+          .descendant(of: tile.first, matching: find.text(en.premiumBadge))
+          .evaluate()
+          .length;
     }
-    expect(find.text(en.premiumBadge), findsNWidgets(5));
+    expect(badges, 5);
     await tester.scrollUntilVisible(find.text(en.toolsPremiumNote), 200);
     expect(find.text(en.toolsPremiumNote), findsOneWidget);
     await app.dispose();

@@ -2015,4 +2015,51 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get backupReminderHelp =>
       'A card on Home reminds you when a backup is due. Nothing is backed up automatically.';
+
+  @override
+  String get photosToPdf => 'Photos to PDF';
+
+  @override
+  String get photosToPdfDesc =>
+      'Pick photos from your gallery or take them with the camera, arrange them and save one PDF';
+
+  @override
+  String get photosFromGallery => 'Choose photos';
+
+  @override
+  String get photosTakePhoto => 'Take photo';
+
+  @override
+  String get photosOpening => 'Opening…';
+
+  @override
+  String get photosNoPages => 'No photos yet';
+
+  @override
+  String get photosNoPagesBody =>
+      'Choose photos from your gallery or take one with the camera.';
+
+  @override
+  String get photosDiscardTitle => 'Discard these pages?';
+
+  @override
+  String get photosDiscardBody =>
+      'The pages will be deleted from DocSafe. Photos in your gallery are not changed. Nothing has been saved.';
+
+  @override
+  String get photosPrivacyNote =>
+      'Photos are copied into DocSafe and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when DocSafe locks.';
+
+  @override
+  String get photosSaveTitle => 'Save PDF';
+
+  @override
+  String photosDefaultTitle(String date) {
+    return 'Photos $date';
+  }
+
+  @override
+  String photosLimitReached(int count) {
+    return 'A document can have up to $count pages.';
+  }
 }

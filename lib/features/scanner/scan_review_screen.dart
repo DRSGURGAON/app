@@ -11,13 +11,21 @@ import '../../core/security/security_failure.dart';
 import 'scan_controller.dart';
 import 'scan_save_screen.dart';
 
-/// Review scanned pages: reorder (drag handle or move up/down), rotate, delete,
-/// view full screen, add more pages, then continue to save.
+/// Review pages: reorder (drag handle or move up/down), rotate, delete, view
+/// full screen, add more pages (scanner, gallery or camera, mixed freely),
+/// then continue to save. [source] is where the first pages come from; any
+/// source other than the scanner is "Photos to PDF".
 class ScanReviewScreen extends ConsumerStatefulWidget {
-  const ScanReviewScreen({super.key, this.folderId, this.categoryId});
+  const ScanReviewScreen({
+    super.key,
+    this.folderId,
+    this.categoryId,
+    this.source = PageSource.scanner,
+  });
 
   final int? folderId;
   final int? categoryId;
+  final PageSource source;
 
   @override
   ConsumerState<ScanReviewScreen> createState() => _ScanReviewScreenState();
@@ -26,24 +34,38 @@ class ScanReviewScreen extends ConsumerStatefulWidget {
 class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   String? _error;
 
+  /// False until the first scanner / picker / camera call returns, so the
+  /// empty state does not flash before it opens.
+  bool _started = false;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _scan(initial: true));
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => _add(widget.source, initial: true),
+    );
   }
 
-  Future<void> _scan({bool initial = false}) async {
+  bool get _photos => widget.source != PageSource.scanner;
+
+  Future<void> _add(PageSource source, {bool initial = false}) async {
     final l = AppLocalizations.of(context);
     setState(() => _error = null);
     try {
-      final added = await ref.read(scanControllerProvider.notifier).scan();
+      final added = await ref.read(scanControllerProvider.notifier).add(source);
       if (!mounted) return;
+      setState(() => _started = true);
       // Cancelling the very first scan leaves without creating anything.
       if (!added && initial && ref.read(scanControllerProvider).pages.isEmpty) {
         Navigator.of(context).pop();
       }
     } on SecurityFailure catch (e) {
-      if (mounted) setState(() => _error = l.errorFor(e.code));
+      if (mounted) {
+        setState(() {
+          _started = true;
+          _error = l.errorFor(e.code);
+        });
+      }
     }
   }
 
@@ -51,8 +73,8 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
     final l = AppLocalizations.of(context);
     final ok = await showConfirmDialog(
       context,
-      title: l.scanDiscardTitle,
-      message: l.scanDiscardBody,
+      title: _photos ? l.photosDiscardTitle : l.scanDiscardTitle,
+      message: _photos ? l.photosDiscardBody : l.scanDiscardBody,
       confirmLabel: l.scanDiscard,
       destructive: true,
     );
@@ -70,29 +92,66 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
     final pages = state.pages;
 
     Widget body;
-    if (state.scanning && pages.isEmpty) {
+    if ((state.scanning || !_started) && pages.isEmpty) {
       body = Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
             const SizedBox(height: 16),
-            Text(l.scanStarting),
+            Text(_photos ? l.photosOpening : l.scanStarting),
           ],
         ),
       );
     } else if (pages.isEmpty) {
       body = EmptyState(
-        icon: _error == null
-            ? Icons.document_scanner_outlined
-            : Icons.error_outline,
-        title: _error ?? l.scanNoPages,
-        body: _error == null ? l.scanNoPagesBody : null,
-        action: FilledButton.icon(
-          style: FilledButton.styleFrom(minimumSize: const Size(200, 48)),
-          onPressed: state.scanning ? null : _scan,
-          icon: const Icon(Icons.document_scanner_outlined),
-          label: Text(l.scanDocument),
+        icon: _error != null
+            ? Icons.error_outline
+            : _photos
+            ? Icons.photo_library_outlined
+            : Icons.document_scanner_outlined,
+        title: _error ?? (_photos ? l.photosNoPages : l.scanNoPages),
+        body: _error != null
+            ? null
+            : _photos
+            ? l.photosNoPagesBody
+            : l.scanNoPagesBody,
+        action: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 8,
+          runSpacing: 8,
+          children: [
+            if (_photos) ...[
+              FilledButton.icon(
+                key: const Key('photos-gallery'),
+                style: FilledButton.styleFrom(minimumSize: const Size(160, 48)),
+                onPressed: state.scanning
+                    ? null
+                    : () => _add(PageSource.gallery),
+                icon: const Icon(Icons.photo_library_outlined),
+                label: Text(l.photosFromGallery),
+              ),
+              OutlinedButton.icon(
+                key: const Key('photos-camera'),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(160, 48),
+                ),
+                onPressed: state.scanning
+                    ? null
+                    : () => _add(PageSource.camera),
+                icon: const Icon(Icons.photo_camera_outlined),
+                label: Text(l.photosTakePhoto),
+              ),
+            ] else
+              FilledButton.icon(
+                style: FilledButton.styleFrom(minimumSize: const Size(200, 48)),
+                onPressed: state.scanning
+                    ? null
+                    : () => _add(PageSource.scanner),
+                icon: const Icon(Icons.document_scanner_outlined),
+                label: Text(l.scanDocument),
+              ),
+          ],
         ),
       );
     } else {
@@ -143,16 +202,47 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            pages.isEmpty ? l.scanDocument : l.scanPageCount(pages.length),
+            pages.isNotEmpty
+                ? l.scanPageCount(pages.length)
+                : _photos
+                ? l.photosToPdf
+                : l.scanDocument,
           ),
           actions: [
             if (pages.isNotEmpty) ...[
-              IconButton(
+              PopupMenuButton<PageSource>(
+                key: const Key('scan-add-pages'),
                 tooltip: l.scanAddPages,
-                onPressed: state.scanning || pages.length >= scanPageLimit
-                    ? null
-                    : _scan,
+                enabled: !state.scanning && pages.length < scanPageLimit,
                 icon: const Icon(Icons.add_a_photo_outlined),
+                onSelected: _add,
+                itemBuilder: (_) => [
+                  for (final (source, icon, label) in [
+                    (
+                      PageSource.scanner,
+                      Icons.document_scanner_outlined,
+                      l.scanDocument,
+                    ),
+                    (
+                      PageSource.gallery,
+                      Icons.photo_library_outlined,
+                      l.photosFromGallery,
+                    ),
+                    (
+                      PageSource.camera,
+                      Icons.photo_camera_outlined,
+                      l.photosTakePhoto,
+                    ),
+                  ])
+                    PopupMenuItem(
+                      value: source,
+                      child: ListTile(
+                        contentPadding: EdgeInsets.zero,
+                        leading: Icon(icon),
+                        title: Text(label),
+                      ),
+                    ),
+                ],
               ),
               IconButton(
                 tooltip: l.scanDiscard,
@@ -171,10 +261,31 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        l.scanPrivacyNote,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
+                      // Scrolls on small screens instead of pushing the
+                      // Continue button off screen.
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxHeight: MediaQuery.sizeOf(context).height * .16,
+                        ),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (pages.length >= scanPageLimit)
+                                Text(
+                                  l.photosLimitReached(scanPageLimit),
+                                  style: theme.textTheme.bodySmall,
+                                ),
+                              Text(
+                                _photos
+                                    ? l.photosPrivacyNote
+                                    : l.scanPrivacyNote,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: theme.colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -186,6 +297,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
                                   builder: (_) => ScanSaveScreen(
                                     folderId: widget.folderId,
                                     categoryId: widget.categoryId,
+                                    photos: _photos,
                                   ),
                                 ),
                               ),

@@ -144,7 +144,10 @@ class ScanStore(
         persist()
         // Belt and braces: ML Kit writes its results under the app cache in a
         // directory whose name contains "docscan"; remove anything left there.
-        cacheDir.listFiles()?.filter { it.isDirectory && it.name.contains("docscan", ignoreCase = true) }?.forEach { dir ->
+        // Same for photo pages and camera captures (PhotoPages.ROOT_DIR).
+        cacheDir.listFiles()?.filter {
+            it.isDirectory && (it.name.contains("docscan", ignoreCase = true) || it.name == PhotoPages.ROOT_DIR)
+        }?.forEach { dir ->
             dir.walkBottomUp().forEach { f -> if (f.isFile) { if (SecureFiles.bestEffortWipe(f)) n++ } else f.delete() }
         }
         n

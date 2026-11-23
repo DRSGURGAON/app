@@ -989,5 +989,18 @@
   "backupReminderSetting": "बैकअप रिमाइंडर",
   "backupReminderOff": "बंद",
   "backupReminderEvery": "हर {days} दिन",
-  "backupReminderHelp": "बैकअप का समय होने पर होम पर एक कार्ड याद दिलाता है। अपने-आप कोई बैकअप नहीं होता।"
+  "backupReminderHelp": "बैकअप का समय होने पर होम पर एक कार्ड याद दिलाता है। अपने-आप कोई बैकअप नहीं होता।",
+  "photosToPdf": "फ़ोटो से PDF",
+  "photosToPdfDesc": "गैलरी से फ़ोटो चुनें या कैमरे से खींचें, क्रम ठीक करें और एक PDF बनाएँ",
+  "photosFromGallery": "फ़ोटो चुनें",
+  "photosTakePhoto": "फ़ोटो खींचें",
+  "photosOpening": "खुल रहा है…",
+  "photosNoPages": "अभी कोई फ़ोटो नहीं",
+  "photosNoPagesBody": "गैलरी से फ़ोटो चुनें या कैमरे से एक फ़ोटो खींचें।",
+  "photosDiscardTitle": "ये पेज हटाएँ?",
+  "photosDiscardBody": "ये पेज DocSafe से हट जाएँगे। आपकी गैलरी की फ़ोटो नहीं बदलेंगी। अभी कुछ सेव नहीं हुआ है।",
+  "photosPrivacyNote": "फ़ोटो DocSafe में कॉपी होती हैं और सेव करने पर एन्क्रिप्ट होती हैं। असली फ़ोटो आपकी गैलरी में रहती हैं (कुछ कैमरा ऐप भी एक कॉपी रखते हैं) — अगर फ़ोन पर नहीं चाहिए तो उन्हें वहाँ से हटाएँ। बिना सेव किए पेज DocSafe लॉक होने पर हट जाते हैं।",
+  "photosSaveTitle": "PDF सेव करें",
+  "photosDefaultTitle": "फ़ोटो {date}",
+  "photosLimitReached": "एक दस्तावेज़ में ज़्यादा से ज़्यादा {count} पेज हो सकते हैं।"
 }

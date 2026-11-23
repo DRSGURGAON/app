@@ -22,6 +22,10 @@ feature changes.
 - **Google Play services document scanner.** The scanner UI runs in Google Play services
   on the device and returns images to DocSafe; DocSafe sends nothing. Google's own data
   handling is covered by Google's policy.
+- **Photos to PDF.** Photos come from the Android photo picker or the phone's camera app
+  (no CAMERA or storage permission; the camera writes one file into DocSafe's private cache
+  through a non-exported FileProvider). They are processed on the device and encrypted;
+  nothing is sent anywhere.
 - **Backups.** The user saves the encrypted backup file through the Android system dialog
   to a place they choose (Drive, USB, folder). DocSafe does not upload it, so this is not
   collection by DocSafe.

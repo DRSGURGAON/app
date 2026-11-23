@@ -3421,6 +3421,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A card on Home reminds you when a backup is due. Nothing is backed up automatically.'**
   String get backupReminderHelp;
+
+  /// No description provided for @photosToPdf.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos to PDF'**
+  String get photosToPdf;
+
+  /// No description provided for @photosToPdfDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick photos from your gallery or take them with the camera, arrange them and save one PDF'**
+  String get photosToPdfDesc;
+
+  /// No description provided for @photosFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photos'**
+  String get photosFromGallery;
+
+  /// No description provided for @photosTakePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get photosTakePhoto;
+
+  /// No description provided for @photosOpening.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening…'**
+  String get photosOpening;
+
+  /// No description provided for @photosNoPages.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos yet'**
+  String get photosNoPages;
+
+  /// No description provided for @photosNoPagesBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose photos from your gallery or take one with the camera.'**
+  String get photosNoPagesBody;
+
+  /// No description provided for @photosDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard these pages?'**
+  String get photosDiscardTitle;
+
+  /// No description provided for @photosDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The pages will be deleted from DocSafe. Photos in your gallery are not changed. Nothing has been saved.'**
+  String get photosDiscardBody;
+
+  /// No description provided for @photosPrivacyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are copied into DocSafe and encrypted when you save. The originals stay in your gallery (some camera apps also keep a copy) — delete them there if you don\'t want them on the phone. Unsaved pages are deleted when DocSafe locks.'**
+  String get photosPrivacyNote;
+
+  /// No description provided for @photosSaveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save PDF'**
+  String get photosSaveTitle;
+
+  /// No description provided for @photosDefaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos {date}'**
+  String photosDefaultTitle(String date);
+
+  /// No description provided for @photosLimitReached.
+  ///
+  /// In en, this message translates to:
+  /// **'A document can have up to {count} pages.'**
+  String photosLimitReached(int count);
 }
 
 class _AppLocalizationsDelegate

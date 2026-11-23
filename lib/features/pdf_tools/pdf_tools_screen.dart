@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/localization/gen/app_localizations.dart';
+import '../../app/router/app_router.dart';
 import '../../app/widgets/brand_mark.dart';
 import '../../core/entitlement/entitlement.dart';
 import '../../data/models/vault_document.dart';
@@ -206,6 +208,13 @@ class PdfToolsScreen extends ConsumerWidget {
             title: l.toolEditPages,
             body: l.toolEditPagesDesc,
             onTap: () => PdfToolFlows.editPages(context),
+          ),
+          _Tool(
+            key: const Key('tool-photos-to-pdf'),
+            icon: Icons.photo_library_outlined,
+            title: l.photosToPdf,
+            body: l.photosToPdfDesc,
+            onTap: () => context.push(Routes.photosToPdf()),
           ),
           _Tool(
             icon: Icons.collections_outlined,

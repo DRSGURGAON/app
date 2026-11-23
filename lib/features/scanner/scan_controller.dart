@@ -35,6 +35,10 @@ class ScanState {
   final bool scanning;
 }
 
+/// Where review pages come from: the ML Kit scanner, the photo picker
+/// (gallery) or the camera app. All end up as JPEG pages in the same review.
+enum PageSource { scanner, gallery, camera }
+
 /// Maximum pages per document.
 const scanPageLimit = 50;
 
@@ -67,19 +71,31 @@ class ScanController extends Notifier<ScanState> {
 
   /// Opens the ML Kit scanner and appends its pages. Returns false if the user
   /// cancelled. Throws [SecurityFailure] (e.g. scanner unavailable).
-  Future<bool> scan() async {
+  Future<bool> scan() => add(PageSource.scanner);
+
+  /// Appends pages from [source]. Returns false if the user cancelled or the
+  /// page limit is reached. Throws [SecurityFailure].
+  Future<bool> add(PageSource source) async {
     final remaining = scanPageLimit - state.pages.length;
     if (remaining <= 0) return false;
     state = ScanState(pages: state.pages, scanning: true);
     try {
       final pages = await ref
           .read(lockControllerProvider.notifier)
-          .runWithoutAutoLock(
-            () => _service.startScan(
-              pageLimit: remaining,
-              allowGalleryImport: true,
-            ),
-          );
+          .runWithoutAutoLock(() async {
+            switch (source) {
+              case PageSource.scanner:
+                return _service.startScan(
+                  pageLimit: remaining,
+                  allowGalleryImport: true,
+                );
+              case PageSource.gallery:
+                return _service.pickPhotos(remaining);
+              case PageSource.camera:
+                final p = await _service.takePhoto();
+                return p == null ? null : [p];
+            }
+          });
       if (!ref.mounted) return false;
       final added = [
         for (final p in pages ?? const <ScannedPage>[])

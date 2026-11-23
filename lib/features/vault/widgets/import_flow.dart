@@ -59,6 +59,7 @@ Future<void> runImport(
 }
 
 const _scanChoice = 'scan';
+const _photosChoice = 'photos';
 
 /// Bottom sheet offering scan, PDF or image import.
 Future<void> showImportSheet(
@@ -90,6 +91,12 @@ Future<void> showImportSheet(
             onTap: () => Navigator.pop(context, _scanChoice),
           ),
           ListTile(
+            key: const Key('import-photos-to-pdf'),
+            leading: const Icon(Icons.photo_library_outlined),
+            title: Text(l.photosToPdf),
+            onTap: () => Navigator.pop(context, _photosChoice),
+          ),
+          ListTile(
             leading: const Icon(Icons.picture_as_pdf_outlined),
             title: Text(l.homeImportPdf),
             onTap: () => Navigator.pop(context, ImportKind.pdf),
@@ -108,6 +115,12 @@ Future<void> showImportSheet(
   if (kind == _scanChoice) {
     await context.push(
       Routes.scanInto(folderId: folderId, categoryId: categoryId),
+    );
+    return;
+  }
+  if (kind == _photosChoice) {
+    await context.push(
+      Routes.photosToPdf(folderId: folderId, categoryId: categoryId),
     );
     return;
   }
