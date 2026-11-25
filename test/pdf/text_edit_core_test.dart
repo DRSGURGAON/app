@@ -378,6 +378,28 @@ void main() {
       expect(all, contains('Education: Delhi Public School'));
       expect(all, contains('ASHA SHARMA'));
     });
+
+    test('letter-spaced line keeps its letter spacing when edited', () {
+      final pdf = fixture('form_xobject_resume.pdf');
+      final m = analyzePdf(p, pdf);
+      final orig = run(m, 'TEAM');
+      // Same text written again: same width, so the spacing is the original.
+      final same = applyEdits(p, pdf, [TextEdit.of(orig, 'TEAM LEAD')], {});
+      final again = run(analyzePdf(p, same.bytes), 'TEAM');
+      expect(again.text, 'TEAM LEAD');
+      expect(again.left, closeTo(orig.left, 0.5));
+      expect(again.right, closeTo(orig.right, 0.8));
+      // New words: still one object per letter, read back as words.
+      final changed = applyEdits(p, pdf, [
+        TextEdit.of(orig, 'TEAM MANAGER'),
+      ], {});
+      final after = run(analyzePdf(p, changed.bytes), 'TEAM');
+      expect(after.text, 'TEAM MANAGER');
+      expect(after.objectIndices, hasLength(11));
+      // Wider than the old line by about three spaced letters.
+      expect(after.right - orig.right, inInclusiveRange(18, 40));
+      expect(changed.overflow, [false]);
+    });
   });
 
   test('font file parser reads names, style and characters', () {

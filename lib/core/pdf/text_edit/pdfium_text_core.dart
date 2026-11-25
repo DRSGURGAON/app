@@ -612,6 +612,193 @@ TextRun _run(int page, List<_Obj> group, List<_Obj> objs, double pageWidth) {
   );
 }
 
+/// Advance (pen movement, in page units) of [s] written with [font] at [size]
+/// and the scale of [m]: right edge of [s]+probe minus right edge of probe.
+double? _advance(
+  PDFium p,
+  FPDF_DOCUMENT doc,
+  FPDF_FONT font,
+  double size,
+  _M m,
+  String s,
+) {
+  final letters = s.trim();
+  if (letters.isEmpty) return null;
+  final probe = letters[0];
+  double? right(String text) {
+    final o = p.FPDFPageObj_CreateTextObj(doc, font, size);
+    if (o.address == 0) return null;
+    final wide = _wide(text);
+    final fm = calloc<FS_MATRIX>();
+    try {
+      if (p.FPDFText_SetText(o, wide.cast()) != 1) return null;
+      fm.ref
+        ..a = m.a
+        ..b = m.b
+        ..c = m.c
+        ..d = m.d
+        ..e = 0
+        ..f = 0;
+      p.FPDFPageObj_SetMatrix(o, fm);
+      return _bounds(p, o).r;
+    } finally {
+      calloc.free(wide);
+      calloc.free(fm);
+      p.FPDFPageObj_Destroy(o);
+    }
+  }
+
+  final a = right(s + probe);
+  final b = right(probe);
+  return a == null || b == null ? null : a - b;
+}
+
+/// The characters each text object really draws, by object address. The text
+/// reader also reports spaces it adds between objects; those are left out.
+Map<int, String> _realTexts(PDFium p, FPDF_TEXTPAGE tp) {
+  final out = <int, StringBuffer>{};
+  final n = p.FPDFText_CountChars(tp);
+  for (var i = 0; i < n; i++) {
+    if (p.FPDFText_IsGenerated(tp, i) == 1) continue;
+    final o = p.FPDFText_GetTextObject(tp, i);
+    if (o.address == 0) continue;
+    out
+        .putIfAbsent(o.address, StringBuffer.new)
+        .writeCharCode(p.FPDFText_GetUnicode(tp, i));
+  }
+  return {for (final e in out.entries) e.key: e.value.toString()};
+}
+
+/// Letter-spaced text written one object per letter (Canva and other design
+/// tools): writes the new text the same way, one object per letter, keeping
+/// the original letter spacing, instead of one tightly set line.
+///
+/// Returns null when [nodes] is not such a line (the normal edit is used),
+/// otherwise whether the text runs past the edit's limit. The new objects are
+/// on the page; the caller removes [nodes].
+bool? _spacedEdit(
+  _Doc doc,
+  FPDF_PAGE page,
+  List<_Node> nodes,
+  TextEdit e,
+  EditFonts fonts,
+) {
+  final p = doc.p;
+  if (nodes.length < 3 || e.text.trim().isEmpty) return null;
+  final tp = p.FPDFText_LoadPage(page);
+  final m = calloc<FS_MATRIX>();
+  final sz = calloc<Float>();
+  final rgba = calloc<UnsignedInt>(4);
+  try {
+    final real = _realTexts(p, tp);
+    final texts = [for (final n in nodes) real[n.obj.address] ?? ''];
+    final lengths = [for (final t in texts) t.trim().length]..sort();
+    if (lengths[lengths.length ~/ 2] > 2) return null;
+    final first = nodes.first.obj;
+    p.FPDFTextObj_GetFontSize(first, sz);
+    final size = sz.value;
+    final pm = _concat(_matrixOf(p, first, m), nodes.first.toPage);
+    if (pm.b.abs() > 0.01 || pm.c.abs() > 0.01 || pm.a <= 0) return null;
+    final origFont = p.FPDFTextObj_GetFont(first);
+    // Letter spacing: from one letter's origin to the next, minus the
+    // letter's own advance; the median over letter pairs. A space at the end
+    // of an object may be added by PDFium's reader, so those pairs are left
+    // out.
+    final steps = <double>[];
+    for (var i = 1; i < nodes.length; i++) {
+      if (texts[i - 1].endsWith(' ') || texts[i - 1].trim().length != 1) {
+        continue;
+      }
+      final x0 = _concat(
+        _matrixOf(p, nodes[i - 1].obj, m),
+        nodes[i - 1].toPage,
+      ).e;
+      final x1 = _concat(_matrixOf(p, nodes[i].obj, m), nodes[i].toPage).e;
+      final adv = _advance(
+        p,
+        doc.handle,
+        origFont,
+        size,
+        pm,
+        texts[i - 1].trim(),
+      );
+      if (adv != null) steps.add(x1 - x0 - adv);
+    }
+    if (steps.length < 2) return null;
+    steps.sort();
+    var tracking = steps[steps.length ~/ 2];
+    // Ordinary text has (almost) no letter spacing: use the normal edit.
+    if (tracking.abs() < pm.a * size * 0.02) return null;
+
+    final font = e.fontId == null
+        ? origFont
+        : doc.font(e.fontId!, fonts[e.fontId!]!);
+    p.FPDFPageObj_GetFillColor(first, rgba, rgba + 1, rgba + 2, rgba + 3);
+    final mode = p.FPDFTextObj_GetTextRenderMode(first);
+    // Letters with the spaces that follow them, like the source objects.
+    final pieces = <String>[];
+    for (final ch in e.text.trim().runes.map(String.fromCharCode)) {
+      if (ch.trim().isEmpty && pieces.isNotEmpty) {
+        pieces[pieces.length - 1] += ch;
+      } else {
+        pieces.add(ch);
+      }
+    }
+    final advances = <double>[];
+    for (final piece in pieces) {
+      final a = _advance(p, doc.handle, font, size, pm, piece);
+      if (a == null) return null;
+      advances.add(a);
+    }
+    final natural = advances.fold<double>(0, (a, b) => a + b);
+    // Letter spacing is added once per object (letter + its spaces).
+    final steps2 = pieces.length - 1;
+    final startX = pm.e;
+    double rightFor(double t) {
+      // The last letter's right edge: its origin plus its ink width, close
+      // enough to its advance for the limit check.
+      return startX + natural + t * math.max(0, steps2);
+    }
+
+    if (e.fit && rightFor(tracking) > e.maxRight + 0.5 && steps2 > 0) {
+      final fitted = (e.maxRight - startX - natural) / steps2;
+      tracking = math.max(0.0, math.min(tracking, fitted));
+    }
+    var x = startX;
+    var right = startX;
+    for (var i = 0; i < pieces.length; i++) {
+      final o = p.FPDFPageObj_CreateTextObj(doc.handle, font, size);
+      final wide = _wide(pieces[i]);
+      try {
+        p.FPDFText_SetText(o, wide.cast());
+      } finally {
+        calloc.free(wide);
+      }
+      m.ref
+        ..a = pm.a
+        ..b = pm.b
+        ..c = pm.c
+        ..d = pm.d
+        ..e = x
+        ..f = pm.f;
+      p.FPDFPageObj_SetMatrix(o, m);
+      p.FPDFPageObj_SetFillColor(o, rgba[0], rgba[1], rgba[2], rgba[3]);
+      if (mode != FPDF_TEXT_RENDERMODE.FPDF_TEXTRENDERMODE_UNKNOWN) {
+        p.FPDFTextObj_SetTextRenderMode(o, mode);
+      }
+      p.FPDFPage_InsertObject(page, o);
+      right = math.max(right, _bounds(p, o).r);
+      x += advances[i] + tracking;
+    }
+    return right > e.maxRight + 0.5;
+  } finally {
+    p.FPDFText_ClosePage(tp);
+    calloc.free(m);
+    calloc.free(sz);
+    calloc.free(rgba);
+  }
+}
+
 /// Applies [edits] in memory and returns per-edit overflow flags.
 List<bool> _applyTo(_Doc doc, List<TextEdit> edits, EditFonts fonts) {
   final p = doc.p;
@@ -653,6 +840,12 @@ List<bool> _applyTo(_Doc doc, List<TextEdit> edits, EditFonts fonts) {
         ];
         if (nodes.isEmpty) continue;
         final first = nodes.first.obj;
+        final spaced = _spacedEdit(doc, page, nodes, e, fonts);
+        if (spaced != null) {
+          nodes.forEach(remove);
+          overflow[ei] = spaced;
+          continue;
+        }
         FPDF_PAGEOBJECT target;
         var targetToPage = nodes.first.toPage;
         final wide = _wide(e.text);
