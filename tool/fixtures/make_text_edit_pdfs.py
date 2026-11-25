@@ -81,10 +81,55 @@ def libreoffice_letter():
                    check=True, capture_output=True, timeout=180)
 
 
+def canva_like(fonts):
+    """Design-tool style page: every text object sits inside a Form XObject
+    (Canva and similar tools do this), one of them in a nested form, with a
+    transformed form matrix."""
+    src = find(fonts, "Carlito-Regular.ttf")
+    pdfmetrics.registerFont(RLFont("CarlitoEmb", src))
+    c = canvas.Canvas(os.path.join(OUT, "form_xobject_resume.pdf"), pagesize=A4)
+    # Inner form, used inside the outer one.
+    c.beginForm("Badge")
+    c.setFillColorRGB(0.1, 0.6, 0.7)
+    c.rect(0, 0, 220, 22, fill=1, stroke=0)
+    c.setFillColorRGB(1, 1, 1)
+    c.setFont("Helvetica-Bold", 11)
+    c.drawString(8, 7, "SUPPORT AGENT (FINANCE)")
+    c.endForm()
+    c.beginForm("Page")
+    c.setFillColorRGB(0, 0, 0)
+    c.setFont("Helvetica-Bold", 24)
+    c.drawString(0, 700, "ASHA VERMA")
+    c.saveState()
+    c.translate(0, 660)
+    c.doForm("Badge")
+    c.restoreState()
+    c.setFont("CarlitoEmb", 12)
+    c.drawString(0, 620, "Education: Delhi Public School")
+    c.drawString(0, 600, "Skills: Customer care, Excel")
+    # Letter-spaced heading written one letter per text object, word spaces
+    # inside the objects ("M "), the way Canva writes it.
+    c.setFont("Helvetica", 11)
+    x = 0
+    for ch in ["T", "E", "A", "M ", "L", "E", "A", "D"]:
+        c.drawString(x, 570, ch)
+        x += pdfmetrics.stringWidth(ch, "Helvetica", 11) + 2.5
+    c.endForm()
+    c.setFillColorRGB(0.95, 0.95, 0.95)
+    c.rect(0, 0, A4[0], A4[1], fill=1, stroke=0)
+    c.saveState()
+    c.translate(60, 40)
+    c.doForm("Page")
+    c.restoreState()
+    c.showPage()
+    c.save()
+
+
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     receipt()
     calibri_named(sys.argv[1])
     libreoffice_letter()
+    canva_like(sys.argv[1])
     for f in sorted(os.listdir(OUT)):
         print(f, os.path.getsize(os.path.join(OUT, f)))

@@ -305,6 +305,81 @@ void main() {
     });
   });
 
+  group('design-tool PDFs: text inside Form XObjects (Canva style)', () {
+    // Every text object is inside a form drawn at (60, 40); the badge is a
+    // form inside that form, moved up by 660.
+    String text(Uint8List pdf) =>
+        analyzePdf(p, pdf).runs.map((r) => r.text).join('\n');
+
+    test(
+      'text inside forms and nested forms is found, in page coordinates',
+      () {
+        final m = analyzePdf(p, fixture('form_xobject_resume.pdf'));
+        final name = run(m, 'ASHA VERMA');
+        expect(name.left, closeTo(60, 1));
+        expect(name.bottom, inInclusiveRange(735, 745));
+        expect(name.fontSize, closeTo(24, 0.1));
+        final badge = run(m, 'SUPPORT AGENT');
+        expect(badge.text, 'SUPPORT AGENT (FINANCE)');
+        expect(badge.left, closeTo(68, 1));
+        expect(badge.bottom, inInclusiveRange(703, 710));
+        expect(badge.color & 0xFFFFFF, 0xFFFFFF);
+        expect(run(m, 'Education').text, 'Education: Delhi Public School');
+        expect(m.fonts[run(m, 'Education').fontKey]!.embedded, isTrue);
+        // One object per letter with letter spacing: read as words, not as
+        // "T E A M L E A D".
+        expect(run(m, 'TEAM').text, 'TEAM LEAD');
+      },
+    );
+
+    test('editing replaces the text in the saved file, not just on screen', () {
+      final pdf = fixture('form_xobject_resume.pdf');
+      final m = analyzePdf(p, pdf);
+      final (nameEdit, nameChoice) = edit(
+        pdf,
+        m,
+        run(m, 'ASHA VERMA'),
+        'ASHA SHARMA',
+      );
+      expect(nameChoice.kind, FontMatchKind.original);
+      final after = analyzePdf(p, nameEdit.bytes);
+      final name = run(after, 'ASHA SHARMA');
+      expect(name.left, closeTo(60, 1));
+      expect(text(nameEdit.bytes), isNot(contains('VERMA')));
+
+      // Nested form, and a letter the embedded subset lacks (so another
+      // font is used and the new object goes on the page itself).
+      final m2 = analyzePdf(p, nameEdit.bytes);
+      final result = applyEdits(p, nameEdit.bytes, [
+        TextEdit.of(
+          run(m2, 'SUPPORT AGENT'),
+          'SUPPORT LEAD (FINANCE)',
+          fontId: null,
+        ),
+        TextEdit.of(
+          run(m2, 'Skills'),
+          'Skills: Customer care, Word, Tally',
+          fontId: chooseFont(
+            m2.fonts[run(m2, 'Skills').fontKey]!,
+            'Skills: Customer care, Word, Tally',
+            library,
+          ).font?.id,
+        ),
+      ], fontBytes);
+      final all = text(result.bytes);
+      expect(all, contains('SUPPORT LEAD (FINANCE)'));
+      expect(all, isNot(contains('SUPPORT AGENT')));
+      expect(all, contains('Skills: Customer care, Word, Tally'));
+      expect(all, isNot(contains('Excel')));
+      final skills = run(analyzePdf(p, result.bytes), 'Skills');
+      expect(skills.left, closeTo(60, 1));
+      expect(skills.bottom, inInclusiveRange(636, 642));
+      // Untouched text in the form is still there.
+      expect(all, contains('Education: Delhi Public School'));
+      expect(all, contains('ASHA SHARMA'));
+    });
+  });
+
   test('font file parser reads names, style and characters', () {
     final (sans, _) = builtIns.firstWhere(
       (e) => e.$1.id.endsWith('ScannerProSans-Bold.ttf'),
