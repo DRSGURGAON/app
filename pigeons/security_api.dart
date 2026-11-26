@@ -435,7 +435,11 @@ abstract class SecurityHostApi {
   /// Compresses a vault photo to a JPEG of at most [targetBytes] (at least
   /// 10 KB), as large and sharp as fits. Errors: INVALID_INPUT.
   @async
-  SizedFile compressImageToSize(String fileId, String mimeType, int targetBytes);
+  SizedFile compressImageToSize(
+    String fileId,
+    String mimeType,
+    int targetBytes,
+  );
 
   /// Annotate & Sign: renders each listed page of a vault PDF, draws its
   /// overlay on top and returns a NEW encrypted PDF containing only those
