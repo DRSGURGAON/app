@@ -174,6 +174,31 @@ void main() {
     );
     await startScan(tester);
     expect(find.text(en.scanUnavailable), findsOneWidget);
+    // Camera and gallery are offered instead; the gallery works.
+    expect(find.text(en.scanFallbackHint), findsOneWidget);
+    expect(find.byKey(const Key('photos-camera')), findsOneWidget);
+    expect(find.byKey(const Key('scan-retry')), findsOneWidget);
+    fake.nextPhotos = [
+      ScannedPage(
+        path: '/cache/docsafe-photos/b/g1.jpg',
+        width: 3000,
+        height: 4000,
+      ),
+    ];
+    await tester.tap(find.byKey(const Key('photos-gallery')));
+    await settle(tester);
+    expect(find.text(en.scanPageCount(1)), findsOneWidget);
+    expect(find.text(en.scanUnavailable), findsNothing);
+    await app.dispose();
+  });
+
+  testWidgets('any scanner failure offers camera and gallery', (tester) async {
+    final fake = await unlockedFake();
+    final app = await pumpApp(tester, fake);
+    fake.nextScanFailure = const SecurityFailure(SecurityErrorCode.unknown);
+    await startScan(tester);
+    expect(find.text(en.errorGeneric), findsOneWidget);
+    expect(find.byKey(const Key('photos-gallery')), findsOneWidget);
     await app.dispose();
   });
 

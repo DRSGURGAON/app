@@ -2217,4 +2217,8 @@ class AppLocalizationsHi extends AppLocalizations {
   String compressSizeNotReached(String target, String size) {
     return '$target से कम नहीं हो पाया। सबसे छोटा संभव: $size (सेव किया गया)।';
   }
+
+  @override
+  String get scanFallbackHint =>
+      'फिर भी आप कैमरे से स्कैन कर सकते हैं: फ़ोटो लें या गैलरी से चुनें, वे एक PDF में सेव हो जाएँगी।';
 }

@@ -1245,5 +1245,6 @@
         "type": "String"
       }
     }
-  }
+  },
+  "scanFallbackHint": "You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF."
 }

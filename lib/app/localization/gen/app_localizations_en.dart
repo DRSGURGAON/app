@@ -2249,4 +2249,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String compressSizeNotReached(String target, String size) {
     return 'Couldn\'t get under $target. Smallest possible: $size (saved).';
   }
+
+  @override
+  String get scanFallbackHint =>
+      'You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF.';
 }

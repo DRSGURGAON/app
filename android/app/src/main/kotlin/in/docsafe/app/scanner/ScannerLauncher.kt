@@ -3,16 +3,19 @@ package `in`.docsafe.app.scanner
 import android.app.Activity
 import android.content.IntentSender
 import android.net.Uri
+import android.util.Log
 import androidx.activity.result.ActivityResult
 import androidx.fragment.app.FragmentActivity
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanning
 import com.google.mlkit.vision.documentscanner.GmsDocumentScanningResult
+import `in`.docsafe.app.bridge.SecurityBridgeError
 import `in`.docsafe.crypto.VaultIoException
 import java.io.File
 import java.security.SecureRandom
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.suspendCancellableCoroutine
 
 /** The scanner could not start (Google Play services module missing, unsupported device, ...). */
@@ -38,12 +41,35 @@ class ScannerLauncher(private val cacheDir: File) {
             .setPageLimit(pageLimit.coerceIn(1, MAX_PAGES))
             .setGalleryImportAllowed(allowGalleryImport)
             .build()
-        val sender = suspendCancellableCoroutine<IntentSender> { cont ->
-            GmsDocumentScanning.getClient(options).getStartScanIntent(activity)
-                .addOnSuccessListener { if (cont.isActive) cont.resume(it) }
-                .addOnFailureListener { if (cont.isActive) cont.resumeWithException(ScannerUnavailableException(it)) }
+        // Anything that stops the scanner from opening (Play services module
+        // missing or being downloaded, old Play services, unsupported device,
+        // the system refusing to start its screen) is "scanner unavailable",
+        // so the app can offer the camera / gallery instead.
+        val sender = try {
+            suspendCancellableCoroutine<IntentSender> { cont ->
+                GmsDocumentScanning.getClient(options).getStartScanIntent(activity)
+                    .addOnSuccessListener { if (cont.isActive) cont.resume(it) }
+                    .addOnFailureListener { if (cont.isActive) cont.resumeWithException(ScannerUnavailableException(it)) }
+            }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: ScannerUnavailableException) {
+            Log.w(TAG, "Scanner did not start (${e.cause?.javaClass?.simpleName})")
+            throw e
+        } catch (e: Exception) {
+            Log.w(TAG, "Scanner did not start (${e.javaClass.simpleName})")
+            throw ScannerUnavailableException(e)
         }
-        val result = launch(sender) ?: return null
+        val result = try {
+            launch(sender)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: SecurityBridgeError) {
+            throw e // e.g. another system screen is already open
+        } catch (e: Exception) {
+            Log.w(TAG, "Scanner screen did not open (${e.javaClass.simpleName})")
+            throw ScannerUnavailableException(e)
+        } ?: return null
         if (result.resultCode != Activity.RESULT_OK) return null // cancelled
         val scan = GmsDocumentScanningResult.fromActivityResultIntent(result.data)
             ?: throw VaultIoException("Scanner returned no result")
@@ -71,5 +97,6 @@ class ScannerLauncher(private val cacheDir: File) {
 
     companion object {
         const val MAX_PAGES = 50
+        private const val TAG = "DocSafeScanner"
     }
 }

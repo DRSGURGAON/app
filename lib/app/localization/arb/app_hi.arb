@@ -1052,5 +1052,6 @@
   "compressRunSize": "{target} से कम करें",
   "compressSizeDone": "{from} → {to} ({target} से कम)",
   "compressAlreadyUnder": "पहले से {size} है, {target} से कम। कुछ करने की ज़रूरत नहीं।",
-  "compressSizeNotReached": "{target} से कम नहीं हो पाया। सबसे छोटा संभव: {size} (सेव किया गया)।"
+  "compressSizeNotReached": "{target} से कम नहीं हो पाया। सबसे छोटा संभव: {size} (सेव किया गया)।",
+  "scanFallbackHint": "फिर भी आप कैमरे से स्कैन कर सकते हैं: फ़ोटो लें या गैलरी से चुनें, वे एक PDF में सेव हो जाएँगी।"
 }

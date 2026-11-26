@@ -3799,6 +3799,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Couldn\'t get under {target}. Smallest possible: {size} (saved).'**
   String compressSizeNotReached(String target, String size);
+
+  /// No description provided for @scanFallbackHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF.'**
+  String get scanFallbackHint;
 }
 
 class _AppLocalizationsDelegate

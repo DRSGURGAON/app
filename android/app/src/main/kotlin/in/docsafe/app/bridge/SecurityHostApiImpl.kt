@@ -294,7 +294,13 @@ class SecurityHostApiImpl(
             allowGalleryImport = allowGalleryImport,
         ) ?: return@guard null
         io {
-            session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+            try {
+                session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+            } catch (e: Exception) {
+                // Class name only (messages may contain paths).
+                Log.w(TAG, "Scanned pages could not be read (${e.javaClass.simpleName})")
+                throw e
+            }
         }
     }
 

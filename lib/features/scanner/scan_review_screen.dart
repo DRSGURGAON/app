@@ -37,6 +37,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
   /// False until the first scanner / picker / camera call returns, so the
   /// empty state does not flash before it opens.
   bool _started = false;
+  bool _scannerFailed = false;
 
   @override
   void initState() {
@@ -50,7 +51,10 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
 
   Future<void> _add(PageSource source, {bool initial = false}) async {
     final l = AppLocalizations.of(context);
-    setState(() => _error = null);
+    setState(() {
+      _error = null;
+      _scannerFailed = false;
+    });
     try {
       final added = await ref.read(scanControllerProvider.notifier).add(source);
       if (!mounted) return;
@@ -64,6 +68,10 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
         setState(() {
           _started = true;
           _error = l.errorFor(e.code);
+          // The scanner itself failed: offer the camera and gallery instead.
+          _scannerFailed =
+              source == PageSource.scanner &&
+              e.code != SecurityErrorCode.locked;
         });
       }
     }
@@ -112,7 +120,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
             : Icons.document_scanner_outlined,
         title: _error ?? (_photos ? l.photosNoPages : l.scanNoPages),
         body: _error != null
-            ? null
+            ? (_scannerFailed ? l.scanFallbackHint : null)
             : _photos
             ? l.photosNoPagesBody
             : l.scanNoPagesBody,
@@ -121,7 +129,7 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
           spacing: 8,
           runSpacing: 8,
           children: [
-            if (_photos) ...[
+            if (_photos || _scannerFailed) ...[
               FilledButton.icon(
                 key: const Key('photos-gallery'),
                 style: FilledButton.styleFrom(minimumSize: const Size(160, 48)),
@@ -142,9 +150,13 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
                 icon: const Icon(Icons.photo_camera_outlined),
                 label: Text(l.photosTakePhoto),
               ),
-            ] else
-              FilledButton.icon(
-                style: FilledButton.styleFrom(minimumSize: const Size(200, 48)),
+            ],
+            if (!_photos)
+              (_scannerFailed ? OutlinedButton.icon : FilledButton.icon)(
+                key: const Key('scan-retry'),
+                style: ButtonStyle(
+                  minimumSize: WidgetStateProperty.all(const Size(200, 48)),
+                ),
                 onPressed: state.scanning
                     ? null
                     : () => _add(PageSource.scanner),
