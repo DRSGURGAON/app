@@ -1661,13 +1661,13 @@ abstract class AppLocalizations {
   /// No description provided for @toolCompress.
   ///
   /// In en, this message translates to:
-  /// **'Compress PDF'**
+  /// **'Compress PDF & photos'**
   String get toolCompress;
 
   /// No description provided for @toolCompressDesc.
   ///
   /// In en, this message translates to:
-  /// **'Reduce file size — one or several PDFs at once'**
+  /// **'Reduce file size, or get it under a size like 100 KB'**
   String get toolCompressDesc;
 
   /// No description provided for @premiumBadge.
@@ -2603,13 +2603,13 @@ abstract class AppLocalizations {
   /// No description provided for @premiumPdfTools.
   ///
   /// In en, this message translates to:
-  /// **'Merge, split and compress PDFs'**
+  /// **'Merge, split and compress'**
   String get premiumPdfTools;
 
   /// No description provided for @premiumPdfToolsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Combine files, pull out pages and shrink PDFs, all on this phone.'**
+  /// **'Combine files, pull out pages, and shrink PDFs or photos to a size like 100 KB, all on this phone.'**
   String get premiumPdfToolsDesc;
 
   /// No description provided for @premiumOcrSearch.
@@ -3709,6 +3709,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An encrypted backup saved for you to Google Drive or another place you choose'**
   String get premiumAutoBackupDesc;
+
+  /// No description provided for @pickPdfsOrPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose PDFs or photos'**
+  String get pickPdfsOrPhotos;
+
+  /// No description provided for @compressModeLevel.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality'**
+  String get compressModeLevel;
+
+  /// No description provided for @compressModeSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Under a size'**
+  String get compressModeSize;
+
+  /// No description provided for @compressTargetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make each file smaller than'**
+  String get compressTargetTitle;
+
+  /// No description provided for @compressTargetHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Handy for upload limits on forms and websites. The smaller the size, the less sharp text and photos become.'**
+  String get compressTargetHelp;
+
+  /// No description provided for @compressTargetOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other size'**
+  String get compressTargetOther;
+
+  /// No description provided for @compressUnitKb.
+  ///
+  /// In en, this message translates to:
+  /// **'KB'**
+  String get compressUnitKb;
+
+  /// No description provided for @compressUnitMb.
+  ///
+  /// In en, this message translates to:
+  /// **'MB'**
+  String get compressUnitMb;
+
+  /// No description provided for @compressTargetTooSmall.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at least 10 KB.'**
+  String get compressTargetTooSmall;
+
+  /// No description provided for @compressTargetTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter at most 100 MB.'**
+  String get compressTargetTooLarge;
+
+  /// No description provided for @compressPhotoNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos are saved as JPEG.'**
+  String get compressPhotoNote;
+
+  /// No description provided for @compressRunSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Compress to under {target}'**
+  String compressRunSize(String target);
+
+  /// No description provided for @compressSizeDone.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} → {to} (under {target})'**
+  String compressSizeDone(String from, String to, String target);
+
+  /// No description provided for @compressAlreadyUnder.
+  ///
+  /// In en, this message translates to:
+  /// **'Already {size}, under {target}. Nothing to do.'**
+  String compressAlreadyUnder(String size, String target);
+
+  /// No description provided for @compressSizeNotReached.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t get under {target}. Smallest possible: {size} (saved).'**
+  String compressSizeNotReached(String target, String size);
 }
 
 class _AppLocalizationsDelegate

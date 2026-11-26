@@ -222,6 +222,15 @@ class OcrResult {
   int pageCount;
 }
 
+/// "Compress to under N KB": the new file, and whether it really is under
+/// the target (false: the smallest version possible, still larger).
+class SizedFile {
+  SizedFile({required this.file, required this.fits});
+
+  ImportedFile file;
+  bool fits;
+}
+
 /// Result of writing a backup file.
 class BackupSummary {
   BackupSummary({
@@ -416,6 +425,17 @@ abstract class SecurityHostApi {
   /// in the result is no longer selectable. Errors: PDF_UNREADABLE.
   @async
   ImportedFile compressPdf(String fileId, CompressionLevel level);
+
+  /// Compresses a vault PDF to at most [targetBytes] (at least 10 KB): pages
+  /// are rasterised at the sharpest resolution and best quality that fit.
+  /// Errors: PDF_UNREADABLE, INVALID_INPUT (target too small, > 100 pages).
+  @async
+  SizedFile compressPdfToSize(String fileId, int targetBytes);
+
+  /// Compresses a vault photo to a JPEG of at most [targetBytes] (at least
+  /// 10 KB), as large and sharp as fits. Errors: INVALID_INPUT.
+  @async
+  SizedFile compressImageToSize(String fileId, String mimeType, int targetBytes);
 
   /// Annotate & Sign: renders each listed page of a vault PDF, draws its
   /// overlay on top and returns a NEW encrypted PDF containing only those

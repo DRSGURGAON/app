@@ -6,6 +6,7 @@
 |---|---|---|
 | Edit pages, Images to PDF, OCR read + suggestions, backup, everything else | Yes | Yes |
 | Merge, Split, Compress PDFs | — | Yes |
+| Compress PDFs and photos to under a chosen size (e.g. 90 KB, 450 KB) | — | Yes |
 | Edit text (English PDFs) | — | Yes |
 | Annotate & Sign | — | Yes |
 | Save recognised text for search ("Inside documents") | — | Yes |

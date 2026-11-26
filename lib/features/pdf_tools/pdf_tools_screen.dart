@@ -101,8 +101,8 @@ abstract final class PdfToolFlows {
         ? [doc]
         : await pickDocuments(
             context,
-            title: AppLocalizations.of(context).pickPdfs,
-            kind: PickKind.pdf,
+            title: AppLocalizations.of(context).pickPdfsOrPhotos,
+            kind: PickKind.pdfOrImage,
             multiple: true,
           );
     if (docs == null || !context.mounted) return;

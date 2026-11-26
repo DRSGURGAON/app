@@ -396,6 +396,23 @@ class SecurityHostApiImpl(
         }
     }
 
+    override suspend fun compressPdfToSize(fileId: String, targetBytes: Long): SizedFile = guard {
+        io {
+            session.requireUnlocked()
+            VaultStore.validateId(fileId)
+            val sized = session.pdfOps.compressToSize(fileId, targetBytes)
+            SizedFile(sized.result.toPigeon("application/pdf"), sized.fits)
+        }
+    }
+
+    override suspend fun compressImageToSize(fileId: String, mimeType: String, targetBytes: Long): SizedFile = guard {
+        io {
+            session.requireUnlocked()
+            val sized = session.pdfOps.compressImageToSize(fileId, mimeType, targetBytes)
+            SizedFile(sized.result.toPigeon("image/jpeg"), sized.fits)
+        }
+    }
+
     override suspend fun flattenPages(fileId: String, overlays: List<PageOverlay>): ImportedFile = guard {
         io {
             session.requireUnlocked()

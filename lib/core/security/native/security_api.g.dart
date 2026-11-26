@@ -943,6 +943,53 @@ class OcrResult {
   }
 }
 
+/// "Compress to under N KB": the new file, and whether it really is under
+/// the target (false: the smallest version possible, still larger).
+class SizedFile {
+  SizedFile({required this.file, required this.fits});
+
+  ImportedFile file;
+
+  bool fits;
+
+  List<Object?> _toList() {
+    return <Object?>[file, fits];
+  }
+
+  Object encode() {
+    return _toList();
+  }
+
+  static SizedFile decode(Object result) {
+    result as List<Object?>;
+    return SizedFile(
+      file: result[0]! as ImportedFile,
+      fits: result[1]! as bool,
+    );
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  bool operator ==(Object other) {
+    if (other is! SizedFile || other.runtimeType != runtimeType) {
+      return false;
+    }
+    if (identical(this, other)) {
+      return true;
+    }
+    return _deepEquals(file, other.file) && _deepEquals(fits, other.fits);
+  }
+
+  @override
+  // ignore: avoid_equals_and_hash_code_on_mutable_classes
+  int get hashCode => _deepHash(<Object?>[runtimeType, ..._toList()]);
+
+  @override
+  String toString() {
+    return 'SizedFile(file: $file, fits: $fits)';
+  }
+}
+
 /// Result of writing a backup file.
 class BackupSummary {
   BackupSummary({
@@ -1172,14 +1219,17 @@ class _PigeonCodec extends StandardMessageCodec {
     } else if (value is OcrResult) {
       buffer.putUint8(149);
       writeValue(buffer, value.encode());
-    } else if (value is BackupSummary) {
+    } else if (value is SizedFile) {
       buffer.putUint8(150);
       writeValue(buffer, value.encode());
-    } else if (value is RestoredFile) {
+    } else if (value is BackupSummary) {
       buffer.putUint8(151);
       writeValue(buffer, value.encode());
-    } else if (value is RestoreResult) {
+    } else if (value is RestoredFile) {
       buffer.putUint8(152);
+      writeValue(buffer, value.encode());
+    } else if (value is RestoreResult) {
+      buffer.putUint8(153);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -1238,10 +1288,12 @@ class _PigeonCodec extends StandardMessageCodec {
       case 149:
         return OcrResult.decode(readValue(buffer)!);
       case 150:
-        return BackupSummary.decode(readValue(buffer)!);
+        return SizedFile.decode(readValue(buffer)!);
       case 151:
-        return RestoredFile.decode(readValue(buffer)!);
+        return BackupSummary.decode(readValue(buffer)!);
       case 152:
+        return RestoredFile.decode(readValue(buffer)!);
+      case 153:
         return RestoreResult.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
@@ -2020,6 +2072,57 @@ class SecurityHostApi {
       isNullValid: false,
     );
     return pigeonVar_replyValue! as ImportedFile;
+  }
+
+  /// Compresses a vault PDF to at most [targetBytes] (at least 10 KB): pages
+  /// are rasterised at the sharpest resolution and best quality that fit.
+  /// Errors: PDF_UNREADABLE, INVALID_INPUT (target too small, > 100 pages).
+  Future<SizedFile> compressPdfToSize(String fileId, int targetBytes) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.compressPdfToSize$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, targetBytes],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as SizedFile;
+  }
+
+  /// Compresses a vault photo to a JPEG of at most [targetBytes] (at least
+  /// 10 KB), as large and sharp as fits. Errors: INVALID_INPUT.
+  Future<SizedFile> compressImageToSize(
+    String fileId,
+    String mimeType,
+    int targetBytes,
+  ) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.compressImageToSize$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[fileId, mimeType, targetBytes],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return pigeonVar_replyValue! as SizedFile;
   }
 
   /// Annotate & Sign: renders each listed page of a vault PDF, draws its

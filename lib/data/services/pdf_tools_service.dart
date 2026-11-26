@@ -37,6 +37,43 @@ class CompressResult {
   final SecurityErrorCode? error;
 }
 
+/// Smallest "compress to under" target (10 KB): below that nothing stays
+/// readable. Matches the native limit.
+const minTargetBytes = 10 * 1024;
+
+/// Quick choices for "compress to under" (bytes).
+const targetSizeChoices = [
+  50 * 1024,
+  100 * 1024,
+  200 * 1024,
+  500 * 1024,
+  1024 * 1024,
+];
+
+/// Outcome of compressing one document to a target size.
+class SizedCompressResult {
+  const SizedCompressResult({
+    required this.source,
+    this.output,
+    this.fits = false,
+    this.alreadyUnder = false,
+    this.error,
+  });
+
+  final VaultDocument source;
+
+  /// The new, smaller document (kept even when [fits] is false: it is the
+  /// smallest possible version).
+  final VaultDocument? output;
+
+  /// The new document is at most the target size.
+  final bool fits;
+
+  /// The document was already at most the target size; nothing was made.
+  final bool alreadyUnder;
+  final SecurityErrorCode? error;
+}
+
 /// Annotate & Sign is refused for documents in this category (Aadhaar, PAN,
 /// passport...): changing official identity documents is not supported.
 const annotationBlockedCategoryKey = 'identity';
@@ -220,6 +257,71 @@ class PdfToolsService {
       }
     }
     AppLogger.event('pdf_compress');
+    return results;
+  }
+
+  /// Compresses each PDF or photo to at most [targetBytes] (batch). PDFs stay
+  /// PDFs; photos become JPEGs. Documents already that small are left alone.
+  /// When the target cannot be reached, the smallest possible version is
+  /// still saved and reported with `fits: false`. Originals are kept.
+  Future<List<SizedCompressResult>> compressToSize(
+    List<VaultDocument> docs,
+    int targetBytes, {
+    required String Function(String title) titleFor,
+  }) async {
+    if (targetBytes < minTargetBytes) {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    final results = <SizedCompressResult>[];
+    for (final d in docs) {
+      if (d.sizeBytes <= targetBytes) {
+        results.add(SizedCompressResult(source: d, alreadyUnder: true));
+        continue;
+      }
+      try {
+        final SizedFile sized;
+        if (d.isPdf) {
+          sized = await _security.compressPdfToSize(d.fileId, targetBytes);
+        } else if (d.isImage) {
+          sized = await _security.compressImageToSize(
+            d.fileId,
+            d.mimeType,
+            targetBytes,
+          );
+        } else {
+          results.add(
+            SizedCompressResult(
+              source: d,
+              error: SecurityErrorCode.invalidInput,
+            ),
+          );
+          continue;
+        }
+        if (sized.file.plaintextBytes >= d.sizeBytes) {
+          // Could not make it any smaller: nothing to keep.
+          await _security.deleteEncryptedFile(sized.file.fileId);
+          results.add(SizedCompressResult(source: d));
+          continue;
+        }
+        final saved = await _repo.recordGenerated(
+          [sized.file],
+          titles: [titleFor(d.title)],
+          folderId: d.folderId,
+          categoryId: d.categoryId,
+        );
+        results.add(
+          SizedCompressResult(
+            source: d,
+            output: saved.single,
+            fits: sized.fits,
+          ),
+        );
+      } on SecurityFailure catch (e) {
+        if (e.code == SecurityErrorCode.locked) rethrow;
+        results.add(SizedCompressResult(source: d, error: e.code));
+      }
+    }
+    AppLogger.event('compress_to_size');
     return results;
   }
 

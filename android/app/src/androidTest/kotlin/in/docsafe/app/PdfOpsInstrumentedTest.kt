@@ -112,6 +112,52 @@ class PdfOpsInstrumentedTest {
     }
 
     @Test
+    fun compressToSizeGetsAHeavyPdfUnderTheTarget() {
+        val heavy = (0 until 2).map { store(image(2480, 3508, Bitmap.CompressFormat.JPEG, noise = true)) }
+        val original = ops.imagesToPdf(heavy.map { PdfOps.ImageSpec(it, "image/jpeg", 0) })
+        val target = 300L * 1024
+        assertTrue("source is larger than the target", original.plaintextBytes > target)
+        val sized = ops.compressToSize(original.fileId, target)
+        assertTrue("fits", sized.fits)
+        assertTrue("${sized.result.plaintextBytes} <= $target", sized.result.plaintextBytes <= target)
+        render(sized.result.fileId) { r -> assertEquals(2, r.pageCount) }
+        assertTrue("no decrypted temp left", temp.listFiles().isNullOrEmpty())
+    }
+
+    @Test
+    fun compressToSizeReportsAnImpossibleTarget() {
+        // Random noise at full page size cannot become 10 KB at readable settings.
+        val noisy = (0 until 3).map { store(image(2480, 3508, Bitmap.CompressFormat.JPEG, noise = true)) }
+        val original = ops.imagesToPdf(noisy.map { PdfOps.ImageSpec(it, "image/jpeg", 0) })
+        val sized = ops.compressToSize(original.fileId, 10L * 1024)
+        if (!sized.fits) {
+            assertTrue("still smaller than before", sized.result.plaintextBytes < original.plaintextBytes)
+        } else {
+            assertTrue(sized.result.plaintextBytes <= 10L * 1024)
+        }
+        try {
+            ops.compressToSize(original.fileId, 5L * 1024)
+            fail("target below 10 KB must be refused")
+        } catch (_: InvalidInputException) {
+        }
+    }
+
+    @Test
+    fun compressPhotoToSizeMakesAJpegUnderTheTarget() {
+        val png = store(image(3000, 4000, Bitmap.CompressFormat.PNG, noise = true, alpha = true))
+        val target = 90L * 1024
+        val sized = ops.compressImageToSize(png, "image/png", target)
+        assertTrue("fits", sized.fits)
+        assertTrue("${sized.result.plaintextBytes} <= $target", sized.result.plaintextBytes <= target)
+        val jpeg = ByteArrayOutputStream().also { vault.decryptTo(sized.result.fileId, it) }.toByteArray()
+        assertEquals("JPEG", 0xFF.toByte(), jpeg[0])
+        assertEquals("JPEG", 0xD8.toByte(), jpeg[1])
+        val decoded = android.graphics.BitmapFactory.decodeByteArray(jpeg, 0, jpeg.size)
+        assertTrue("portrait kept", decoded.height > decoded.width)
+        decoded.recycle()
+    }
+
+    @Test
     fun compressionShrinksAHeavyPdfAndKeepsPageCount() {
         val heavy = (0 until 3).map { store(image(2480, 3508, Bitmap.CompressFormat.JPEG, noise = true)) }
         val original = ops.imagesToPdf(heavy.map { PdfOps.ImageSpec(it, "image/jpeg", 0) })

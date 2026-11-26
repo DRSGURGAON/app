@@ -10,6 +10,7 @@ export 'native/security_api.g.dart'
         BiometricPromptText,
         BackupSummary,
         CompressionLevel,
+        SizedFile,
         ImagePageSpec,
         AutoBackupStatus,
         ReminderAlarm,
@@ -78,6 +79,12 @@ abstract interface class SecurityService {
   Future<ImportedFile> importPdfBytes(Uint8List bytes);
   Future<ImportedFile> imagesToPdf(List<ImagePageSpec> images);
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level);
+  Future<SizedFile> compressPdfToSize(String fileId, int targetBytes);
+  Future<SizedFile> compressImageToSize(
+    String fileId,
+    String mimeType,
+    int targetBytes,
+  );
   Future<ImportedFile> flattenPages(String fileId, List<PageOverlay> overlays);
   Future<OcrResult> recognizeText(String fileId, String mimeType, int maxPages);
   Future<void> setReminderSchedule(List<ReminderAlarm> alarms);
@@ -266,6 +273,17 @@ class PigeonSecurityService implements SecurityService {
   @override
   Future<ImportedFile> compressPdf(String fileId, CompressionLevel level) =>
       _guard(() => _api.compressPdf(fileId, level));
+
+  @override
+  Future<SizedFile> compressPdfToSize(String fileId, int targetBytes) =>
+      _guard(() => _api.compressPdfToSize(fileId, targetBytes));
+
+  @override
+  Future<SizedFile> compressImageToSize(
+    String fileId,
+    String mimeType,
+    int targetBytes,
+  ) => _guard(() => _api.compressImageToSize(fileId, mimeType, targetBytes));
 
   @override
   Future<ImportedFile> flattenPages(

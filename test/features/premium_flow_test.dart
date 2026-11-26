@@ -181,7 +181,7 @@ void main() {
     await tester.binding.handlePopRoute();
     await settle(tester);
     expect(find.byType(DocumentPickerScreen), findsOneWidget);
-    expect(find.text(en.pickPdfs), findsOneWidget);
+    expect(find.text(en.pickPdfs), findsOneWidget); // Merge
     await app.dispose();
   });
 

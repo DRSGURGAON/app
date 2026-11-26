@@ -412,8 +412,8 @@
   "toolMergeDesc": "Join two or more PDFs into one",
   "toolSplit": "Split PDF",
   "toolSplitDesc": "Extract pages, or save each page separately",
-  "toolCompress": "Compress PDF",
-  "toolCompressDesc": "Reduce file size — one or several PDFs at once",
+  "toolCompress": "Compress PDF & photos",
+  "toolCompressDesc": "Reduce file size, or get it under a size like 100 KB",
   "premiumBadge": "Premium",
   "toolsPremiumNote": "Edit text, merge, split, compress and Annotate & Sign are part of Premium. Editing pages and Images to PDF are free.",
   "toolsPrivacyNote": "Everything runs on this phone. Results are saved as new encrypted documents.",
@@ -755,8 +755,8 @@
       }
     }
   },
-  "premiumPdfTools": "Merge, split and compress PDFs",
-  "premiumPdfToolsDesc": "Combine files, pull out pages and shrink PDFs, all on this phone.",
+  "premiumPdfTools": "Merge, split and compress",
+  "premiumPdfToolsDesc": "Combine files, pull out pages, and shrink PDFs or photos to a size like 100 KB, all on this phone.",
   "premiumOcrSearch": "Search inside documents",
   "premiumOcrSearchDesc": "Keep the recognised text so search finds words inside your documents.",
   "premiumReminders": "Unlimited and automatic reminders",
@@ -1190,5 +1190,60 @@
   "autoBackupFix": "Fix",
   "autoBackupNeedsPremium": "Premium has ended, so automatic backups are paused. Your existing backup file is unchanged.",
   "premiumAutoBackup": "Automatic backup",
-  "premiumAutoBackupDesc": "An encrypted backup saved for you to Google Drive or another place you choose"
+  "premiumAutoBackupDesc": "An encrypted backup saved for you to Google Drive or another place you choose",
+  "pickPdfsOrPhotos": "Choose PDFs or photos",
+  "compressModeLevel": "Quality",
+  "compressModeSize": "Under a size",
+  "compressTargetTitle": "Make each file smaller than",
+  "compressTargetHelp": "Handy for upload limits on forms and websites. The smaller the size, the less sharp text and photos become.",
+  "compressTargetOther": "Other size",
+  "compressUnitKb": "KB",
+  "compressUnitMb": "MB",
+  "compressTargetTooSmall": "Enter at least 10 KB.",
+  "compressTargetTooLarge": "Enter at most 100 MB.",
+  "compressPhotoNote": "Photos are saved as JPEG.",
+  "compressRunSize": "Compress to under {target}",
+  "@compressRunSize": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "compressSizeDone": "{from} → {to} (under {target})",
+  "@compressSizeDone": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "compressAlreadyUnder": "Already {size}, under {target}. Nothing to do.",
+  "@compressAlreadyUnder": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      },
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "compressSizeNotReached": "Couldn't get under {target}. Smallest possible: {size} (saved).",
+  "@compressSizeNotReached": {
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "size": {
+        "type": "String"
+      }
+    }
+  }
 }

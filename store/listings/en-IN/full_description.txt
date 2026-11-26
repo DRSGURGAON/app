@@ -8,6 +8,7 @@ Document Scanner Pro is a document scanner and PDF maker that keeps your scans i
 
 🛠️ PDF TOOLS ON YOUR PHONE
 • Merge PDF, split PDF and compress PDF (Premium).
+• Compress PDF or photo to a size you choose, like 100 KB or 50 KB, for form uploads (Premium).
 • Sign PDF and annotate: add text, your signature, highlights or cover parts of a page (Premium).
 • Edit text in English PDFs in the document's own font (Premium).
 • Results are always saved as a new copy; your original stays untouched.

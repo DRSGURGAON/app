@@ -249,6 +249,121 @@ void main() {
     await app.dispose();
   });
 
+  testWidgets('compress PDFs and photos to under a chosen size', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    final engine = FakePdfEngine();
+    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    unlockPremium(app);
+    final pdf = await importDoc(tester, fake, engine, 'Form.pdf', size: 600000);
+    final photo = await importDoc(
+      tester,
+      fake,
+      engine,
+      'Photo.png',
+      mime: 'image/png',
+      size: 2000000,
+    );
+    await importDoc(tester, fake, engine, 'Tiny.pdf', size: 40000);
+    fake.sizeUnreachable.add(photo);
+    await goTab(tester, en.navTools);
+    await tester.tap(find.text(en.toolCompress));
+    await settle(tester);
+    expect(find.text(en.pickPdfsOrPhotos), findsOneWidget);
+    for (final t in ['Form', 'Photo', 'Tiny']) {
+      await tester.tap(find.text(t));
+      await tester.pump();
+    }
+    await tester.tap(find.text(en.pickNext));
+    await settle(tester);
+    // A photo is in the batch: only "under a size" is offered.
+    expect(find.byKey(const Key('compress-mode')), findsNothing);
+    expect(find.text(en.compressTargetTitle), findsOneWidget);
+
+    // Custom size: 90 KB. Too small first.
+    await tester.enterText(
+      find.byKey(const Key('compress-target-custom')),
+      '5',
+    );
+    await settle(tester);
+    expect(find.text(en.compressTargetTooSmall), findsOneWidget);
+    final run = find.byKey(const Key('compress-run'));
+    expect(tester.widget<FilledButton>(run).onPressed, isNull);
+    await tester.enterText(
+      find.byKey(const Key('compress-target-custom')),
+      '90',
+    );
+    await settle(tester);
+    expect(find.text(en.compressRunSize('90 KB')), findsOneWidget);
+    await tester.ensureVisible(run);
+    await tester.tap(run);
+    await settle(tester);
+
+    expect(fake.sizeCompressCalls, [(pdf, 90 * 1024), (photo, 90 * 1024)]);
+    expect(
+      find.text(en.compressSizeDone('585.9 KB', '45.0 KB', '90 KB')),
+      findsOneWidget,
+    );
+    expect(
+      find.text(en.compressSizeNotReached('90 KB', '180.0 KB')),
+      findsOneWidget,
+    );
+    expect(
+      find.text(en.compressAlreadyUnder('39.1 KB', '90 KB')),
+      findsOneWidget,
+    );
+    // The photo result is a JPEG document.
+    final db = app.databases.last;
+    final docs = await tester.runAsync(() => db.select(db.documents).get());
+    expect(
+      docs!
+          .where((d) => d.title == en.compressedTitle('Photo'))
+          .single
+          .mimeType,
+      'image/jpeg',
+    );
+    await app.dispose();
+  });
+
+  testWidgets('PDF only: switch to "under a size" and pick a chip', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    final engine = FakePdfEngine();
+    final app = await pumpApp(tester, fake, pdfEngine: engine);
+    unlockPremium(app);
+    final id = await importDoc(tester, fake, engine, 'Big.pdf', size: 3000000);
+    await goTab(tester, en.navTools);
+    await tester.tap(find.text(en.toolCompress));
+    await settle(tester);
+    await tester.tap(find.text('Big'));
+    await tester.pump();
+    await tester.tap(find.text(en.pickNext));
+    await settle(tester);
+    expect(find.text(en.compressLevelBalanced), findsOneWidget);
+    await tester.tap(find.text(en.compressModeSize));
+    await settle(tester);
+    await tester.tap(find.byKey(const Key('compress-target-500')));
+    await settle(tester);
+    // MB works too: 1.5 MB in the custom box.
+    await tester.enterText(
+      find.byKey(const Key('compress-target-custom')),
+      '1.5',
+    );
+    await tester.tap(find.byKey(const Key('compress-target-unit')));
+    await settle(tester);
+    await tester.tap(find.text(en.compressUnitMb).last);
+    await settle(tester);
+    final run = find.byKey(const Key('compress-run'));
+    await tester.ensureVisible(run);
+    await tester.tap(run);
+    await settle(tester);
+    expect(fake.sizeCompressCalls, [(id, (1.5 * 1024 * 1024).round())]);
+    expect(fake.compressCalls, isEmpty);
+    await app.dispose();
+  });
+
   testWidgets('unreadable PDF in the editor shows a clear message', (
     tester,
   ) async {

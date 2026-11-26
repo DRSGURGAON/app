@@ -45,6 +45,9 @@ void main() {
       'filterAddedRange',
       'languageEnglish',
       'languageHindi',
+      // Units are written KB / MB in Hindi too.
+      'compressUnitKb',
+      'compressUnitMb',
     };
     final same = [
       for (final k in keys(en))

@@ -213,6 +213,19 @@ class _DetailsView extends ConsumerWidget {
               ),
             ),
           ),
+          if (!inTrash && doc.isImage)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: ActionChip(
+                  key: const Key('details-compress-photo'),
+                  avatar: const Icon(Icons.compress, size: 18),
+                  label: Text(l.toolCompress),
+                  onPressed: () => PdfToolFlows.compress(context, doc: doc),
+                ),
+              ),
+            ),
           if (!inTrash && doc.isPdf)
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),

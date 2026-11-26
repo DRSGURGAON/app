@@ -60,6 +60,12 @@ class FakeSecurityService implements SecurityService {
   final Map<String, int> compressedSize = {};
   final Set<String> compressFailures = {};
 
+  /// Compress to a size: calls (fileId, target), result size per file
+  /// (default: half the target), and files whose target cannot be reached.
+  final List<(String, int)> sizeCompressCalls = [];
+  final Map<String, int> sizedResult = {};
+  final Set<String> sizeUnreachable = {};
+
   /// Annotate simulation: every flattenPages call (source id, overlays).
   final List<(String, List<PageOverlay>)> flattenCalls = [];
   final Set<String> flattenFailures = {};
@@ -494,6 +500,42 @@ class FakeSecurityService implements SecurityService {
       throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
     }
     return _generated(compressedSize[fileId] ?? 100);
+  }
+
+  @override
+  Future<SizedFile> compressPdfToSize(String fileId, int targetBytes) async {
+    _requireUnlocked();
+    return _sized(fileId, targetBytes, 'application/pdf');
+  }
+
+  @override
+  Future<SizedFile> compressImageToSize(
+    String fileId,
+    String mimeType,
+    int targetBytes,
+  ) async {
+    _requireUnlocked();
+    if (!mimeType.startsWith('image/')) {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    return _sized(fileId, targetBytes, 'image/jpeg');
+  }
+
+  SizedFile _sized(String fileId, int target, String mime) {
+    sizeCompressCalls.add((fileId, target));
+    if (target < 10 * 1024) {
+      throw const SecurityFailure(SecurityErrorCode.invalidInput);
+    }
+    if (compressFailures.contains(fileId)) {
+      throw const SecurityFailure(SecurityErrorCode.pdfUnreadable);
+    }
+    final unreachable = sizeUnreachable.contains(fileId);
+    final size =
+        sizedResult[fileId] ?? (unreachable ? target * 2 : target ~/ 2);
+    return SizedFile(
+      file: _generated(size, mime: mime),
+      fits: !unreachable,
+    );
   }
 
   @override

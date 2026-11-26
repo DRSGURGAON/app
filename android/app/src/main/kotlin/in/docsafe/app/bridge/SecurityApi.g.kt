@@ -996,6 +996,52 @@ data class OcrResult (
 }
 
 /**
+ * "Compress to under N KB": the new file, and whether it really is under
+ * the target (false: the smallest version possible, still larger).
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class SizedFile (
+  val file: ImportedFile,
+  val fits: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): SizedFile {
+      val file = pigeonVar_list[0] as ImportedFile
+      val fits = pigeonVar_list[1] as Boolean
+      return SizedFile(file, fits)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      file,
+      fits,
+    )
+  }
+  override fun equals(other: Any?): Boolean {
+    if (other == null || other.javaClass != javaClass) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    val other = other as SizedFile
+    return SecurityApiPigeonUtils.deepEquals(this.file, other.file) && SecurityApiPigeonUtils.deepEquals(this.fits, other.fits)
+  }
+
+  override fun hashCode(): Int {
+    var result = javaClass.hashCode()
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.file)
+    result = 31 * result + SecurityApiPigeonUtils.deepHash(this.fits)
+    return result
+  }
+  override fun toString(): String {
+    return "SizedFile(file=$file, fits=$fits)"
+  }
+}
+
+/**
  * Result of writing a backup file.
  *
  * Generated class from Pigeon that represents data sent in messages.
@@ -1246,15 +1292,20 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
       }
       150.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          BackupSummary.fromList(it)
+          SizedFile.fromList(it)
         }
       }
       151.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
-          RestoredFile.fromList(it)
+          BackupSummary.fromList(it)
         }
       }
       152.toByte() -> {
+        (readValue(buffer) as? List<Any?>)?.let {
+          RestoredFile.fromList(it)
+        }
+      }
+      153.toByte() -> {
         (readValue(buffer) as? List<Any?>)?.let {
           RestoreResult.fromList(it)
         }
@@ -1348,16 +1399,20 @@ private open class SecurityApiPigeonCodec : StandardMessageCodec() {
         stream.write(149)
         writeValue(stream, value.toList())
       }
-      is BackupSummary -> {
+      is SizedFile -> {
         stream.write(150)
         writeValue(stream, value.toList())
       }
-      is RestoredFile -> {
+      is BackupSummary -> {
         stream.write(151)
         writeValue(stream, value.toList())
       }
-      is RestoreResult -> {
+      is RestoredFile -> {
         stream.write(152)
+        writeValue(stream, value.toList())
+      }
+      is RestoreResult -> {
+        stream.write(153)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
@@ -1483,6 +1538,17 @@ interface SecurityHostApi {
    * in the result is no longer selectable. Errors: PDF_UNREADABLE.
    */
   suspend fun compressPdf(fileId: String, level: CompressionLevel): ImportedFile
+  /**
+   * Compresses a vault PDF to at most [targetBytes] (at least 10 KB): pages
+   * are rasterised at the sharpest resolution and best quality that fit.
+   * Errors: PDF_UNREADABLE, INVALID_INPUT (target too small, > 100 pages).
+   */
+  suspend fun compressPdfToSize(fileId: String, targetBytes: Long): SizedFile
+  /**
+   * Compresses a vault photo to a JPEG of at most [targetBytes] (at least
+   * 10 KB), as large and sharp as fits. Errors: INVALID_INPUT.
+   */
+  suspend fun compressImageToSize(fileId: String, mimeType: String, targetBytes: Long): SizedFile
   /**
    * Annotate & Sign: renders each listed page of a vault PDF, draws its
    * overlay on top and returns a NEW encrypted PDF containing only those
@@ -2176,6 +2242,47 @@ interface SecurityHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.compressPdf(fileIdArg, levelArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.compressPdfToSize$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileIdArg = args[0] as String
+            val targetBytesArg = args[1] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.compressPdfToSize(fileIdArg, targetBytesArg))
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.compressImageToSize$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val fileIdArg = args[0] as String
+            val mimeTypeArg = args[1] as String
+            val targetBytesArg = args[2] as Long
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.compressImageToSize(fileIdArg, mimeTypeArg, targetBytesArg))
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)
               }

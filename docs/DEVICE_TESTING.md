@@ -306,6 +306,17 @@ utility PDF, one scanned PDF.
 | AB8 | Free plan: tap Set up | Premium screen |
 | AB9 | Turn off; Erase all data | No further writes; old file stays |
 
+## 20. Compress to a size (Premium)
+
+| # | Step | Expected |
+|---|---|---|
+| CS1 | PDF Tools → Compress → pick a 2–5 MB scanned PDF → Under a size → 200 KB | Result "… → x KB (under 200 KB)"; exported file is ≤ 200 KB and readable |
+| CS2 | Same PDF, custom 90 KB | Under 90 KB, or "Couldn't get under 90 KB. Smallest possible: …" |
+| CS3 | A 4 MB camera photo (portrait, EXIF-rotated) → custom 100 KB | JPEG ≤ 100 KB, upright, opens in the gallery after export |
+| CS4 | A PNG screenshot with transparency → 50 KB | JPEG, transparent areas white |
+| CS5 | A document already smaller than the target | "Already … under …", nothing new made |
+| CS6 | 30-page PDF → 1 MB on a low-end phone | Finishes (progress shown), no crash / out-of-memory |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

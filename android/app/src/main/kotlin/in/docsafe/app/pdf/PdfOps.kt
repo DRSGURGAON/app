@@ -12,10 +12,12 @@ import `in`.docsafe.crypto.InvalidInputException
 import `in`.docsafe.crypto.JpegInfo
 import `in`.docsafe.crypto.JpegPdfWriter
 import `in`.docsafe.crypto.PhotoGeometry
+import `in`.docsafe.crypto.TargetSize
 import `in`.docsafe.crypto.VaultStore
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.OutputStream
 
 /** The PDF cannot be processed (damaged, or protected with a password). */
 class PdfUnreadableException(cause: Throwable?) : Exception("PDF unreadable", cause)
@@ -93,6 +95,159 @@ class PdfOps(private val vault: VaultStore) {
         } finally {
             runCatching { vault.deleteTemp(src.path) }
         }
+    }
+
+    /** Result of compressing to a size: [fits] is false when even the smallest setting is larger. */
+    class Sized(val result: VaultStore.ImportResult, val fits: Boolean)
+
+    /**
+     * "Under N KB": rasterises the pages at the sharpest resolution and the
+     * highest JPEG quality whose finished PDF is at most [targetBytes]
+     * (see [TargetSize]). If nothing fits, the smallest version is saved and
+     * [Sized.fits] is false.
+     */
+    fun compressToSize(fileId: String, targetBytes: Long): Sized {
+        if (targetBytes < TargetSize.MIN_TARGET) throw InvalidInputException("Target too small")
+        return withRenderer(fileId) { r ->
+            if (r.pageCount == 0) throw PdfUnreadableException(null)
+            if (r.pageCount > MAX_TARGET_PAGES) throw InvalidInputException("Too many pages")
+            // Pages of the settings that fit (each list is under the target).
+            val cache = HashMap<TargetSize.Setting, List<EncodedPage>>()
+            fun encode(s: TargetSize.Setting): List<EncodedPage>? {
+                cache[s]?.let { return it }
+                val dpi = TARGET_DPI[s.level]
+                val pages = ArrayList<EncodedPage>(r.pageCount)
+                var total = 0L
+                for (i in 0 until r.pageCount) {
+                    val page = renderJpeg(r, i, dpi, s.quality)
+                    total += page.bytes.size
+                    // Already over: no need to render the rest.
+                    if (total > targetBytes) return null
+                    pages += page
+                }
+                cache[s] = pages
+                return pages
+            }
+            fun pdfSize(pages: List<EncodedPage>): Long {
+                val counter = NullOutputStream()
+                return JpegPdfWriter.write(counter, pages.map { it.asPage() })
+            }
+            val found = TargetSize.search(TARGET_DPI.size, targetBytes) { s ->
+                encode(s)?.let { pdfSize(it) }
+            }
+            val pages = encode(found.setting)
+                ?: renderAll(r, TARGET_DPI[found.setting.level], found.setting.quality)
+            val result = vault.importWriting(null) { out -> JpegPdfWriter.write(out, pages.map { it.asPage() }) }
+            Sized(result, found.fits)
+        }
+    }
+
+    /**
+     * "Under N KB" for a photo: the largest size and highest JPEG quality
+     * whose file is at most [targetBytes]. The result is always a JPEG
+     * (upright, transparent areas white). If nothing fits, the smallest
+     * version is saved and [Sized.fits] is false.
+     */
+    fun compressImageToSize(fileId: String, mimeType: String, targetBytes: Long): Sized {
+        if (targetBytes < TargetSize.MIN_TARGET) throw InvalidInputException("Target too small")
+        VaultStore.validateId(fileId)
+        if (!mimeType.startsWith("image/")) throw InvalidInputException("Not an image")
+        val plain = ByteArrayOutputStream().also { vault.decryptTo(fileId, it) }.toByteArray()
+        val full = decodeOpaqueUpright(plain)
+        try {
+            var scaledFor = -1
+            var scaled: Bitmap? = null
+            val cache = HashMap<TargetSize.Setting, ByteArray>()
+            fun encode(s: TargetSize.Setting): ByteArray = cache.getOrPut(s) {
+                if (scaledFor != s.level) {
+                    scaled?.let { if (it !== full) it.recycle() }
+                    scaled = scaleToSide(full, TARGET_SIDE[s.level])
+                    scaledFor = s.level
+                }
+                ByteArrayOutputStream().also { scaled!!.compress(Bitmap.CompressFormat.JPEG, s.quality, it) }
+                    .toByteArray()
+            }
+            try {
+                val found = TargetSize.search(TARGET_SIDE.size, targetBytes) { s ->
+                    encode(s).size.toLong()
+                }
+                val jpeg = encode(found.setting)
+                val result = vault.import(ByteArrayInputStream(jpeg), jpeg.size.toLong())
+                return Sized(result, found.fits)
+            } finally {
+                scaled?.let { if (it !== full) it.recycle() }
+            }
+        } finally {
+            full.recycle()
+        }
+    }
+
+    private class EncodedPage(val bytes: ByteArray, val width: Int, val height: Int, val sizePt: Pair<Double, Double>) {
+        fun asPage() = JpegPdfWriter.Page(0) {
+            JpegPdfWriter.Opened(JpegInfo(width, height, 3), ByteArrayInputStream(bytes), sizePt)
+        }
+    }
+
+    private fun renderAll(r: PdfRenderer, dpi: Int, quality: Int) =
+        (0 until r.pageCount).map { renderJpeg(r, it, dpi, quality) }
+
+    private fun renderJpeg(r: PdfRenderer, index: Int, dpi: Int, quality: Int): EncodedPage =
+        r.openPage(index).use { page ->
+            val (w, h) = renderSize(page.width, page.height, dpi)
+            val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+            try {
+                bmp.eraseColor(Color.WHITE)
+                page.render(bmp, null, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT)
+                val out = ByteArrayOutputStream()
+                bmp.compress(Bitmap.CompressFormat.JPEG, quality, out)
+                EncodedPage(out.toByteArray(), w, h, page.width.toDouble() to page.height.toDouble())
+            } finally {
+                bmp.recycle()
+            }
+        }
+
+    /** Decodes a photo (sampled to at most [PhotoGeometry.MAX_SIDE]), upright, on white. */
+    private fun decodeOpaqueUpright(bytes: ByteArray): Bitmap {
+        val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.size, bounds)
+        if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw InvalidInputException("Unreadable image")
+        val opts = BitmapFactory.Options().apply {
+            inSampleSize = PhotoGeometry.sampleSize(bounds.outWidth, bounds.outHeight)
+        }
+        val src = BitmapFactory.decodeByteArray(bytes, 0, bytes.size, opts)
+            ?: throw InvalidInputException("Unreadable image")
+        val orientation = runCatching {
+            ExifInterface(ByteArrayInputStream(bytes)).getAttributeInt(ExifInterface.TAG_ORIENTATION, 1)
+        }.getOrDefault(1)
+        val t = PhotoGeometry.forExifOrientation(orientation)
+        val (w, h) = PhotoGeometry.fit(src.width, src.height)
+        val m = Matrix().apply {
+            postScale(w.toFloat() / src.width, h.toFloat() / src.height)
+            postRotate(t.degrees.toFloat())
+            if (t.mirror) postScale(-1f, 1f)
+        }
+        val upright = if (m.isIdentity) src else Bitmap.createBitmap(src, 0, 0, src.width, src.height, m, true)
+        if (upright !== src) src.recycle()
+        if (!upright.hasAlpha()) return upright
+        val opaque = Bitmap.createBitmap(upright.width, upright.height, Bitmap.Config.ARGB_8888)
+        opaque.eraseColor(Color.WHITE)
+        android.graphics.Canvas(opaque).drawBitmap(upright, 0f, 0f, null)
+        upright.recycle()
+        return opaque
+    }
+
+    /** [src] scaled down so its longest side is at most [side] (never enlarged). */
+    private fun scaleToSide(src: Bitmap, side: Int): Bitmap {
+        val longest = maxOf(src.width, src.height)
+        if (longest <= side) return src
+        val w = (src.width.toLong() * side / longest).toInt().coerceAtLeast(1)
+        val h = (src.height.toLong() * side / longest).toInt().coerceAtLeast(1)
+        return Bitmap.createScaledBitmap(src, w, h, true)
+    }
+
+    private class NullOutputStream : OutputStream() {
+        override fun write(b: Int) = Unit
+        override fun write(b: ByteArray, off: Int, len: Int) = Unit
     }
 
     /**
@@ -281,5 +436,14 @@ class PdfOps(private val vault: VaultStore) {
         private const val FLATTEN_QUALITY = 90
         private const val MAX_FLATTEN_PAGES = 500
         private const val MAX_OVERLAY_BYTES = 30 * 1024 * 1024
+
+        /** "Under N KB": page resolutions tried, sharpest first. */
+        private val TARGET_DPI = intArrayOf(200, 160, 130, 110, 96, 84, 72, 60, 50)
+
+        /** "Under N KB" for photos: longest side in pixels, largest first. */
+        private val TARGET_SIDE = intArrayOf(4000, 3200, 2560, 2048, 1600, 1280, 1024, 800, 640, 480, 360)
+
+        /** Every page is kept in memory as a JPEG while searching. */
+        const val MAX_TARGET_PAGES = 100
     }
 }

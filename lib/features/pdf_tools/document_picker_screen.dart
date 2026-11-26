@@ -8,7 +8,7 @@ import '../../data/models/vault_document.dart';
 import '../../data/repositories/document_repository.dart';
 import '../vault/widgets/document_list.dart';
 
-enum PickKind { pdf, image }
+enum PickKind { pdf, image, pdfOrImage }
 
 /// Selects documents from the vault. Multi-select keeps the tap order.
 class DocumentPickerScreen extends ConsumerStatefulWidget {
@@ -33,8 +33,11 @@ class DocumentPickerScreen extends ConsumerStatefulWidget {
 class _DocumentPickerScreenState extends ConsumerState<DocumentPickerScreen> {
   final List<VaultDocument> _selected = [];
 
-  bool _matches(VaultDocument d) =>
-      widget.kind == PickKind.pdf ? d.isPdf : d.isImage;
+  bool _matches(VaultDocument d) => switch (widget.kind) {
+    PickKind.pdf => d.isPdf,
+    PickKind.image => d.isImage,
+    PickKind.pdfOrImage => d.isPdf || d.isImage,
+  };
 
   void _toggle(VaultDocument d) {
     if (!widget.multiple) {

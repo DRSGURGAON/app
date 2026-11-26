@@ -909,10 +909,11 @@ class AppLocalizationsHi extends AppLocalizations {
   String get toolSplitDesc => 'पेज निकालें, या हर पेज अलग सेव करें';
 
   @override
-  String get toolCompress => 'PDF छोटा करें';
+  String get toolCompress => 'PDF और फ़ोटो छोटा करें';
 
   @override
-  String get toolCompressDesc => 'फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ';
+  String get toolCompressDesc =>
+      'फ़ाइल का आकार घटाएँ, या 100 KB जैसे किसी आकार से कम करें';
 
   @override
   String get premiumBadge => 'प्रीमियम';
@@ -1486,11 +1487,11 @@ class AppLocalizationsHi extends AppLocalizations {
   }
 
   @override
-  String get premiumPdfTools => 'PDF जोड़ें, अलग करें और छोटा करें';
+  String get premiumPdfTools => 'जोड़ें, अलग करें और छोटा करें';
 
   @override
   String get premiumPdfToolsDesc =>
-      'फ़ाइलें जोड़ें, पेज निकालें और PDF छोटे करें — सब इसी फ़ोन पर।';
+      'फ़ाइलें जोड़ें, पेज अलग करें, और PDF या फ़ोटो को 100 KB जैसे आकार तक छोटा करें, सब इसी फ़ोन पर।';
 
   @override
   String get premiumOcrSearch => 'दस्तावेज़ों के अंदर खोजें';
@@ -2162,4 +2163,58 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get premiumAutoBackupDesc =>
       'एन्क्रिप्टेड बैकअप आपके लिए Google Drive या आपकी चुनी किसी जगह पर सेव होता है';
+
+  @override
+  String get pickPdfsOrPhotos => 'PDF या फ़ोटो चुनें';
+
+  @override
+  String get compressModeLevel => 'क्वालिटी';
+
+  @override
+  String get compressModeSize => 'आकार से कम';
+
+  @override
+  String get compressTargetTitle => 'हर फ़ाइल को इससे छोटा करें';
+
+  @override
+  String get compressTargetHelp =>
+      'फ़ॉर्म और वेबसाइट की अपलोड सीमा के लिए काम का। आकार जितना छोटा, टेक्स्ट और फ़ोटो उतने कम साफ़।';
+
+  @override
+  String get compressTargetOther => 'दूसरा आकार';
+
+  @override
+  String get compressUnitKb => 'KB';
+
+  @override
+  String get compressUnitMb => 'MB';
+
+  @override
+  String get compressTargetTooSmall => 'कम से कम 10 KB डालें।';
+
+  @override
+  String get compressTargetTooLarge => 'ज़्यादा से ज़्यादा 100 MB डालें।';
+
+  @override
+  String get compressPhotoNote => 'फ़ोटो JPEG के रूप में सेव होती हैं।';
+
+  @override
+  String compressRunSize(String target) {
+    return '$target से कम करें';
+  }
+
+  @override
+  String compressSizeDone(String from, String to, String target) {
+    return '$from → $to ($target से कम)';
+  }
+
+  @override
+  String compressAlreadyUnder(String size, String target) {
+    return 'पहले से $size है, $target से कम। कुछ करने की ज़रूरत नहीं।';
+  }
+
+  @override
+  String compressSizeNotReached(String target, String size) {
+    return '$target से कम नहीं हो पाया। सबसे छोटा संभव: $size (सेव किया गया)।';
+  }
 }

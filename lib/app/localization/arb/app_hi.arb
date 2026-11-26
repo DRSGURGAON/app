@@ -412,8 +412,8 @@
   "toolMergeDesc": "दो या ज़्यादा PDF को एक में जोड़ें",
   "toolSplit": "PDF अलग करें",
   "toolSplitDesc": "पेज निकालें, या हर पेज अलग सेव करें",
-  "toolCompress": "PDF छोटा करें",
-  "toolCompressDesc": "फ़ाइल का आकार घटाएँ — एक या कई PDF एक साथ",
+  "toolCompress": "PDF और फ़ोटो छोटा करें",
+  "toolCompressDesc": "फ़ाइल का आकार घटाएँ, या 100 KB जैसे किसी आकार से कम करें",
   "premiumBadge": "प्रीमियम",
   "toolsPremiumNote": "टेक्स्ट बदलना, जोड़ना, अलग करना, छोटा करना और 'लिखें और साइन करें' प्रीमियम का हिस्सा हैं। पेज संपादित करना और इमेज से PDF मुफ़्त हैं।",
   "toolsPrivacyNote": "सब कुछ इसी फ़ोन पर होता है। परिणाम नए एन्क्रिप्टेड दस्तावेज़ के रूप में सेव होते हैं।",
@@ -755,8 +755,8 @@
       }
     }
   },
-  "premiumPdfTools": "PDF जोड़ें, अलग करें और छोटा करें",
-  "premiumPdfToolsDesc": "फ़ाइलें जोड़ें, पेज निकालें और PDF छोटे करें — सब इसी फ़ोन पर।",
+  "premiumPdfTools": "जोड़ें, अलग करें और छोटा करें",
+  "premiumPdfToolsDesc": "फ़ाइलें जोड़ें, पेज अलग करें, और PDF या फ़ोटो को 100 KB जैसे आकार तक छोटा करें, सब इसी फ़ोन पर।",
   "premiumOcrSearch": "दस्तावेज़ों के अंदर खोजें",
   "premiumOcrSearchDesc": "पहचाना गया टेक्स्ट सहेजें ताकि खोज दस्तावेज़ों के अंदर के शब्द भी ढूँढ सके।",
   "premiumReminders": "असीमित और अपने-आप रिमाइंडर",
@@ -1037,5 +1037,20 @@
   "autoBackupFix": "ठीक करें",
   "autoBackupNeedsPremium": "Premium खत्म हो गया है, इसलिए अपने-आप बैकअप रुके हुए हैं। आपकी मौजूदा बैकअप फ़ाइल नहीं बदली।",
   "premiumAutoBackup": "अपने-आप बैकअप",
-  "premiumAutoBackupDesc": "एन्क्रिप्टेड बैकअप आपके लिए Google Drive या आपकी चुनी किसी जगह पर सेव होता है"
+  "premiumAutoBackupDesc": "एन्क्रिप्टेड बैकअप आपके लिए Google Drive या आपकी चुनी किसी जगह पर सेव होता है",
+  "pickPdfsOrPhotos": "PDF या फ़ोटो चुनें",
+  "compressModeLevel": "क्वालिटी",
+  "compressModeSize": "आकार से कम",
+  "compressTargetTitle": "हर फ़ाइल को इससे छोटा करें",
+  "compressTargetHelp": "फ़ॉर्म और वेबसाइट की अपलोड सीमा के लिए काम का। आकार जितना छोटा, टेक्स्ट और फ़ोटो उतने कम साफ़।",
+  "compressTargetOther": "दूसरा आकार",
+  "compressUnitKb": "KB",
+  "compressUnitMb": "MB",
+  "compressTargetTooSmall": "कम से कम 10 KB डालें।",
+  "compressTargetTooLarge": "ज़्यादा से ज़्यादा 100 MB डालें।",
+  "compressPhotoNote": "फ़ोटो JPEG के रूप में सेव होती हैं।",
+  "compressRunSize": "{target} से कम करें",
+  "compressSizeDone": "{from} → {to} ({target} से कम)",
+  "compressAlreadyUnder": "पहले से {size} है, {target} से कम। कुछ करने की ज़रूरत नहीं।",
+  "compressSizeNotReached": "{target} से कम नहीं हो पाया। सबसे छोटा संभव: {size} (सेव किया गया)।"
 }
