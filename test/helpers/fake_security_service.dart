@@ -417,6 +417,25 @@ class FakeSecurityService implements SecurityService {
     return page;
   }
 
+  /// In-app camera captures handed to native (paths), in order.
+  final List<List<String>> capturedImports = [];
+
+  @override
+  Future<List<ScannedPage>> importCapturedPhotos(List<String> paths) async {
+    _requireUnlocked();
+    capturedImports.add(List.of(paths));
+    final pages = [
+      for (var i = 0; i < paths.length; i++)
+        ScannedPage(
+          path: '/cache/docsafe-photos/cam/c${capturedImports.length}_$i.jpg',
+          width: 3000,
+          height: 4000,
+        ),
+    ];
+    pendingScanPages.addAll(pages.map((p) => p.path));
+    return pages;
+  }
+
   @override
   Future<List<ImportedFile>> saveScan(
     List<ScanPageSpec> pages,

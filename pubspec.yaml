@@ -1,7 +1,7 @@
 name: docsafe
 description: "DocSafe – privacy-first encrypted document vault for Android."
 publish_to: 'none'
-version: 1.0.2+3
+version: 1.0.3+4
 
 environment:
   sdk: ^3.13.7
@@ -24,6 +24,7 @@ dependencies:
   pdfium_dart: ^0.4.1
   ffi: ^2.2.0
   intl: ^0.20.3
+  camera: ^0.12.2
 
 dev_dependencies:
   flutter_test:

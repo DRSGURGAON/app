@@ -8,6 +8,7 @@ import '../../app/localization/gen/app_localizations.dart';
 import '../../app/widgets/dialogs.dart';
 import '../../app/widgets/states.dart';
 import '../../core/security/security_failure.dart';
+import 'camera_capture_screen.dart';
 import 'scan_controller.dart';
 import 'scan_save_screen.dart';
 
@@ -56,7 +57,13 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
       _scannerFailed = false;
     });
     try {
-      final added = await ref.read(scanControllerProvider.notifier).add(source);
+      final ctl = ref.read(scanControllerProvider.notifier);
+      final bool added;
+      if (source == PageSource.camera) {
+        added = await _fromCamera(ctl);
+      } else {
+        added = await ctl.add(source);
+      }
       if (!mounted) return;
       setState(() => _started = true);
       // Cancelling the very first scan leaves without creating anything.
@@ -75,6 +82,20 @@ class _ScanReviewScreenState extends ConsumerState<ScanReviewScreen> {
         });
       }
     }
+  }
+
+  /// The in-app camera; the phone's camera app only if it can't be used.
+  Future<bool> _fromCamera(ScanController ctl) async {
+    final remaining =
+        scanPageLimit - ref.read(scanControllerProvider).pages.length;
+    if (remaining <= 0) return false;
+    final outcome = await ref.read(cameraLauncherProvider)(context, remaining);
+    if (!mounted) return false;
+    return switch (outcome) {
+      CameraCaptured(:final paths) => ctl.addCaptured(paths),
+      CameraUseSystem() => ctl.add(PageSource.camera),
+      CameraCancelled() => Future.value(false),
+    };
   }
 
   Future<void> _confirmDiscard() async {

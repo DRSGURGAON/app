@@ -54,7 +54,7 @@ chunk_i = AES-256-GCM(DEK, nonce = 0^32 || i (u64), aad = header || i (u64) || f
 - Preview: decrypted to `cacheDir/vault_tmp/<random>.<ext>`, deleted when the viewer closes,
   wiped on lock and on every start. Deletion overwrites with zeros first, **but on flash storage
   this is best effort only** (wear-levelling and the filesystem may retain old blocks).
-- No `MANAGE_EXTERNAL_STORAGE`, no storage permissions, no camera permission, INTERNET removed
+- No `MANAGE_EXTERNAL_STORAGE`, no storage permissions, INTERNET removed. CAMERA only for the in-app camera (asked on first use); the camera plugin's RECORD_AUDIO and WRITE_EXTERNAL_STORAGE are removed from the manifest
   from release builds.
 - `allowBackup=false` and data-extraction rules exclude everything from cloud backup and device transfer.
 
@@ -174,11 +174,19 @@ suggestions/autocorrect so IMEs are not taught document names.
 
 - **Gallery:** the Android photo picker (`PickMultipleVisualMedia`, images only, up to 50). No
   READ_MEDIA_IMAGES / storage permission; DocSafe gets read access to the chosen photos only.
-- **Camera:** the phone's own camera app via `ACTION_IMAGE_CAPTURE`. DocSafe declares no CAMERA
-  permission. The camera app writes one file into `cache/docsafe-photos/<random>/` through a
-  non-exported `FileProvider` (`${applicationId}.photos`, only that folder) with a one-off
-  write grant. Some camera apps also save their own copy in the gallery (stated in the app and
-  the privacy policy).
+- **Camera (in-app):** "Take photo" uses the app's own camera screen (Flutter `camera` plugin,
+  CameraX) so the app never goes to the background: with the phone's camera app Android could end
+  the app to free memory, which locks the vault (PIN again) and loses the photo. CAMERA permission
+  is asked on first use; audio and storage permissions of the plugin are removed. Each photo is
+  saved by the plugin as `cache/CAP<random>.jpg`; on "Done" native `importCapturedPhotos` accepts
+  only such files directly in the cache folder, prepares them as pages and wipes the originals.
+  Leftovers are wiped on discard, lock, erase and next start (`ScanStore.sweep`). Nothing is
+  saved to the gallery.
+- **Camera (fallback):** if the in-app camera can't be used (permission refused, no camera, error),
+  the user may choose the phone's camera app via `ACTION_IMAGE_CAPTURE`: it writes one file into
+  `cache/docsafe-photos/<random>/` through a non-exported `FileProvider` (`${applicationId}.photos`,
+  only that folder) with a one-off write grant. Some camera apps also save their own copy in the
+  gallery (stated in the app and the privacy policy).
 - **Preparation** (`PhotoPages`): decoded with Android's decoders, EXIF orientation applied,
   HEIC/WebP converted, longest side capped at 4000 px, transparency on white, written as a JPEG
   page next to the capture; the capture is wiped immediately. Pages then follow the scanner path
@@ -194,6 +202,7 @@ suggestions/autocorrect so IMEs are not taught document names.
 | 2 | Partial decryption | `cache/vault_tmp/<random>.part` | During decrypt | On failure immediately; next start | No |
 | 3 | Scanner pages | ML Kit output directory under `cache/` (copies of non-file results: `cache/docscan_pages/`) | Scan returns | Save confirmed, discard, page delete, lock/auto-lock, erase, next start | No |
 | 4 | Other scanner output in the same directory | as 3 | ML Kit | When the scan session ends, lock, erase, next start (recorded scan directories) | No |
+| 4b | In-app camera photos | `cache/CAP<random>.jpg` | Shutter pressed | "Done" (prepared, then wiped), discard, lock, erase, next start | No |
 | 4a | Photos to PDF pages and camera capture | `cache/docsafe-photos/<random>/` (upright JPEG pages; the camera's original `capture.jpg` only until it is prepared) | Photo picker / camera returns | Capture: right after preparing (or on failure/cancel). Pages: as #3. Whole folder on lock, erase, next start | No |
 | 5 | Decoded images in memory | Flutter image cache | Viewer / thumbnails | Viewer close (cache cleared) | — |
 | 6 | Rendered PDF pages in memory | PDFium (pdfrx) | Viewer | Viewer close | — |

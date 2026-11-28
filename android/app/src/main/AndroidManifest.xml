@@ -11,6 +11,16 @@
     <!-- Flutter adds INTERNET for debug builds only (hot reload). DocSafe makes no network calls. -->
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
 
+    <!-- In-app camera for "Take photo" (Photos to PDF): photos are taken inside
+         the app, so it never goes to the background (which could end the session
+         and ask for the PIN again). Asked for only when the camera is first used.
+         The camera plugin also declares audio and storage permissions; neither is
+         used, so they are removed. -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
+    <uses-feature android:name="android.hardware.camera.any" android:required="false" tools:replace="android:required" />
+
     <!-- A library activity asks for portrait orientation, which Play turns into a required
          "portrait screen" feature and hides the app from landscape-only devices. The app
          works in any orientation, so the feature is optional. -->

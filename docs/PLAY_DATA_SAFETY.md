@@ -22,8 +22,9 @@ feature changes.
 - **Google Play services document scanner.** The scanner UI runs in Google Play services
   on the device and returns images to DocSafe; DocSafe sends nothing. Google's own data
   handling is covered by Google's policy.
-- **Photos to PDF.** Photos come from the Android photo picker or the phone's camera app
-  (no CAMERA or storage permission; the camera writes one file into DocSafe's private cache
+- **Photos to PDF.** Photos come from the Android photo picker or the app's own camera screen
+  (CAMERA permission, used only while that screen is open; photos stay in the app's private cache
+  and are encrypted, never uploaded). Fallback: the phone's camera app (it writes one file into DocSafe's private cache
   through a non-exported FileProvider). They are processed on the device and encrypted;
   nothing is sent anywhere.
 - **Backups.** The user saves the encrypted backup file through the Android system dialog
@@ -40,7 +41,8 @@ feature changes.
 | POST_NOTIFICATIONS | Reminder notifications (generic text, no document names) |
 | RECEIVE_BOOT_COMPLETED | Re-arm reminders after a restart |
 | com.android.vending.BILLING | DocSafe Premium subscription |
+| CAMERA | In-app camera for "Take photo" (asked on first use; photos stay in the app, encrypted) |
 | ACCESS_NETWORK_STATE | Added by Google libraries; DocSafe has no internet access |
 
-No camera, storage, location, contacts, phone, SMS, exact-alarm, accessibility-service or
+No storage, microphone, location, contacts, phone, SMS, exact-alarm, accessibility-service or
 MANAGE_EXTERNAL_STORAGE permission (CI fails if any appears).

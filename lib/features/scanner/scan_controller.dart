@@ -69,6 +69,28 @@ class ScanController extends Notifier<ScanState> {
 
   SecurityService get _service => ref.read(securityServiceProvider);
 
+  /// Appends photos taken with the in-app camera (CAP*.jpg in the app cache):
+  /// native turns them into upright pages and wipes the originals.
+  Future<bool> addCaptured(List<String> paths) async {
+    if (paths.isEmpty) return false;
+    state = ScanState(pages: state.pages, scanning: true);
+    try {
+      final pages = await _service.importCapturedPhotos(paths);
+      if (!ref.mounted) return false;
+      state = ScanState(
+        pages: [
+          ...state.pages,
+          for (final p in pages)
+            ScanPageState(path: p.path, width: p.width, height: p.height),
+        ],
+      );
+      return pages.isNotEmpty;
+    } catch (_) {
+      if (ref.mounted) state = ScanState(pages: state.pages);
+      rethrow;
+    }
+  }
+
   /// Opens the ML Kit scanner and appends its pages. Returns false if the user
   /// cancelled. Throws [SecurityFailure] (e.g. scanner unavailable).
   Future<bool> scan() => add(PageSource.scanner);

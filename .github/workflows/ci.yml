@@ -81,7 +81,7 @@ jobs:
           flutter build apk --release
           AAPT2=$(ls "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
           "$AAPT2" dump permissions build/app/outputs/flutter-apk/app-release.apk | tee release-permissions.txt
-          if grep -E "permission: android.permission.(CAMERA|RECORD_AUDIO|INTERNET|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|READ_MEDIA_[A-Z_]+|ACCESS_(FINE|COARSE)_LOCATION|READ_CONTACTS|READ_PHONE_STATE)" release-permissions.txt; then
+          if grep -E "permission: android.permission.(RECORD_AUDIO|INTERNET|READ_EXTERNAL_STORAGE|WRITE_EXTERNAL_STORAGE|MANAGE_EXTERNAL_STORAGE|READ_MEDIA_[A-Z_]+|ACCESS_(FINE|COARSE)_LOCATION|READ_CONTACTS|READ_PHONE_STATE)" release-permissions.txt; then
             echo "::error::Unexpected permission in the release APK"
             exit 1
           fi

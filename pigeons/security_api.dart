@@ -398,6 +398,12 @@ abstract class SecurityHostApi {
   @async
   ScannedPage? takePhoto();
 
+  /// In-app camera: turns photos the app's own camera saved in the app cache
+  /// (files named CAP*.jpg directly in the cache folder) into upright pages
+  /// like [takePhoto], and wipes the originals. Errors: INVALID_INPUT.
+  @async
+  List<ScannedPage> importCapturedPhotos(List<String> paths);
+
   /// Encrypts the pages into the vault without writing any plaintext file:
   /// one PDF (pages embedded unchanged, rotation as page metadata) or one
   /// JPEG document per page. Source pages are NOT deleted here, so a failed

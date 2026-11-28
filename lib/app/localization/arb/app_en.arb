@@ -1246,5 +1246,28 @@
       }
     }
   },
-  "scanFallbackHint": "You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF."
+  "scanFallbackHint": "You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF.",
+  "cameraShutter": "Take photo",
+  "cameraDone": "Done",
+  "cameraFlash": "Flash",
+  "cameraCount": "{count, plural, =0{No photos yet} =1{1 photo} other{{count} photos}}",
+  "@cameraCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cameraDiscardTitle": "{count, plural, =1{Discard 1 photo?} other{Discard {count} photos?}}",
+  "@cameraDiscardTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cameraDiscardBody": "The photos you took will be deleted.",
+  "cameraDenied": "Camera access is off. Allow it in the phone's Settings → Apps → Document Scanner Pro → Permissions, or use the phone's camera app.",
+  "cameraUnavailable": "The camera couldn't be opened. You can use the phone's camera app instead.",
+  "cameraUseSystem": "Use phone's camera app"
 }

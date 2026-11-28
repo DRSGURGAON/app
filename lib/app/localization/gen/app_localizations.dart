@@ -3805,6 +3805,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF.'**
   String get scanFallbackHint;
+
+  /// No description provided for @cameraShutter.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get cameraShutter;
+
+  /// No description provided for @cameraDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get cameraDone;
+
+  /// No description provided for @cameraFlash.
+  ///
+  /// In en, this message translates to:
+  /// **'Flash'**
+  String get cameraFlash;
+
+  /// No description provided for @cameraCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No photos yet} =1{1 photo} other{{count} photos}}'**
+  String cameraCount(int count);
+
+  /// No description provided for @cameraDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Discard 1 photo?} other{Discard {count} photos?}}'**
+  String cameraDiscardTitle(int count);
+
+  /// No description provided for @cameraDiscardBody.
+  ///
+  /// In en, this message translates to:
+  /// **'The photos you took will be deleted.'**
+  String get cameraDiscardBody;
+
+  /// No description provided for @cameraDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera access is off. Allow it in the phone\'s Settings → Apps → Document Scanner Pro → Permissions, or use the phone\'s camera app.'**
+  String get cameraDenied;
+
+  /// No description provided for @cameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera couldn\'t be opened. You can use the phone\'s camera app instead.'**
+  String get cameraUnavailable;
+
+  /// No description provided for @cameraUseSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'Use phone\'s camera app'**
+  String get cameraUseSystem;
 }
 
 class _AppLocalizationsDelegate

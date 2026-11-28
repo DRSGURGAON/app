@@ -1,9 +1,13 @@
+import 'dart:async';
+
 // Photos to PDF: gallery and camera pages share the scanner's review / save
 // pipeline (native side faked).
 import 'package:docsafe/app/localization/error_messages.dart';
 import 'package:docsafe/app/localization/gen/app_localizations_hi.dart';
 import 'package:docsafe/core/security/security_failure.dart';
 import 'package:docsafe/core/security/security_service.dart';
+import 'package:camera/camera.dart';
+import 'package:docsafe/features/scanner/camera_capture_screen.dart';
 import 'package:docsafe/features/scanner/scan_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -115,6 +119,61 @@ void main() {
     await settle(tester);
     expect(fake.pendingScanPages, isEmpty);
     expect(fake.lastSavedScan, isNull);
+    await app.dispose();
+  });
+
+  testWidgets('in-app camera: several photos become pages, app stays open', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    int? askedMax;
+    final app = await pumpApp(
+      tester,
+      fake,
+      camera: (context, max) async {
+        askedMax = max;
+        return const CameraCaptured([
+          '/data/user/0/in.docsafe.app/cache/CAP1.jpg',
+          '/data/user/0/in.docsafe.app/cache/CAP2.jpg',
+        ]);
+      },
+    );
+    fake.nextPhotos = photos(1);
+    await openPhotosFromHome(tester);
+    await addFrom(tester, en.photosTakePhoto);
+    expect(askedMax, scanPageLimit - 1);
+    expect(fake.capturedImports.single, hasLength(2));
+    expect(find.text(en.scanPageCount(3)), findsOneWidget);
+    // The phone's camera app was not used.
+    expect(fake.nextCameraPhoto, isNull);
+    await app.dispose();
+  });
+
+  testWidgets('camera screen without a usable camera offers the camera app', (
+    tester,
+  ) async {
+    final fake = await unlockedFake();
+    final app = await pumpApp(tester, fake);
+    final nav = tester.state<NavigatorState>(find.byType(Navigator).first);
+    CameraOutcome? result;
+    unawaited(
+      nav
+          .push<CameraOutcome>(
+            MaterialPageRoute(
+              builder: (_) => CameraCaptureScreen(
+                maxPhotos: 5,
+                findCameras: () async =>
+                    throw CameraException('CameraAccessDenied', null),
+              ),
+            ),
+          )
+          .then((r) => result = r),
+    );
+    await settle(tester);
+    expect(find.text(en.cameraDenied), findsOneWidget);
+    await tester.tap(find.byKey(const Key('camera-use-system')));
+    await settle(tester);
+    expect(result, isA<CameraUseSystem>());
     await app.dispose();
   });
 

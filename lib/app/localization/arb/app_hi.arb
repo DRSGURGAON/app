@@ -1053,5 +1053,14 @@
   "compressSizeDone": "{from} → {to} ({target} से कम)",
   "compressAlreadyUnder": "पहले से {size} है, {target} से कम। कुछ करने की ज़रूरत नहीं।",
   "compressSizeNotReached": "{target} से कम नहीं हो पाया। सबसे छोटा संभव: {size} (सेव किया गया)।",
-  "scanFallbackHint": "फिर भी आप कैमरे से स्कैन कर सकते हैं: फ़ोटो लें या गैलरी से चुनें, वे एक PDF में सेव हो जाएँगी।"
+  "scanFallbackHint": "फिर भी आप कैमरे से स्कैन कर सकते हैं: फ़ोटो लें या गैलरी से चुनें, वे एक PDF में सेव हो जाएँगी।",
+  "cameraShutter": "फ़ोटो लें",
+  "cameraDone": "हो गया",
+  "cameraFlash": "फ़्लैश",
+  "cameraCount": "{count, plural, =0{अभी कोई फ़ोटो नहीं} =1{1 फ़ोटो} other{{count} फ़ोटो}}",
+  "cameraDiscardTitle": "{count, plural, =1{1 फ़ोटो हटाएँ?} other{{count} फ़ोटो हटाएँ?}}",
+  "cameraDiscardBody": "आपकी ली गई फ़ोटो हटा दी जाएँगी।",
+  "cameraDenied": "कैमरे की अनुमति बंद है। फ़ोन की Settings → Apps → Document Scanner Pro → Permissions में चालू करें, या फ़ोन का कैमरा ऐप इस्तेमाल करें।",
+  "cameraUnavailable": "कैमरा नहीं खुल पाया। आप फ़ोन का कैमरा ऐप इस्तेमाल कर सकते हैं।",
+  "cameraUseSystem": "फ़ोन का कैमरा ऐप इस्तेमाल करें"
 }

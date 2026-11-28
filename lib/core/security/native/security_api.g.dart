@@ -1951,6 +1951,30 @@ class SecurityHostApi {
     return pigeonVar_replyValue as ScannedPage?;
   }
 
+  /// In-app camera: turns photos the app's own camera saved in the app cache
+  /// (files named CAP*.jpg directly in the cache folder) into upright pages
+  /// like [takePhoto], and wipes the originals. Errors: INVALID_INPUT.
+  Future<List<ScannedPage>> importCapturedPhotos(List<String> paths) async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.docsafe.SecurityHostApi.importCapturedPhotos$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(
+      <Object?>[paths],
+    );
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: false,
+    );
+    return (pigeonVar_replyValue! as List<Object?>).cast<ScannedPage>();
+  }
+
   /// Encrypts the pages into the vault without writing any plaintext file:
   /// one PDF (pages embedded unchanged, rotation as page metadata) or one
   /// JPEG document per page. Source pages are NOT deleted here, so a failed

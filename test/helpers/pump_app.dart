@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:docsafe/features/scanner/camera_capture_screen.dart';
 import 'package:docsafe/app/app.dart';
 import 'package:docsafe/app/localization/locale_controller.dart';
 import 'package:docsafe/core/billing/billing_service.dart';
@@ -63,6 +64,7 @@ Future<TestApp> pumpApp(
   Locale deviceLocale = const Locale('en', 'US'),
   BillingService? billing,
   List<Override> overrides = const [],
+  CameraLauncher? camera,
 }) async {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
   tester.view.physicalSize = size;
@@ -95,6 +97,11 @@ Future<TestApp> pumpApp(
         overlayRenderer ??
             (marks, size) async =>
                 Uint8List.fromList([137, 80, 78, 71, marks.length]),
+      ),
+      // No camera on the host: the in-app camera says "use the phone's
+      // camera app", so the fake's takePhoto() runs unless a test overrides.
+      cameraLauncherProvider.overrideWithValue(
+        camera ?? (context, max) async => const CameraUseSystem(),
       ),
       ...overrides,
       databaseOpenerProvider.overrideWithValue((path, key) {

@@ -317,6 +317,18 @@ utility PDF, one scanned PDF.
 | CS5 | A document already smaller than the target | "Already … under …", nothing new made |
 | CS6 | 30-page PDF → 1 MB on a low-end phone | Finishes (progress shown), no crash / out-of-memory |
 
+## 21. In-app camera ("Take photo")
+
+| # | Step | Expected |
+|---|---|---|
+| CM1 | Photos to PDF → Take photo (first time) | Android asks for camera permission; after Allow the camera opens inside the app |
+| CM2 | Take 3 photos → Done | 3 pages in review; **no PIN asked**; nothing new in the phone's gallery |
+| CM3 | Flash button cycles off / auto / on | Flash behaves accordingly |
+| CM4 | Take 2 photos → ✕ | "Discard 2 photos?" → Discard → back to review, no pages added |
+| CM5 | Deny camera permission | Message + "Use phone's camera app" works |
+| CM6 | Press Home while the camera is open, come back within the auto-lock time | Camera resumes, photos so far kept |
+| CM7 | Low-end phone: 10 photos in a row | No crash; all 10 pages |
+
 ## Results
 
 | Area | Device / Android / Play services | Result | Notes |

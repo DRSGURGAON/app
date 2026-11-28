@@ -2221,4 +2221,50 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get scanFallbackHint =>
       'फिर भी आप कैमरे से स्कैन कर सकते हैं: फ़ोटो लें या गैलरी से चुनें, वे एक PDF में सेव हो जाएँगी।';
+
+  @override
+  String get cameraShutter => 'फ़ोटो लें';
+
+  @override
+  String get cameraDone => 'हो गया';
+
+  @override
+  String get cameraFlash => 'फ़्लैश';
+
+  @override
+  String cameraCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count फ़ोटो',
+      one: '1 फ़ोटो',
+      zero: 'अभी कोई फ़ोटो नहीं',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cameraDiscardTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count फ़ोटो हटाएँ?',
+      one: '1 फ़ोटो हटाएँ?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cameraDiscardBody => 'आपकी ली गई फ़ोटो हटा दी जाएँगी।';
+
+  @override
+  String get cameraDenied =>
+      'कैमरे की अनुमति बंद है। फ़ोन की Settings → Apps → Document Scanner Pro → Permissions में चालू करें, या फ़ोन का कैमरा ऐप इस्तेमाल करें।';
+
+  @override
+  String get cameraUnavailable =>
+      'कैमरा नहीं खुल पाया। आप फ़ोन का कैमरा ऐप इस्तेमाल कर सकते हैं।';
+
+  @override
+  String get cameraUseSystem => 'फ़ोन का कैमरा ऐप इस्तेमाल करें';
 }

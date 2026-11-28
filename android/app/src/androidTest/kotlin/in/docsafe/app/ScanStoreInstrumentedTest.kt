@@ -184,4 +184,28 @@ class ScanStoreInstrumentedTest {
         assertTrue(afterRestart.sweep() >= 1)
         assertFalse(page.exists())
     }
+
+    @Test
+    fun inAppCameraCapturesAreAcceptedOnlyFromTheCacheRootAndSwept() {
+        val capture = File(context.cacheDir, "CAP${System.nanoTime()}.jpg").apply { writeBytes(byteArrayOf(1, 2, 3)) }
+        val nested = File(pagesDir, "CAP1.jpg").apply { writeBytes(byteArrayOf(1)) }
+        val other = File(context.cacheDir, "notes-$stamp.jpg").apply { writeBytes(byteArrayOf(1)) }
+        try {
+            assertEquals(capture.canonicalFile, ScanStore.cameraCapture(context.cacheDir, capture.path))
+            for (bad in listOf(nested.path, other.path, File(context.filesDir, "CAP1.jpg").path, "${context.cacheDir}/../CAP1.jpg")) {
+                try {
+                    ScanStore.cameraCapture(context.cacheDir, bad)
+                    fail("accepted $bad")
+                } catch (_: InvalidInputException) {
+                }
+            }
+            scanStore().sweep()
+            assertFalse("capture wiped on sweep", capture.exists())
+            assertTrue("other cache files untouched", other.exists())
+        } finally {
+            capture.delete()
+            nested.delete()
+            other.delete()
+        }
+    }
 }

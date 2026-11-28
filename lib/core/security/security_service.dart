@@ -67,6 +67,7 @@ abstract interface class SecurityService {
   });
   Future<List<ScannedPage>?> pickPhotos(int limit);
   Future<ScannedPage?> takePhoto();
+  Future<List<ScannedPage>> importCapturedPhotos(List<String> paths);
   Future<AutoBackupStatus> autoBackupStatus();
   Future<bool> setUpAutoBackup(Uint8List password);
   Future<BackupSummary> runAutoBackup(Uint8List metadata, List<String> fileIds);
@@ -235,6 +236,10 @@ class PigeonSecurityService implements SecurityService {
 
   @override
   Future<ScannedPage?> takePhoto() => _guard(_api.takePhoto);
+
+  @override
+  Future<List<ScannedPage>> importCapturedPhotos(List<String> paths) =>
+      _guard(() => _api.importCapturedPhotos(paths));
 
   @override
   Future<AutoBackupStatus> autoBackupStatus() => _guard(_api.autoBackupStatus);

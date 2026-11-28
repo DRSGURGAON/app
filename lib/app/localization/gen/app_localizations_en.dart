@@ -2253,4 +2253,50 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get scanFallbackHint =>
       'You can still scan with your camera: take photos or choose them from the gallery, and they are saved as one PDF.';
+
+  @override
+  String get cameraShutter => 'Take photo';
+
+  @override
+  String get cameraDone => 'Done';
+
+  @override
+  String get cameraFlash => 'Flash';
+
+  @override
+  String cameraCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count photos',
+      one: '1 photo',
+      zero: 'No photos yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String cameraDiscardTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Discard $count photos?',
+      one: 'Discard 1 photo?',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get cameraDiscardBody => 'The photos you took will be deleted.';
+
+  @override
+  String get cameraDenied =>
+      'Camera access is off. Allow it in the phone\'s Settings → Apps → Document Scanner Pro → Permissions, or use the phone\'s camera app.';
+
+  @override
+  String get cameraUnavailable =>
+      'The camera couldn\'t be opened. You can use the phone\'s camera app instead.';
+
+  @override
+  String get cameraUseSystem => 'Use phone\'s camera app';
 }

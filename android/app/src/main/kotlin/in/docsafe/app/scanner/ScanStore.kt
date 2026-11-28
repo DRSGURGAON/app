@@ -150,6 +150,8 @@ class ScanStore(
         }?.forEach { dir ->
             dir.walkBottomUp().forEach { f -> if (f.isFile) { if (SecureFiles.bestEffortWipe(f)) n++ } else f.delete() }
         }
+        // In-app camera captures not yet turned into pages (CAP*.jpg).
+        cacheDir.listFiles()?.filter { isCameraCapture(it) }?.forEach { if (SecureFiles.bestEffortWipe(it)) n++ }
         n
     }
 
@@ -188,8 +190,25 @@ class ScanStore(
     }
 
     companion object {
+        /** Photos taken by the in-app camera are saved by it as cache/CAP<random>.jpg. */
+        fun isCameraCapture(f: File): Boolean =
+            f.isFile && f.name.startsWith("CAP") && f.name.endsWith(".jpg") &&
+                f.parentFile?.name == "cache"
+
+        /** [path] if it is such a capture directly in [cacheDir], else INVALID_INPUT. */
+        fun cameraCapture(cacheDir: File, path: String): File {
+            val f = File(path).canonicalFile
+            if (f.parentFile != cacheDir.canonicalFile || !f.name.startsWith("CAP") ||
+                !f.name.endsWith(".jpg") || !f.isFile
+            ) {
+                throw InvalidInputException("Not a camera capture")
+            }
+            return f
+        }
+
         const val JPEG_QUALITY = 92
         private const val DIR_PREFIX = "D "
         private const val VAULT_TMP_DIR = "vault_tmp"
     }
+
 }

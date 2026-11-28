@@ -1513,6 +1513,12 @@ interface SecurityHostApi {
    */
   suspend fun takePhoto(): ScannedPage?
   /**
+   * In-app camera: turns photos the app's own camera saved in the app cache
+   * (files named CAP*.jpg directly in the cache folder) into upright pages
+   * like [takePhoto], and wipes the originals. Errors: INVALID_INPUT.
+   */
+  suspend fun importCapturedPhotos(paths: List<String>): List<ScannedPage>
+  /**
    * Encrypts the pages into the vault without writing any plaintext file:
    * one PDF (pages embedded unchanged, rotation as page metadata) or one
    * JPEG document per page. Source pages are NOT deleted here, so a failed
@@ -2144,6 +2150,25 @@ interface SecurityHostApi {
             CoroutineScope(Dispatchers.Main).launch {
               val wrapped: List<Any?> = try {
                 listOf(api.takePhoto())
+              } catch (exception: Throwable) {
+                SecurityApiPigeonUtils.wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.docsafe.SecurityHostApi.importCapturedPhotos$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val pathsArg = args[0] as List<String>
+            CoroutineScope(Dispatchers.Main).launch {
+              val wrapped: List<Any?> = try {
+                listOf(api.importCapturedPhotos(pathsArg))
               } catch (exception: Throwable) {
                 SecurityApiPigeonUtils.wrapError(exception)
               }

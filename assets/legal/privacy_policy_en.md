@@ -23,7 +23,7 @@ All of this is stored only on your phone. Each document is encrypted with its ow
 ## Services provided by Google
 
 - **Document scanner:** the camera screen is provided by Google Play services on your phone. The pages are processed on the phone and handed to Document Scanner Pro, which encrypts them. Google Play services is covered by Google's privacy policy.
-- **Photos to PDF:** photos you pick in Android's photo picker, or take with your phone's camera app, are copied into Document Scanner Pro and encrypted when you save. Document Scanner Pro has no camera or photo permission. The originals stay in your gallery, and some camera apps keep their own copy.
+- **Photos to PDF:** photos you pick in Android's photo picker are copied into Document Scanner Pro and encrypted when you save; the originals stay in your gallery. Photos you take with "Take photo" use Document Scanner Pro's own camera screen: the camera permission is asked the first time and used only while that screen is open. These photos are not saved to your gallery; they stay inside the app and are encrypted when you save. If you choose your phone's camera app instead, some camera apps keep their own copy. Document Scanner Pro has no photo/storage or microphone permission.
 - **Text recognition (OCR):** runs inside Document Scanner Pro on your phone with a model included in the app. No image or text leaves the phone.
 - **Premium:** subscriptions are bought and managed through Google Play. Google processes the payment under Google's privacy policy. Document Scanner Pro only learns whether a valid subscription exists; it never sees your payment details.
 

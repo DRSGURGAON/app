@@ -350,6 +350,27 @@ class SecurityHostApiImpl(
         }
     }
 
+    override suspend fun importCapturedPhotos(paths: List<String>): List<ScannedPage> = guard {
+        io {
+            session.requireUnlocked()
+            val captures = paths.map { ScanStore.cameraCapture(appContext.cacheDir, it) }
+            val photos = PhotoPages(appContext.contentResolver, appContext.cacheDir)
+            val dir = photos.newBatchDir()
+            val files = mutableListOf<File>()
+            try {
+                captures.forEachIndexed { i, f -> files += photos.prepare(Uri.fromFile(f), dir, i) }
+                session.scanStore.register(files).map { ScannedPage(it.path, it.width.toLong(), it.height.toLong()) }
+            } catch (e: Exception) {
+                files.forEach { SecureFiles.bestEffortWipe(it) }
+                dir.delete()
+                throw e
+            } finally {
+                // The camera's full-size originals never stay: only the prepared pages do.
+                captures.forEach { SecureFiles.bestEffortWipe(it) }
+            }
+        }
+    }
+
     override suspend fun saveScan(pages: List<ScanPageSpec>, format: ScanSaveFormat): List<ImportedFile> = guard {
         io {
             session.requireUnlocked()
